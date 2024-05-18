@@ -1,0 +1,2 @@
+# Project:   CBUtilLibTests
+ObjectList = Main StrBufTest ListTest RWIntTest StrDicTest IntDicTest

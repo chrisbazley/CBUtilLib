@@ -1,0 +1,23 @@
+# Project:   CBUtilLibTests
+
+# Tools
+CC = cc
+Link = link
+
+# Toolflags:
+CCFlags =  -c -depend !Depend -IC: -throwback -fahi -apcs 3/32/fpe2/swst/fp/nofpr -memaccess -L22-S22-L41 -g -DUSE_CBDEBUG -DDEBUG_OUTPUT -DDEBUG_DUMP -DFORTIFY -o $@
+LinkFlags = -aif -d -c++ -o $@ C:o.stubs C:o.Fortify C:o.CBDebugLib ^.debug.CBUtilLib
+
+include MakeCommon
+
+Objects = $(addprefix o.,$(ObjectList))
+
+# Final targets:
+Tests: $(Objects)
+	$(Link) $(LinkFlags) $(Objects)
+
+# User-editable dependencies:
+.SUFFIXES: .o .c
+.c.o:; ${CC} $(CCFlags) $<
+
+# Dynamic dependencies:

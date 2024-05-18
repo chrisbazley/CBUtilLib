@@ -1,0 +1,6 @@
+# Project:   CBUtilLib
+LibName = CBUtil
+ObjectList = LinkedList FileRWInt ArgUtils TrigTable \
+             Strdup Strnicmp Stricmp StrInflate StringBuff StrTail CSV \
+             IntDict StrDict IntDictVIt StrDictVIt StringBuf2 \
+             StringBuf3

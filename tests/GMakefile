@@ -1,0 +1,34 @@
+# Project:   CBUtilLibTests
+
+# Tools
+CC = gcc
+Link = gcc
+# Make cannot understand rules which contain RISC OS path names such as /C:Macros.h as prerequisites, so strip them from the dynamic dependencies
+StripBadPre = sed -r 's@/[A-Za-z]+:[^ ]*@@g'
+Delete = delete
+
+# Toolflags:
+CCFlags = -c -IC: -mlibscl -mthrowback -Wall -Wextra -Wsign-conversion -pedantic -std=c99 -g -DUSE_CBDEBUG -DDEBUG_OUTPUT -DDEBUG_DUMP -DFORTIFY -MMD -MP -o $@
+LinkFlags = -L../debug -LC: -mlibscl -lCBDebug -lCBUtildbg -lFortify -o $@
+
+include MakeCommon
+
+# GNU Make doesn't apply suffix rules to make object files in subdirectories
+# if referenced by path (even if the directory name is in UnixEnv$make$sfix)
+# so use addsuffix not addprefix here
+Objects = $(addsuffix .o,$(ObjectList))
+
+# Final targets:
+Tests: $(Objects)
+	$(Link) $(LinkFlags) $(Objects)
+
+# User-editable dependencies:
+.SUFFIXES: .o .c
+.c.o:
+	${CC} $(CCFlags) -MF $*T.d $<
+	$(StripBadPre) < $*T.d >$*.d
+	$(Delete) d.$*T
+
+# These files are generated during compilation to track C header #includes.
+# It's not an error if they don't exist.
+-include $(addsuffix .d,$(ObjectList))
