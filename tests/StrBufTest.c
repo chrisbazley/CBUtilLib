@@ -262,6 +262,7 @@ static void test7(void)
 
 static void test8(void)
 {
+#ifdef FORTIFY
   /* Append fail recovery */
   StringBuffer buffer;
   bool success;
@@ -292,6 +293,7 @@ static void test8(void)
   assert(strcmp(s, "foobar") == 0);
 
   stringbuffer_destroy(&buffer);
+#endif
 }
 
 static void test9(void)
@@ -685,6 +687,7 @@ static void test20(void)
 
 static void test21(void)
 {
+#ifdef FORTIFY
   /* Append separated fail recovery */
   StringBuffer buffer;
   bool success;
@@ -716,6 +719,7 @@ static void test21(void)
   assert(strcmp(s, ".foo.bar") == 0);
 
   stringbuffer_destroy(&buffer);
+#endif
 }
 
 static void test22(void)
@@ -748,6 +752,7 @@ static void test22(void)
 
 static void test23(void)
 {
+#ifdef FORTIFY
   /* Append fail recovery */
   StringBuffer buffer;
   bool success;
@@ -778,6 +783,7 @@ static void test23(void)
   assert(strcmp(s, "foobar") == 0);
 
   stringbuffer_destroy(&buffer);
+#endif
 }
 
 void StringBuffer_tests(void)

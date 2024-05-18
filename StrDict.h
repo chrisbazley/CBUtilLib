@@ -29,6 +29,7 @@
                   strdict_contains was subsumed into strdict_find.
                   Added the strdict_find_specific function.
                   strdictviter_remove now returns the removed item's index.
+  CJB: 18-May-24: Corrected description of the return value of strdict_remove.
  */
 
 #ifndef StrDict_h
@@ -220,8 +221,9 @@ static inline bool strdict_remove(StrDict *const dict,
    /*
     * Remove an item with a given key from a string dictionary.
     * If the specified key is not unique then it is indeterminate which item
-    * with that key was removed.
-    * Returns: the former position of the removed item if successful.
+    * with that key was removed. Outputs the former position of the removed item
+    * if successful.
+    * Returns: true if the dictionary contained the key, otherwise false.
     */
 
 static inline void *strdict_remove_value(StrDict *const dict,

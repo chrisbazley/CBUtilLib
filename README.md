@@ -1,7 +1,7 @@
 # CBUtilLib
 (C) 2018 Christopher Bazley
 
-Release 9 (03 Dec 2023)
+Release 10 (18 May 2024)
 
 Introduction
 ------------
@@ -185,6 +185,12 @@ Release 8 (17 Nov 2023)
 
 Release 9 (03 Dec 2023)
 - Added missing source files for string buffers.
+
+Release 10 (18-May-24)
+- Corrected description of the return value of strdict_remove and a
+  test for the same.
+- Added #ifdefs to make the tests pass when built without Fortify.
+- Added new makefiles for use on Linux.
 
 Contact details
 ---------------

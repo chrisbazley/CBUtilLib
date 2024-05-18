@@ -72,7 +72,7 @@ static void test1(void)
 
     long int num = DUMMY;
     assert(fread_int32le(&num, f));
-    assert(ftell(f) == sizeof(uint));
+    assert(ftell(f) == sizeof(uint32_t));
     assert(!ferror(f));
     assert(!feof(f));
     assert(num == cases[i]);
@@ -112,6 +112,7 @@ static void test2(void)
 
 static void test3(void)
 {
+#ifdef FORTIFY
   /* Read fail */
   FILE *f = fopen(PATH, "wb");
   if (f == NULL) perror("Failed to open file");
@@ -138,10 +139,12 @@ static void test3(void)
 
   assert(!fclose(f));
   remove(PATH);
+#endif
 }
 
 static void test4(void)
 {
+#ifdef FORTIFY
   /* Write fail */
   FILE *f = fopen(PATH, "wb");
   if (f == NULL) perror("Failed to open file");
@@ -157,6 +160,7 @@ static void test4(void)
 
   if (fclose(f)) { perror("fclose failed"); }
   remove(PATH);
+#endif
 }
 
 static void test5(void)

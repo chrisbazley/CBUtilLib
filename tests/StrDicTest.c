@@ -1108,7 +1108,7 @@ static void test36(void)
     assert(strdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i);
 
     size_t rem_pos = MagicValue;
-    assert(strdict_remove(&dict, dup_key, &rem_pos) >= 0);
+    assert(strdict_remove(&dict, dup_key, &rem_pos));
     assert(rem_pos == find_pos);
 
     find_pos = MagicValue;
