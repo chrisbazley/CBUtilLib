@@ -36,11 +36,14 @@ to find the required header files. The dependency on CBDebugLib isn't very
 strong: it can be eliminated by modifying the make file so that the macro
 USE_CBDEBUG is no longer predefined.
 
-  Two make files are supplied:
+  Three make files are supplied:
 
-- 'Makefile' is intended for use with Acorn Make Utility (AMU) and the
-   Norcroft C compiler supplied with the Acorn C/C++ Development Suite.
-- 'GMakefile' is intended for use with GNU Make and the GNU C Compiler.
+- 'Makefile' is intended for use with GNU Make and the GNU C Compiler
+  on Linux.
+- 'NMakefile' is intended for use with Acorn Make Utility (AMU) and the
+  Norcroft C compiler supplied with the Acorn C/C++ Development Suite.
+- 'GMakefile' is intended for use with GNU Make and the GNU C Compiler
+  on RISC OS.
 
   These make files share some variable definitions (lists of objects to be
 built) by including a common make file.

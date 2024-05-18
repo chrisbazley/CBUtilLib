@@ -18,6 +18,7 @@
  */
 
 /* ISO library headers */
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
