@@ -1,7 +1,7 @@
 # CBUtilLib
 (C) 2018 Christopher Bazley
 
-Release 10 (18 May 2024)
+Release 11 (19 May 2024)
 
 Introduction
 ------------
@@ -31,10 +31,11 @@ ARM Linker:     Fortify_free, referred to from C:debug.CBUtilLib(ReaderGKey).
 Rebuilding the library
 ----------------------
   You should ensure that the standard C library and CBDebugLib (by the same
-author as CBUtilLib) are on your C$Path, otherwise the compiler won't be able
-to find the required header files. The dependency on CBDebugLib isn't very
-strong: it can be eliminated by modifying the make file so that the macro
-USE_CBDEBUG is no longer predefined.
+author as CBUtilLib) are on your header include path (C$Path if using the
+supplied make files on RISC OS), otherwise the compiler won't be able to find
+the required header files. The dependency on CBDebugLib isn't very strong: it
+can be eliminated by modifying the make file so that the macro USE_CBDEBUG is
+no longer predefined.
 
   Three make files are supplied:
 
@@ -45,7 +46,7 @@ USE_CBDEBUG is no longer predefined.
 - 'GMakefile' is intended for use with GNU Make and the GNU C Compiler
   on RISC OS.
 
-  These make files share some variable definitions (lists of objects to be
+These make files share some variable definitions (lists of objects to be
 built) by including a common make file.
 
   The APCS variant specified for the Norcroft compiler is 32 bit for
@@ -53,8 +54,9 @@ compatibility with ARMv5 and fpe2 for compatibility with older versions of
 the floating point emulator. Generation of unaligned data loads/stores is
 disabled for compatibility with ARM v6.
 
-  The suffix rules put object files in one of several directories, depending
-on the compiler options used to compile them:
+  The suffix rules generate output files with different suffixes (or in
+different subdirectories, if using the supplied make files on RISC OS),
+depending on the compiler options used to compile the source code:
 
 o: Assertions and debugging output are disabled. The code is optimised for
    execution speed.
@@ -86,9 +88,10 @@ UnixEnv$make$sfix, which is why 'GMakefile' uses the built-in function
 addsuffix instead of addprefix to construct lists of the objects to be
 built (e.g. foo.o instead of o.foo).
 
-  Before compiling the library for other platforms, rename the C source and
-header files with .c and .h file extensions then move them out of their
-respective subdirectories.
+  Before compiling the library for RISC OS, move the C source and header
+files with .c and .h suffixes into subdirectories named 'c' and 'h' and
+remove those suffixes from their names. You probably also need to create
+'o', 'oz', 'd' and 'debug' subdirectories for compiler output.
 
 Licence and disclaimer
 ----------------------
@@ -186,11 +189,14 @@ Release 8 (17 Nov 2023)
 Release 9 (03 Dec 2023)
 - Added missing source files for string buffers.
 
-Release 10 (18-May-24)
+Release 10 (18 May 2024)
 - Corrected description of the return value of strdict_remove and a
   test for the same.
 - Added #ifdefs to make the tests pass when built without Fortify.
 - Added new makefiles for use on Linux.
+
+Release 11 (19 May 2024)
+- Improved the README.md file for Linux users.
 
 Contact details
 ---------------
