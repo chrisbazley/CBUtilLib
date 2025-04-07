@@ -38,6 +38,7 @@
                   included header files redefine macros such as assert().
   CJB: 24-Sep-23: Added functions to append a formatted string.
                   Moved undo function to a separate file.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 /* ISO library headers */
@@ -57,7 +58,7 @@
 static bool realloc_buffer(StringBuffer *const buffer,
   size_t const new_size)
 {
-  char *new_buffer = NULL;
+  _Optional char *new_buffer = NULL;
   bool success = true;
 
   assert(buffer != NULL);
@@ -115,13 +116,15 @@ static void set_len(StringBuffer *const buffer, size_t const new_len)
   assert(new_len < buffer->buffer_size);
 
   buffer->undo_len = buffer->string_len;
-
-  /* To undo truncation we need to reinstate the character that was
-     overwritten by a nul terminator. */
-  buffer->undo_char = buffer->buffer[new_len];
-
   buffer->string_len = new_len;
-  buffer->buffer[new_len] = '\0';
+
+  if (buffer->buffer)
+  {
+    /* To undo truncation we need to reinstate the character that was
+      overwritten by a nul terminator. */
+    buffer->undo_char = buffer->buffer[new_len];
+    buffer->buffer[new_len] = '\0';
+  }
 }
 
 void stringbuffer_init(StringBuffer *const buffer)
@@ -135,10 +138,10 @@ void stringbuffer_init(StringBuffer *const buffer)
   buffer->undo_len = 0;
 }
 
-char *stringbuffer_prepare_append(StringBuffer *const buffer,
+_Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
   size_t *const min_size)
 {
-  char *free_ptr = NULL;
+  _Optional char *free_ptr = NULL;
   size_t size;
 
   assert(buffer != NULL);
@@ -157,10 +160,9 @@ char *stringbuffer_prepare_append(StringBuffer *const buffer,
   /* Ensure the string buffer is big enough for the existing string and
      the number of bytes to be appended. */
   size = *min_size ? *min_size : 1; /* can't return null and succeed */
-  if (ensure_size(buffer, buffer->string_len + size))
+  if (ensure_size(buffer, buffer->string_len + size) && buffer->buffer)
   {
-    assert(buffer->buffer != NULL);
-    free_ptr = buffer->buffer + buffer->string_len;
+    free_ptr = &*buffer->buffer + buffer->string_len;
     *min_size = buffer->buffer_size - buffer->string_len;
   }
   else
@@ -192,11 +194,11 @@ bool stringbuffer_append_separated(StringBuffer *const buffer,
   bool success = false;
   const size_t tail_len = strlen(tail);
   size_t buff_size = tail_len + 2;
-  char * const s = stringbuffer_prepare_append(buffer, &buff_size);
+  _Optional char * const s = stringbuffer_prepare_append(buffer, &buff_size);
   if (s != NULL)
   {
     *s = sep;
-    memcpy(s + 1, tail, tail_len);
+    memcpy(&*s + 1, tail, tail_len);
     stringbuffer_finish_append(buffer, 1 + tail_len);
     success = true;
   }
@@ -241,14 +243,14 @@ bool stringbuffer_append(StringBuffer *const buffer,
     /* Allocate space for the number of characters to be appended and a
        null terminator. */
     size_t min_size = extra_chars + 1;
-    char * const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
+    _Optional char * const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
     if (free_ptr != NULL)
     {
       assert(buffer->buffer != NULL);
 
       /* Copy characters from the tail string to the end of the existing
          string. */
-      memcpy(free_ptr, tail, extra_chars);
+      memcpy(&*free_ptr, tail, extra_chars);
 
       /* Record the new string length and append a null terminator. */
       stringbuffer_finish_append(buffer, extra_chars);

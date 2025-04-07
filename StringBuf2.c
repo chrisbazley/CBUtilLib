@@ -19,6 +19,7 @@
 
 /* History:
   CJB: 24-Sep-23: Moved undo function to this file.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 /* ISO library headers */
@@ -50,7 +51,10 @@ void stringbuffer_undo(StringBuffer *const buffer)
     DEBUGF("StringBuff: Undoing append (truncating to %zu)\n",
            buffer->undo_len);
 
-    buffer->buffer[buffer->undo_len] = '\0';
+    if (buffer->buffer)
+    {
+      buffer->buffer[buffer->undo_len] = '\0';
+    }
   }
   else if (buffer->undo_len > buffer->string_len)
   {
@@ -60,8 +64,11 @@ void stringbuffer_undo(StringBuffer *const buffer)
            buffer->undo_len);
 
     assert(buffer->undo_len < buffer->buffer_size);
-    assert(buffer->buffer[buffer->undo_len] == '\0');
-    buffer->buffer[buffer->string_len] = buffer->undo_char;
+    if (buffer->buffer)
+    {
+      assert(buffer->buffer[buffer->undo_len] == '\0');
+      buffer->buffer[buffer->string_len] = buffer->undo_char;
+    }
   }
   else
   {

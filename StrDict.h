@@ -30,6 +30,7 @@
                   Added the strdict_find_specific function.
                   strdictviter_remove now returns the removed item's index.
   CJB: 18-May-24: Corrected description of the return value of strdict_remove.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 #ifndef StrDict_h
@@ -41,18 +42,22 @@
 
 #include "StringBuff.h"
 
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
+
 typedef struct StrDictItem {
   char const *key;
-  void *value;
+  _Optional void *value;
 } StrDictItem;
 
 typedef struct {
   size_t nalloc;
   size_t nitems;
   StringBuffer buffer;
-  char const *sought_key;
-  StrDictItem *array;
-  StrDictItem const *candidate;
+  _Optional char const *sought_key;
+  _Optional StrDictItem *array;
+  _Optional StrDictItem const *candidate;
 } StrDict;
    /*
     * A string dictionary type that associates every item in an ordered
@@ -67,22 +72,22 @@ void strdict_init(StrDict */*dict*/);
     */
 
 typedef void StrDictDestructorFn(char const */*key*/,
-                                 void */*value*/, void */*arg*/);
+                                 _Optional void */*value*/, _Optional void */*arg*/);
    /*
     * Type of function called back to destroy each string dictionary item.
     * The value of 'arg' is that passed to the strdict_destroy function and
     * is expected to point to any additional parameters.
     */
 
-void strdict_destroy(StrDict */*dict*/, StrDictDestructorFn */*destructor*/,
-                     void */*arg*/);
+void strdict_destroy(StrDict */*dict*/, _Optional StrDictDestructorFn */*destructor*/,
+                     _Optional void */*arg*/);
    /*
     * Destroy a string dictionary, optionally calling a destructor function
     * (if the callback function pointer is not null).
     */
 
 bool strdict_find(StrDict */*dict*/, char const * /*key*/,
-                  size_t */*index*/);
+                  _Optional size_t */*index*/);
    /*
     * Search for the first item with a given key in a string dictionary.
     * Outputs the index of the item if the dictionary contains the key.
@@ -92,7 +97,7 @@ bool strdict_find(StrDict */*dict*/, char const * /*key*/,
     */
 
 bool strdict_find_specific(StrDict */*dict*/, char const * /*key*/,
-                            void */*value*/, size_t */*index*/);
+                           _Optional void */*value*/, _Optional size_t */*index*/);
    /*
     * Search for the first item with a given key and value in a string
     * dictionary. Outputs the index of the item if found.
@@ -102,8 +107,8 @@ bool strdict_find_specific(StrDict */*dict*/, char const * /*key*/,
     *          otherwise false.
     */
 
-bool strdict_insert(StrDict */*dict*/, char const * /*key*/, void */*value*/,
-                   size_t */*index*/);
+bool strdict_insert(StrDict */*dict*/, char const * /*key*/, _Optional void */*value*/,
+                   _Optional size_t */*index*/);
    /*
     * Insert an item and value pair into a string dictionary. If the new
     * item's key is not unique then its position is indeterminate relative
@@ -129,20 +134,20 @@ static inline char const *strdict_get_key_at(StrDict const *const dict,
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
-  return dict->array[index].key;
+  return dict->array ? dict->array[index].key : NULL;
 }
    /*
     * Get the key currently at a given index in a string dictionary.
     * Returns: the key with the given index.
     */
 
-static inline void *strdict_get_value_at(StrDict const *const dict,
-                                         size_t const index)
+static inline _Optional void *strdict_get_value_at(StrDict const *const dict,
+                                                   size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
-  return dict->array[index].value;
+  return dict->array ? dict->array[index].value : NULL;
 }
    /*
     * Get the value currently at a given index in a string dictionary.
@@ -154,7 +159,7 @@ void strdict_remove_at(StrDict */*dict*/, size_t /*index*/);
     * Remove the item currently at a given index from a string dictionary.
     */
 
-void *strdict_remove_value_at(StrDict */*dict*/, size_t /*index*/);
+_Optional void *strdict_remove_value_at(StrDict */*dict*/, size_t /*index*/);
    /*
     * Remove the item currently at a given index from a string dictionary,
     * returning the associated value.
@@ -183,9 +188,9 @@ size_t strdict_bisect_right(StrDict */*dict*/, char const * /*key*/);
     *          keys can be found.
     */
 
-static inline void *strdict_find_value(StrDict *const dict,
-                                       char const *const key,
-                                       size_t *const index)
+static inline _Optional void *strdict_find_value(StrDict *const dict,
+                                                 char const *const key,
+                                                 _Optional size_t *const index)
 {
   size_t pos;
   if (!strdict_find(dict, key, &pos)) {
@@ -206,7 +211,7 @@ static inline void *strdict_find_value(StrDict *const dict,
 
 static inline bool strdict_remove(StrDict *const dict,
                                   char const *const key,
-                                  size_t *const index)
+                                  _Optional size_t *const index)
 {
   size_t pos;
   if (!strdict_find(dict, key, &pos)) {
@@ -226,9 +231,9 @@ static inline bool strdict_remove(StrDict *const dict,
     * Returns: true if the dictionary contained the key, otherwise false.
     */
 
-static inline void *strdict_remove_value(StrDict *const dict,
-                                         char const *const key,
-                                         size_t *const index)
+static inline _Optional void *strdict_remove_value(StrDict *const dict,
+                                                   char const *const key,
+                                                   _Optional size_t *const index)
 {
   size_t pos;
   if (!strdict_find(dict, key, &pos)) {
@@ -249,8 +254,8 @@ static inline void *strdict_remove_value(StrDict *const dict,
 
 static inline bool strdict_remove_specific(StrDict *dict,
                                            char const *key,
-                                           void *value,
-                                           size_t *index)
+                                           _Optional void *value,
+                                           _Optional size_t *index)
 {
   size_t pos;
   if (!strdict_find_specific(dict, key, value, &pos)) {
@@ -303,7 +308,7 @@ typedef struct {
     * iterate over the values that are stored in a dictionary.
     */
 
-void *strdictviter_init(StrDictVIter */*iter*/, StrDict */*dict*/,
+_Optional void *strdictviter_init(StrDictVIter */*iter*/, StrDict */*dict*/,
   char const */*min_key*/, char const */*max_key*/);
    /*
     * Initialise an iterator object in preparation for iterating over the
@@ -316,7 +321,7 @@ void *strdictviter_init(StrDictVIter */*iter*/, StrDict */*dict*/,
     *          given range, or NULL if the range is empty.
     */
 
-void *strdictviter_all_init(StrDictVIter */*iter*/, StrDict */*dict*/);
+_Optional void *strdictviter_all_init(StrDictVIter */*iter*/, StrDict */*dict*/);
    /*
     * Initialise an iterator object in preparation for iterating over all the
     * values stored in a string dictionary. Modifying the dictionary (except
@@ -325,7 +330,7 @@ void *strdictviter_all_init(StrDictVIter */*iter*/, StrDict */*dict*/);
     *          the dictionary, or NULL if the dictionary is empty.
     */
 
-void *strdictviter_advance(StrDictVIter */*iter*/);
+_Optional void *strdictviter_advance(StrDictVIter */*iter*/);
    /*
     * Advance an iterator object to get the next value from its associated
     * string dictionary. Values are returned in sorted key order.

@@ -30,6 +30,7 @@
                   included header files redefine macros such as assert().
   CJB: 08-Oct-23: Use strtol and strtod instead of atoi, atof and atod to
                   avoid undefined behaviour if the value is unrepresentable.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 /* ISO library headers */
@@ -45,13 +46,13 @@
                          Public library functions
 */
 
-size_t csv_parse_string(const char     *s,
-                        char          **endp,
-                        void           *output,
-                        CSVOutputType   type,
-                        size_t          nmemb)
+size_t csv_parse_string(const char                *s,
+                        _Optional char *_Optional *endp,
+                        _Optional void            *output,
+                        CSVOutputType              type,
+                        size_t                     nmemb)
 {
-  const char *end_of_record, *cr, *lf;
+  _Optional const char *end_of_record, *cr, *lf;
   size_t field = 0;
 
   DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n", s,
@@ -92,7 +93,7 @@ size_t csv_parse_string(const char     *s,
       /* Find the comma or line ending at the end of this field */
       const char *next_comma = strchr(start_of_field, ',');
       if (next_comma == NULL || end_of_record < next_comma)
-        next_comma = end_of_record;
+        next_comma = &*end_of_record;
 
       DEBUGF("CSV: End of field %zu is character %u at %p\n", field, *next_comma,
             next_comma);
@@ -103,7 +104,7 @@ size_t csv_parse_string(const char     *s,
         {
           case CSVOutputType_Double:
             {
-              double *const output_f = output;
+              double *const output_f = &*output;
               output_f[field] = strtod(start_of_field, NULL);
               DEBUGF("CSV: Decoded field %zu as %f\n", field, output_f[field]);
             }
@@ -111,7 +112,7 @@ size_t csv_parse_string(const char     *s,
 
           case CSVOutputType_Long:
             {
-              long *const output_l = output;
+              long *const output_l = &*output;
               output_l[field] = strtol(start_of_field, NULL, 0);
               DEBUGF("CSV: Decoded field %zu as %li\n", field, output_l[field]);
             }
@@ -119,7 +120,7 @@ size_t csv_parse_string(const char     *s,
 
           case CSVOutputType_Int:
             {
-              int *const output_i = output;
+              int *const output_i = &*output;
               long int const tmp = strtol(start_of_field, NULL, 0);
               output_i[field] = (int)LOWEST(INT_MAX, HIGHEST(INT_MIN, tmp));
               DEBUGF("CSV: Decoded field %zu as %i\n", field, output_i[field]);
@@ -182,7 +183,7 @@ size_t csv_parse_string(const char     *s,
 
   /* N.B. I believe that a cast to eliminate the const qualifier is
      legitimate (compare with strrchr() and similar ANSI functions). */
-  *endp = (char *)end_of_record;
+  *endp = (_Optional char *)end_of_record;
 
   return field; /* Return the number of fields read */
 }

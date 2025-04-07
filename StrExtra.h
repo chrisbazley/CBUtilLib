@@ -34,6 +34,7 @@ History:
   CJB: 11-Dec-20: Removed redundant uses of the 'extern' keyword.
   CJB: 11-Aug-22: Documented the behaviour of strdup when passed a null pointer.
                   Changed the return type of strinflate from int to size_t.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 #ifndef StrExtra_h
@@ -41,6 +42,10 @@ History:
 
 /* ISO library headers */
 #include <stddef.h> /* (for size_t) */
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 int stricmp(const char * /*s1*/, const char * /*s2*/);
    /*
@@ -61,7 +66,7 @@ int strnicmp(const char * /*s1*/, const char * /*s2*/, size_t /*n*/);
     *          or less than the string pointed to by s2.
     */
 
-char *strdup(const char * /*s*/);
+_Optional char *strdup(_Optional const char * /*s*/);
    /*
     * Duplicates the string pointed to by s by copying it into a malloc'd block
     * of appropriate size. If the input is a null pointer then the output will

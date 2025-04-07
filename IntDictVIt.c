@@ -21,13 +21,14 @@
   CJB: 11-Aug-22: Created this source file.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 /* Local headers */
 #include "IntDict.h"
 #include "Internal/CBUtilMisc.h"
 
-void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
+_Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
   IntDictKey const min_key, IntDictKey const max_key)
 {
   assert(iter);
@@ -45,8 +46,8 @@ void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
   return intdictviter_advance(iter);
 }
 
-void *intdictviter_all_init(IntDictVIter *const iter,
-                              IntDict *const dict)
+_Optional void *intdictviter_all_init(IntDictVIter *const iter,
+                                      IntDict *const dict)
 {
   assert(iter);
   assert(dict);
@@ -62,7 +63,7 @@ void *intdictviter_all_init(IntDictVIter *const iter,
   return intdictviter_advance(iter);
 }
 
-void *intdictviter_advance(IntDictVIter *const iter)
+_Optional void *intdictviter_advance(IntDictVIter *const iter)
 {
   assert(iter);
   assert(iter->dict);

@@ -34,6 +34,7 @@
                   explicit in TrigTable_make.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 /* ISO library headers */
@@ -96,7 +97,7 @@ static int look_up_sine(const TrigTable *const table, int angle)
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */
 
-TrigTable *TrigTable_make(int const multiplier, int const quarter_turn)
+_Optional TrigTable *TrigTable_make(int const multiplier, int const quarter_turn)
 {
   DEBUGF("Generating sine look-up table of size %d with scaler %d\n",
         quarter_turn + 1, multiplier);
@@ -104,7 +105,7 @@ TrigTable *TrigTable_make(int const multiplier, int const quarter_turn)
   assert(quarter_turn > 0);
 
   /* Allocate memory for a table of sine values */
-  TrigTable *const table = malloc(offsetof(TrigTable, sine_values) +
+  _Optional TrigTable *const table = malloc(offsetof(TrigTable, sine_values) +
                  ((unsigned)quarter_turn + 1) * sizeof(table->sine_values[0]));
   if (table == NULL)
     return NULL;
@@ -137,7 +138,7 @@ int TrigTable_look_up_cosine(const TrigTable *const table, int const angle)
 {
   int const cosine = look_up_sine(table, angle + table->quarter_turn);
 
-  DEBUGF("Cosine of angle %d (%f°) in trig. table at %p is %d (%f)\n",
+  DEBUGF("Cosine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n",
          angle, to_deg(table, angle), (void *)table,
          cosine, (double)cosine / table->multiplier);
 
@@ -150,7 +151,7 @@ int TrigTable_look_up_sine(const TrigTable *const table, int angle)
 {
   int const sine = look_up_sine(table, angle);
 
-  DEBUGF("Sine of angle %d (%f°) in trig. table at %p is %d (%f)\n",
+  DEBUGF("Sine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n",
          angle, to_deg(table, angle), (void *)table,
          sine, (double)sine / table->multiplier);
 

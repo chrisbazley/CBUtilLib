@@ -29,6 +29,7 @@ History:
   CJB: 11-Aug-22: The LINKEDLIST_FOR_EACH_SAFE macro now requires an extra
                   parameter to make it clear when the next item pointer
                   shadows another variable declaration.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 #ifndef linkedlist_h
@@ -38,10 +39,14 @@ History:
 #include <stdbool.h>
 #include <assert.h>
 
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
+
 typedef struct LinkedListItem
 {
-  struct LinkedListItem *prev;
-  struct LinkedListItem *next;
+  _Optional struct LinkedListItem *prev;
+  _Optional struct LinkedListItem *next;
 }
 LinkedListItem;
    /*
@@ -51,8 +56,8 @@ LinkedListItem;
 
 typedef struct
 {
-  LinkedListItem *head;
-  LinkedListItem *tail;
+  _Optional LinkedListItem *head;
+  _Optional LinkedListItem *tail;
 }
 LinkedList;
    /*
@@ -65,7 +70,7 @@ void linkedlist_init(LinkedList */*list*/);
     * space for the 'list' control structure. The initialized list is empty.
     */
 
-static inline LinkedListItem *linkedlist_get_head(LinkedList const *const list)
+static inline _Optional LinkedListItem *linkedlist_get_head(LinkedList const *const list)
 {
   assert(list);
   assert(list->head == NULL || list->head->prev == NULL);
@@ -76,7 +81,7 @@ static inline LinkedListItem *linkedlist_get_head(LinkedList const *const list)
     * Returns: pointer to the head item of the list, or NULL if the list is empty.
     */
 
-static inline LinkedListItem *linkedlist_get_tail(LinkedList const *const list)
+static inline _Optional LinkedListItem *linkedlist_get_tail(LinkedList const *const list)
 {
   assert(list);
   assert(list->tail == NULL || list->tail->next == NULL);
@@ -87,7 +92,7 @@ static inline LinkedListItem *linkedlist_get_tail(LinkedList const *const list)
     * Returns: pointer to the tail item of the list, or NULL if the list is empty.
     */
 
-static inline LinkedListItem *linkedlist_get_next(LinkedListItem const *const item)
+static inline _Optional LinkedListItem *linkedlist_get_next(LinkedListItem const *const item)
 {
   assert(item);
   assert(item->next == NULL || item->next->prev == item);
@@ -98,7 +103,7 @@ static inline LinkedListItem *linkedlist_get_next(LinkedListItem const *const it
     * Returns: pointer to the next item, or NULL if at the tail of the list.
     */
 
-static inline LinkedListItem *linkedlist_get_prev(LinkedListItem const *const item)
+static inline _Optional LinkedListItem *linkedlist_get_prev(LinkedListItem const *const item)
 {
   assert(item);
   assert(item->prev == NULL || item->prev->next == item);
@@ -109,7 +114,9 @@ static inline LinkedListItem *linkedlist_get_prev(LinkedListItem const *const it
     * Returns: pointer to the previous item, or NULL if at the head of the list.
     */
 
-void linkedlist_insert(LinkedList */*list*/, LinkedListItem */*prev*/, LinkedListItem */*item*/);
+void linkedlist_insert(LinkedList */*list*/,
+                       _Optional LinkedListItem */*prev*/,
+                       LinkedListItem */*item*/);
    /*
     * Adds an item to a linked list after the specified 'prev' item. If 'prev'
     * is NULL then the item will the added at the head of the list. Storage
@@ -122,7 +129,9 @@ void linkedlist_remove(LinkedList */*list*/, LinkedListItem */*item*/);
     * the list item is the caller's responsibility.
     */
 
-typedef bool LinkedListCallbackFn(LinkedList */*list*/, LinkedListItem */*item*/, void */*arg*/);
+typedef bool LinkedListCallbackFn(LinkedList */*list*/,
+                                  LinkedListItem */*item*/,
+                                  _Optional void */*arg*/);
    /*
     * Type of function called back for each list item. The value of 'arg' is
     * that passed to the linkedlist_for_each function and is expected to
@@ -131,7 +140,9 @@ typedef bool LinkedListCallbackFn(LinkedList */*list*/, LinkedListItem */*item*/
     * Returns: true to stop iterating over the list, otherwise false.
     */
 
-LinkedListItem *linkedlist_for_each(LinkedList */*list*/, LinkedListCallbackFn */*callback*/, void */*arg*/);
+  _Optional LinkedListItem *linkedlist_for_each(LinkedList */*list*/,
+                                                LinkedListCallbackFn */*callback*/,
+                                                _Optional void */*arg*/);
    /*
     * Calls a given function for each client data item in a linked list, in
     * order from head to tail. The value of 'arg' will be passed to the
@@ -149,9 +160,9 @@ bool linkedlist_is_member(const LinkedList */*list*/, const LinkedListItem */*it
     */
 
 #define LINKEDLIST_FOR_EACH(list, item) \
-  for (LinkedListItem *(item) = linkedlist_get_head(list); \
+  for (_Optional LinkedListItem *(item) = linkedlist_get_head(list); \
        (item) != NULL; \
-       (item) = linkedlist_get_next(item))
+       (item) = linkedlist_get_next(&*item))
    /*
     * Macro to be used for iterating over a linked list (or part of a list) in
     * cases where the current list item is not removed or invalidated within
@@ -160,9 +171,9 @@ bool linkedlist_is_member(const LinkedList */*list*/, const LinkedListItem */*it
     */
 
 #define LINKEDLIST_FOR_EACH_REVERSE(list, item) \
-  for (LinkedListItem *(item) = linkedlist_get_tail(list); \
+  for (_Optional LinkedListItem *(item) = linkedlist_get_tail(list); \
        (item) != NULL; \
-       (item) = linkedlist_get_prev(item))
+       (item) = linkedlist_get_prev(&*item))
    /*
     * Macro to be used for iterating backwards over a linked list
     * (or part of a list) in cases where the current list item is not removed
@@ -171,8 +182,8 @@ bool linkedlist_is_member(const LinkedList */*list*/, const LinkedListItem */*it
     */
 
 #define LINKEDLIST_FOR_EACH_SAFE(list, item, tmp) \
-  for (LinkedListItem *(item) = linkedlist_get_head(list), *(tmp); \
-       (tmp) = (item) ? linkedlist_get_next(item) : NULL, (item) != NULL; \
+  for (_Optional LinkedListItem *(item) = linkedlist_get_head(list), *(tmp); \
+       (tmp) = (item) ? linkedlist_get_next(&*item) : NULL, (item) != NULL; \
        (item) = (tmp))
    /*
     * Macro to be used for iterating over a linked list (or part of a list) in

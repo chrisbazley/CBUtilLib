@@ -25,6 +25,7 @@
   CJB: 29-Aug-22: Fix text of debug output from intdict_find_specific.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 #include <stdlib.h>
@@ -47,16 +48,18 @@ void intdict_init(IntDict *const dict)
 }
 
 void intdict_destroy(IntDict *const dict,
-  IntDictDestructorFn *const destructor, void *const arg)
+  _Optional IntDictDestructorFn *const destructor, _Optional void *const arg)
 {
   DEBUGF("Terminating integer dictionary %p\n", (void *)dict);
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
 
-  if (destructor) {
+  if (destructor && dict->array) {
     size_t const nitems = dict->nitems;
+    IntDictItem const *const array = &*dict->array;
+
     for (size_t i = 0; i < nitems; ++i) {
-      destructor(dict->array[i].key, dict->array[i].value, arg);
+      destructor(array[i].key, array[i].value, arg);
       assert(nitems == dict->nitems);
     }
   }
@@ -71,8 +74,11 @@ static int compare_key_n_item(const void *const key, const void *const item)
   IntDict *const dict = (IntDict *)key;
   IntDictItem const *const candidate = item;
 
-  assert(candidate >= dict->array);
-  assert(candidate < dict->array + dict->nitems);
+  if (dict->array)
+  {
+    assert(candidate >= dict->array);
+    assert(candidate < dict->array + dict->nitems);
+  }
 
   dict->candidate = candidate;
 
@@ -93,9 +99,14 @@ void intdict_remove_at(IntDict *const dict, size_t const index)
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
 
+  if (!dict->array) {
+    return;
+  }
+  IntDictItem *const array = &*dict->array;
+
   DEBUGF("Removing item with key %" PRIIntDictKey
          ", value %p at position %zu in dictionary %p of size %zu\n",
-         dict->array[index].key, dict->array[index].value, index,
+         array[index].key, array[index].value, index,
          (void *)dict, dict->nitems);
 
   assert(dict->nitems > 0);
@@ -104,7 +115,7 @@ void intdict_remove_at(IntDict *const dict, size_t const index)
   size_t const nitems = dict->nitems;
   for (size_t i = index; i < nitems; ++i) {
     assert(i + 1 < dict->nalloc);
-    dict->array[i] = dict->array[i + 1];
+    array[i] = array[i + 1];
   }
 
   dict->candidate = NULL;
@@ -114,22 +125,22 @@ void intdict_remove_at(IntDict *const dict, size_t const index)
     for (size_t i = 0; i < dict->nitems - 1; ++i) {
       assert(i + 1 < dict->nalloc);
       DEBUGF("%zu: Key %" PRIIntDictKey ", value %p\n", i,
-             dict->array[i].key, dict->array[i].value);
-      assert(dict->array[i].key <= dict->array[i + 1].key);
+             array[i].key, array[i].value);
+
+      assert(array[i].key <= array[i + 1].key);
     }
     DEBUGF("%zu: key %" PRIIntDictKey ", value %p\n", dict->nitems - 1,
-           dict->array[dict->nitems - 1].key,
-           dict->array[dict->nitems - 1].value);
+           array[dict->nitems - 1].key, array[dict->nitems - 1].value);
   }
 #endif
 }
 
-void *intdict_remove_value_at(IntDict *const dict, size_t const index)
+_Optional void *intdict_remove_value_at(IntDict *const dict, size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
-  void *const value = dict->array[index].value;
+  _Optional void *const value = dict->array ? dict->array[index].value : NULL;
   intdict_remove_at(dict, index);
   return value;
 }
@@ -138,7 +149,7 @@ bool intdict_find(IntDict *const dict, IntDictKey const key,
   size_t *const pos)
 {
   size_t const index = intdict_bisect_left(dict, key);
-  if (index >= dict->nitems || dict->array[index].key != key) {
+  if (!dict->array || index >= dict->nitems || dict->array[index].key != key) {
     DEBUGF("Can't find key %" PRIIntDictKey "\n", key);
     return false;
   }
@@ -151,10 +162,10 @@ bool intdict_find(IntDict *const dict, IntDictKey const key,
 }
 
 bool intdict_find_specific(IntDict *const dict, IntDictKey const key,
-  void *const value, size_t *const pos)
+  _Optional void *const value, _Optional size_t *const pos)
 {
   size_t index = intdict_bisect_left(dict, key);
-  if (index >= dict->nitems) {
+  if (!dict->array || index >= dict->nitems) {
     DEBUGF("Can't find key %" PRIIntDictKey " because it's too high\n",
            key);
     return false;
@@ -185,7 +196,7 @@ bool intdict_find_specific(IntDict *const dict, IntDictKey const key,
 }
 
 bool intdict_insert(IntDict *const dict, IntDictKey const key,
-                    void *const value, size_t *const index)
+                    _Optional void *const value, _Optional size_t *const index)
 {
   DEBUGF("Insert key %" PRIIntDictKey
          " with value %p in dictionary %p of size %zu\n",
@@ -213,7 +224,7 @@ bool intdict_insert(IntDict *const dict, IntDictKey const key,
 
     DEBUGF("Reallocating dictionary from %zu to %zu items\n", dict->nalloc,
            new_size);
-    IntDictItem *const new_array = realloc(
+    _Optional IntDictItem *const new_array = realloc(
       dict->array, new_size * sizeof(*new_array));
 
     if (!new_array) {
@@ -224,17 +235,23 @@ bool intdict_insert(IntDict *const dict, IntDictKey const key,
     dict->array = new_array;
   }
 
+  if (!dict->array) {
+    return false;
+  }
+  IntDictItem *const array = &*dict->array;
+
   DEBUGF("Inserting item with key %" PRIIntDictKey ", value %p at %zu\n",
          key, value, ins_index);
   dict->candidate = NULL;
+
   for (size_t i = nitems; i > ins_index; --i) {
     assert(i < dict->nalloc);
     assert(i > 0);
-    dict->array[i] = dict->array[i - 1];
+    array[i] = array[i - 1];
   }
 
   assert(ins_index < dict->nalloc);
-  dict->array[ins_index] = (IntDictItem){.key = key, .value = value};
+  array[ins_index] = (IntDictItem){.key = key, .value = value};
 
   assert(dict->nitems < dict->nalloc);
   dict->nitems++;
@@ -242,13 +259,12 @@ bool intdict_insert(IntDict *const dict, IntDictKey const key,
 #ifndef NDEBUG
   for (size_t i = 0; i < dict->nitems - 1; ++i) {
     assert(i + 1 < dict->nalloc);
-    DEBUGF("%zu: Key %" PRIIntDictKey ", value %p\n", i, dict->array[i].key,
-           dict->array[i].value);
-    assert(dict->array[i].key <= dict->array[i + 1].key);
+    DEBUGF("%zu: Key %" PRIIntDictKey ", value %p\n", i, array[i].key,
+          array[i].value);
+    assert(array[i].key <= array[i + 1].key);
   }
   DEBUGF("%zu: key %" PRIIntDictKey ", value %p\n", dict->nitems - 1,
-         dict->array[dict->nitems - 1].key,
-         dict->array[dict->nitems - 1].value);
+         array[dict->nitems - 1].key, array[dict->nitems - 1].value);
 #endif
 
   if (index) {
@@ -262,6 +278,11 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   DEBUGF("Searching for smallest key >= %" PRIIntDictKey "\n", key);
+
+  if (!dict->array) {
+    return 0;
+  }
+  IntDictItem *const array = &*dict->array;
 
   size_t index = 0;
 
@@ -279,18 +300,18 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
 
     if (!dict->candidate) {
       dict->sought_key = key;
-      (void)bsearch(dict, dict->array, dict->nitems,
-          sizeof(dict->array[0]), compare_key_n_item);
+      (void)bsearch(dict, array, dict->nitems,
+          sizeof(array[0]), compare_key_n_item);
     }
 
     if (dict->candidate) {
       assert(dict->sought_key == key);
-      assert(dict->candidate >= dict->array);
-      assert(dict->candidate < dict->array + dict->nitems);
+      assert(dict->candidate >= array);
+      assert(dict->candidate < array + dict->nitems);
 
-      index = (size_t)(dict->candidate - dict->array);
+      index = (size_t)(dict->candidate - array);
       assert(index < dict->nitems);
-      if (dict->array[index].key < key) {
+      if (array[index].key < key) {
         DEBUGF("Candidate %p was too low: %" PRIIntDictKey " < %"
                PRIIntDictKey "\n",
                (void *)dict->candidate, dict->candidate->key, key);
@@ -299,7 +320,7 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
            the sought key */
         do {
           ++index;
-        } while(index < dict->nitems && dict->array[index].key < key);
+        } while(index < dict->nitems && array[index].key < key);
 
       } else {
         DEBUGF("Candidate %p was not too low: %" PRIIntDictKey " >= %"
@@ -308,14 +329,14 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
 
         /* Search backward for the lowest key greater than or equal to
            the sought key */
-        while (index > 0 && dict->array[index - 1].key >= key) {
+        while (index > 0 && array[index - 1].key >= key) {
           --index;
         }
       }
 
       if (index > 0) {
         assert(index - 1 < dict->nitems);
-        assert(dict->array[index - 1].key < key);
+        assert(array[index - 1].key < key);
       }
     } else {
       DEBUGF("No candidate\n");
@@ -324,7 +345,7 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
 
   DEBUGF("Key %" PRIIntDictKey " belongs at position %zu (current key %"
          PRIIntDictKey ")\n", key, index,
-         index < dict->nitems ? dict->array[index].key : INTDICTKEY_MAX);
+         index < dict->nitems ? array[index].key : INTDICTKEY_MAX);
 
   assert(index <= dict->nitems);
   return index;
@@ -334,11 +355,14 @@ size_t intdict_bisect_right(IntDict *const dict, IntDictKey const key)
 {
   size_t index = intdict_bisect_left(dict, key);
 
-  DEBUGF("Searching for lowest key > %" PRIIntDictKey
-         " in dictionary of size %zu\n", key, dict->nitems);
-  while (index < dict->nitems && dict->array[index].key <= key) {
-    ++index;
+  if (dict->array) {
+    DEBUGF("Searching for lowest key > %" PRIIntDictKey
+          " in dictionary of size %zu\n", key, dict->nitems);
+    while (index < dict->nitems && dict->array[index].key <= key) {
+      ++index;
+    }
   }
+
   return index;
 }
 

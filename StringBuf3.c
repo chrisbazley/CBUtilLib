@@ -19,6 +19,7 @@
 
 /* History:
   CJB: 24-Sep-23: New function to append a formatted string.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 /* ISO library headers */
@@ -61,14 +62,14 @@ bool stringbuffer_vprintf(StringBuffer *const buffer,
   /* Allocate space for the number of characters to be appended and a
      null terminator. */
   size_t min_size = (unsigned)extra_chars + 1;
-  char * const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
+  _Optional char * const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
   if (free_ptr != NULL)
   {
     assert(buffer->buffer != NULL);
 
     /* Copy characters from the tail string to the end of the existing
        string. */
-    int const n = vsnprintf(free_ptr, min_size, format, args_copy);
+    int const n = vsnprintf(&*free_ptr, min_size, format, args_copy);
     assert(n == extra_chars);
     NOT_USED(n);
 

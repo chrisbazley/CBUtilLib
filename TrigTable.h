@@ -29,14 +29,19 @@ History:
                   'TrigTable' and stop using a reserved identifier (containing
                   a double underscore) as the structure tag.
   CJB: 11-Dec-20: Removed redundant uses of the 'extern' keyword.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 #ifndef TrigTable_h
 #define TrigTable_h
 
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
+
 typedef struct TrigTable TrigTable;
 
-TrigTable *TrigTable_make(int multiplier, int quarter_turn);
+_Optional TrigTable *TrigTable_make(int multiplier, int quarter_turn);
    /*
     * Creates a trigonometric table by multiplying the sine of different
     * angles by the specified 'multiplier' (the magnitude of which dictates

@@ -32,6 +32,7 @@ History:
   CJB: 08-Oct-23: Added type-safe veneer functions, e.g. csv_parse_as_int.
                   Use strtol and strtod instead of atoi, atof and atod to
                   avoid undefined behaviour if the value is unrepresentable.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 #ifndef CSV_h
@@ -39,6 +40,10 @@ History:
 
 /* ISO library headers */
 #include <stddef.h>
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 typedef enum
 {
@@ -48,7 +53,7 @@ typedef enum
 }
 CSVOutputType;
 
-size_t csv_parse_string(const char *s, char **endp, void *output,
+size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optional void *output,
   CSVOutputType type, size_t nmemb);
    /*
     * Parses a string 's' that contains comma-separated numeric values and
@@ -66,20 +71,20 @@ size_t csv_parse_string(const char *s, char **endp, void *output,
     *          array if it had been specified and 'nmemb' was big enough.
     */
 
-static inline size_t csv_parse_as_int(const char *const s, char **const endp,
-                                   int *const output, size_t const nmemb)
+static inline size_t csv_parse_as_int(const char *const s, _Optional char *_Optional *const endp,
+                                      _Optional int *const output, size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Int, nmemb);
 }
 
-static inline size_t csv_parse_as_long(const char *const s, char **const endp,
-                                       long int *const output, size_t const nmemb)
+static inline size_t csv_parse_as_long(const char *const s, _Optional char *_Optional *const endp,
+                                       _Optional long int *const output, size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Long, nmemb);
 }
 
-static inline size_t csv_parse_as_double(const char *const s, char **const endp,
-                                         double *const output, size_t const nmemb)
+static inline size_t csv_parse_as_double(const char *const s, _Optional char *_Optional *const endp,
+                                         _Optional double *const output, size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Double, nmemb);
 }

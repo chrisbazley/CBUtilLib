@@ -25,6 +25,7 @@
   CJB: 29-Aug-22: Fix text of debug output from strdict_find_specific.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 #include <stdlib.h>
@@ -49,16 +50,18 @@ void strdict_init(StrDict *const dict)
 }
 
 void strdict_destroy(StrDict *const dict,
-  StrDictDestructorFn *const destructor, void *const arg)
+  _Optional StrDictDestructorFn *const destructor, _Optional void *const arg)
 {
   DEBUGF("Terminating string dictionary %p\n", (void *)dict);
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
 
-  if (destructor) {
+  if (destructor && dict->array) {
     size_t const nitems = dict->nitems;
+    StrDictItem const *const array = &*dict->array;
+
     for (size_t i = 0; i < nitems; ++i) {
-      destructor(dict->array[i].key, dict->array[i].value, arg);
+      destructor(array[i].key, array[i].value, arg);
       assert(nitems == dict->nitems);
     }
   }
@@ -75,11 +78,14 @@ static int compare_key_n_item(const void *const key, const void *const item)
   assert(dict->sought_key);
   StrDictItem const *const candidate = item;
 
-  assert(candidate >= dict->array);
-  assert(candidate < dict->array + dict->nitems);
+  if (dict->array)
+  {
+    assert(candidate >= dict->array);
+    assert(candidate < dict->array + dict->nitems);
+  }
 
   dict->candidate = candidate;
-  return stricmp(dict->sought_key, candidate->key);
+  return stricmp(STRING_OR_NULL(dict->sought_key), candidate->key);
 }
 
 void strdict_remove_at(StrDict *const dict, size_t const index)
@@ -87,9 +93,15 @@ void strdict_remove_at(StrDict *const dict, size_t const index)
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
+
+  if (!dict->array) {
+    return;
+  }
+  StrDictItem *const array = &*dict->array;
+
   DEBUGF("Removing item with key '%s'"
          ", value %p at position %zu in dictionary %p of size %zu\n",
-         dict->array[index].key, dict->array[index].value, index,
+         array[index].key, array[index].value, index,
          (void *)dict, dict->nitems);
 
   assert(dict->nitems > 0);
@@ -98,7 +110,7 @@ void strdict_remove_at(StrDict *const dict, size_t const index)
   size_t const nitems = dict->nitems;
   for (size_t i = index; i < nitems; ++i) {
     assert(i + 1 < dict->nalloc);
-    dict->array[i] = dict->array[i + 1];
+    array[i] = array[i + 1];
   }
 
   dict->candidate = NULL;
@@ -107,33 +119,32 @@ void strdict_remove_at(StrDict *const dict, size_t const index)
   if (nitems > 0) {
     for (size_t i = 0; i < dict->nitems - 1; ++i) {
       assert(i + 1 < dict->nalloc);
-      DEBUGF("%zu: Key %p:'%s', value %p\n", i, (void *)dict->array[i].key,
-             dict->array[i].key, dict->array[i].value);
-      assert(stricmp(dict->array[i].key, dict->array[i + 1].key) <= 0);
+      DEBUGF("%zu: Key %p:'%s', value %p\n", i, (void *)array[i].key,
+             array[i].key, array[i].value);
+      assert(stricmp(array[i].key, array[i + 1].key) <= 0);
     }
     DEBUGF("%zu: key %p:'%s', value %p\n", dict->nitems - 1,
-           (void *)dict->array[dict->nitems - 1].key,
-           dict->array[dict->nitems - 1].key,
-           dict->array[dict->nitems - 1].value);
+           (void *)array[dict->nitems - 1].key,
+           array[dict->nitems - 1].key, array[dict->nitems - 1].value);
   }
 #endif
 }
 
-void *strdict_remove_value_at(StrDict *const dict, size_t const index)
+_Optional void *strdict_remove_value_at(StrDict *const dict, size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
-  void *const value = dict->array[index].value;
+  _Optional void *const value = dict->array ? dict->array[index].value : NULL;
   strdict_remove_at(dict, index);
   return value;
 }
 
 bool strdict_find(StrDict *const dict, char const *const key,
-  size_t *const pos)
+  _Optional size_t *const pos)
 {
   size_t const index = strdict_bisect_left(dict, key);
-  if (index >= dict->nitems || stricmp(dict->array[index].key, key) != 0) {
+  if (!dict->array || index >= dict->nitems || stricmp(dict->array[index].key, key) != 0) {
     DEBUGF("Can't find key '%s'\n", key);
     return false;
   }
@@ -146,10 +157,10 @@ bool strdict_find(StrDict *const dict, char const *const key,
 }
 
 bool strdict_find_specific(StrDict *const dict, char const *const key,
-  void *const value, size_t *const pos)
+  _Optional void *const value, _Optional size_t *const pos)
 {
   size_t index = strdict_bisect_left(dict, key);
-  if (index >= dict->nitems) {
+  if (!dict->array || index >= dict->nitems) {
     DEBUGF("Can't find key '%s' because it's too high\n", key);
     return false;
   }
@@ -181,7 +192,7 @@ bool strdict_find_specific(StrDict *const dict, char const *const key,
 }
 
 bool strdict_insert(StrDict *const dict, char const *const key,
-  void *const value, size_t *const index)
+  _Optional void *const value, _Optional size_t *const index)
 {
   /* Don't allow a null key because we want to preserve the original
      pointer in case the client dynamically allocated it, therefore allowing
@@ -207,7 +218,7 @@ bool strdict_insert(StrDict *const dict, char const *const key,
 
     DEBUGF("Reallocating dictionary from %zu to %zu items\n", dict->nalloc,
            new_size);
-    StrDictItem *const new_array = realloc(
+    _Optional StrDictItem *const new_array = realloc(
       dict->array, new_size * sizeof(*new_array));
 
     if (!new_array) {
@@ -218,17 +229,22 @@ bool strdict_insert(StrDict *const dict, char const *const key,
     dict->array = new_array;
   }
 
+  if (!dict->array) {
+    return false;
+  }
+  StrDictItem *const array = &*dict->array;
+
   DEBUGF("Inserting item with key '%s', value %p at %zu\n", key, value,
          ins_index);
   dict->candidate = NULL;
   for (size_t i = nitems; i > ins_index; --i) {
     assert(i < dict->nalloc);
     assert(i > 0);
-    dict->array[i] = dict->array[i - 1];
+    array[i] = array[i - 1];
   }
 
   assert(ins_index < dict->nalloc);
-  dict->array[ins_index] = (StrDictItem){.key = key, .value = value};
+  array[ins_index] = (StrDictItem){.key = key, .value = value};
 
   assert(dict->nitems < dict->nalloc);
   dict->nitems++;
@@ -236,14 +252,13 @@ bool strdict_insert(StrDict *const dict, char const *const key,
 #ifndef NDEBUG
   for (size_t i = 0; i < dict->nitems - 1; ++i) {
     assert(i + 1 < dict->nalloc);
-    DEBUGF("%zu: Key %p:'%s', value %p\n", i, (void *)dict->array[i].key,
-           dict->array[i].key, dict->array[i].value);
-    assert(stricmp(dict->array[i].key, dict->array[i + 1].key) <= 0);
+    DEBUGF("%zu: Key %p:'%s', value %p\n", i, (void *)array[i].key,
+           array[i].key, array[i].value);
+    assert(stricmp(array[i].key, array[i + 1].key) <= 0);
   }
   DEBUGF("%zu: key %p:'%s', value %p\n", dict->nitems - 1,
-         (void *)dict->array[dict->nitems - 1].key,
-         dict->array[dict->nitems - 1].key,
-         dict->array[dict->nitems - 1].value);
+         (void *)array[dict->nitems - 1].key,
+         array[dict->nitems - 1].key, array[dict->nitems - 1].value);
 #endif
 
   if (index) {
@@ -261,6 +276,11 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
   DEBUGF("Searching for lowest key >= '%s' in dictionary of size %zu\n",
          key, dict->nitems);
 
+  if (!dict->array) {
+    return 0;
+  }
+  StrDictItem *const array = &*dict->array;
+
   size_t index = 0;
 
   if (dict->nitems > 0) {
@@ -268,7 +288,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
       /* Can't just do a pointer comparison here because there could be a
          different string at a recycled address. Not sure how worthwhile
          this optimization is. */
-      if (stricmp(dict->sought_key, key) == 0) {
+      if (stricmp(STRING_OR_NULL(dict->sought_key), key) == 0) {
         DEBUGF("Reuse last result of search for key '%s'\n",
                dict->sought_key);
       } else {
@@ -285,19 +305,21 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
       } else {
         dict->sought_key = key;
       }
-      (void)bsearch(dict, dict->array, dict->nitems,
-          sizeof(dict->array[0]), compare_key_n_item);
+      if (array) {
+        (void)bsearch(dict, array, dict->nitems,
+            sizeof(array[0]), compare_key_n_item);
+      }
     }
 
     if (dict->candidate) {
       assert(dict->sought_key);
-      assert(stricmp(dict->sought_key, key) == 0);
-      assert(dict->candidate >= dict->array);
-      assert(dict->candidate < dict->array + dict->nitems);
+      assert(stricmp(STRING_OR_NULL(dict->sought_key), key) == 0);
+      assert(dict->candidate >= array);
+      assert(dict->candidate < array + dict->nitems);
 
-      index = (size_t)(dict->candidate - dict->array);
+      index = (size_t)(dict->candidate - array);
       assert(index < dict->nitems);
-      if (stricmp(dict->array[index].key, key) < 0) {
+      if (stricmp(array[index].key, key) < 0) {
         DEBUGF("Candidate %p at index %zu with value %p was too low: '%s' < '%s'\n",
                (void *)dict->candidate, index, dict->candidate->value,
                dict->candidate->key, key);
@@ -307,7 +329,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
         do {
           ++index;
         } while(index < dict->nitems &&
-                stricmp(dict->array[index].key, key) < 0);
+                stricmp(array[index].key, key) < 0);
 
       } else {
         DEBUGF("Candidate %p at index %zu with value %p was not too low: '%s' >= '%s'\n",
@@ -316,14 +338,14 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
 
         /* Search backward for the lowest key greater than or equal to
            the sought key */
-        while (index > 0 && stricmp(dict->array[index - 1].key, key) >= 0) {
+        while (index > 0 && stricmp(array[index - 1].key, key) >= 0) {
           --index;
         }
       }
 
       if (index > 0) {
         assert(index - 1 < dict->nitems);
-        assert(stricmp(dict->array[index - 1].key, key) < 0);
+        assert(stricmp(array[index - 1].key, key) < 0);
       }
     } else {
       DEBUGF("No candidate\n");
@@ -336,7 +358,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
   }
 
   DEBUGF("Key '%s' belongs at position %zu (current key '%s')\n", key, index,
-         index < dict->nitems ? dict->array[index].key : "MAX");
+         index < dict->nitems ? array[index].key : "MAX");
 
   assert(index <= dict->nitems);
   return index;
@@ -346,10 +368,13 @@ size_t strdict_bisect_right(StrDict *const dict, char const *const key)
 {
   size_t index = strdict_bisect_left(dict, key);
 
-  DEBUGF("Searching for lowest key > '%s' in dictionary of size %zu\n", key,
+  if (dict->array) {
+    DEBUGF("Searching for lowest key > '%s' in dictionary of size %zu\n", key,
          dict->nitems);
-  while (index < dict->nitems && stricmp(dict->array[index].key, key) <= 0) {
-    ++index;
+    while (index < dict->nitems && stricmp(dict->array[index].key, key) <= 0) {
+      ++index;
+    }
   }
+
   return index;
 }

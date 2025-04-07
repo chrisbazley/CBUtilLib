@@ -32,6 +32,7 @@ History:
   CJB: 05-Feb-19: Added the stringbuffer_append_all function.
   CJB: 10-Aug-22: Converted the most trivial functions into inline functions.
   CJB: 24-Sep-23: Added functions to append a formatted string.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
  */
 
 #ifndef StringBuff_h
@@ -44,6 +45,10 @@ History:
 #include <stdbool.h>
 #include <stdarg.h>
 
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
+
 typedef struct
 {
   size_t  buffer_size; /* No. of bytes of memory allocated for the 'buffer'
@@ -51,9 +56,9 @@ typedef struct
                           string_len is 0. */
   size_t  string_len;  /* Length of the string in the 'buffer' array, not
                           including its nul terminator. */
-  char   *buffer;      /* Pointer to a dynamically-allocated character array
-                          containing the current string. May be NULL if
-                          buffer_size and string_len are both 0. */
+  _Optional char *buffer; /* Pointer to a dynamically-allocated character array
+                             containing the current string. May be NULL if
+                             buffer_size and string_len are both 0. */
   size_t  undo_len; /* Length of the previous string in the 'buffer' array
                        or equal to string_len if not possible to undo. */
   char    undo_char; /* Character replaced by the nul terminator
@@ -72,8 +77,8 @@ void stringbuffer_init(StringBuffer * /*buffer*/);
     * content will be the empty string.
     */
 
-char *stringbuffer_prepare_append(StringBuffer * /*buffer*/,
-                                  size_t       * /*min_size*/);
+_Optional char *stringbuffer_prepare_append(StringBuffer * /*buffer*/,
+                                            size_t       * /*min_size*/);
    /*
     * Prepares to append at the end of the current string in a given buffer
     * by reserving space for at least 'min_size' bytes (which must include
@@ -206,7 +211,7 @@ static inline char *stringbuffer_get_pointer(
     assert(buffer->buffer[buffer->string_len] == '\0');
   }
 
-  return buffer->buffer ? buffer->buffer : "";
+  return buffer->buffer ? &*buffer->buffer : "";
 }
    /*
     * Returns a direct pointer to the current string in a given buffer. May

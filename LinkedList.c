@@ -31,6 +31,7 @@
                   Validate whole list after insertion or removal of an item.
   CJB: 11-Aug-22: The LINKEDLIST_FOR_EACH_SAFE macro now requires an extra
                   parameter.
+  CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
 */
 
 /* ISO library headers */
@@ -39,6 +40,7 @@
 /* Local headers */
 #include "LinkedList.h"
 #include "Internal/CBUtilMisc.h"
+
 
 /* ----------------------------------------------------------------------- */
 /*                       Function prototypes                               */
@@ -61,7 +63,7 @@ void linkedlist_init(LinkedList *const list)
 
 /* ----------------------------------------------------------------------- */
 
-void linkedlist_insert(LinkedList *const list, LinkedListItem *const prev,
+void linkedlist_insert(LinkedList *const list, _Optional LinkedListItem *const prev,
   LinkedListItem *const item)
 {
   assert(item != NULL);
@@ -69,10 +71,11 @@ void linkedlist_insert(LinkedList *const list, LinkedListItem *const prev,
          (void *)item, (void *)list, (void *)prev);
 
   assert(!linkedlist_is_member(list, item));
-  if (prev != NULL)
-    assert(linkedlist_is_member(list, prev));
+  if (prev != NULL) {
+    assert(linkedlist_is_member(list, &*prev));
+  }
 
-  LinkedListItem *next;
+  _Optional LinkedListItem *next;
 
   if (prev == NULL)
   {
@@ -122,7 +125,7 @@ void linkedlist_remove(LinkedList *const list, LinkedListItem *const item)
     list->head = item->next;
   }
 
-  LinkedListItem *const prev = item->prev;
+  _Optional LinkedListItem *const prev = item->prev;
   if (item->next != NULL)
   {
     item->next->prev = prev;
@@ -137,11 +140,11 @@ void linkedlist_remove(LinkedList *const list, LinkedListItem *const item)
 
 /* ----------------------------------------------------------------------- */
 
-LinkedListItem *linkedlist_for_each(LinkedList *const list,
-  LinkedListCallbackFn *const callback, void *const arg)
+_Optional LinkedListItem *linkedlist_for_each(LinkedList *const list,
+  LinkedListCallbackFn *const callback, _Optional void *const arg)
 {
   validate_list(list);
-  assert(callback != NULL);
+  assert(callback);
   DEBUG_VERBOSEF("LinkedList: Calling function with %p for all items in list %p\n",
          arg, (void *)list);
 
@@ -150,7 +153,7 @@ LinkedListItem *linkedlist_for_each(LinkedList *const list,
     DEBUG_VERBOSEF("LinkedList: Visiting item %p in list %p\n",
       (void *)foo, (void *)list);
 
-    if (callback(list, foo, arg))
+    if (callback(list, &*foo, arg))
     {
       DEBUG_VERBOSEF("LinkedList: Callback terminated iteration over list %p\n",
         (void *)list);
