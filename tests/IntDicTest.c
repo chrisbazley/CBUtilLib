@@ -46,21 +46,21 @@ enum
 static struct CBInfo
 {
   IntDictKey key;
-  void *value;
-  void *arg;
+  _Optional void *value;
+  _Optional void *arg;
 }
 callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;
 
-static void record_callbacks(IntDictKey key, void *value, void *arg)
+static void record_callbacks(IntDictKey key, _Optional void *value, _Optional void *arg)
 {
   assert(callback_count < ARRAY_SIZE(callbacks));
   DEBUGF("Callback %zu: key %" PRIIntDictKey ", value %p, arg %p\n", callback_count, key, value, arg);
   callbacks[callback_count++] = (struct CBInfo){.key = key, .value = value, .arg = arg};
 }
 
-static void never_call_me(IntDictKey key, void *value, void *arg)
+static void never_call_me(IntDictKey key, _Optional void *value, _Optional void *arg)
 {
   NOT_USED(key);
   NOT_USED(value);
@@ -68,10 +68,10 @@ static void never_call_me(IntDictKey key, void *value, void *arg)
   assert("Dictionary isn't empty" == NULL);
 }
 
-typedef void remove_t(IntDict *, IntDictKey, void *, size_t);
-typedef void insert_t(IntDict *, IntDictKey, void *, size_t);
+typedef void remove_t(IntDict *, IntDictKey, _Optional void *, size_t);
+typedef void insert_t(IntDict *, IntDictKey, _Optional void *, size_t);
 
-static void remove_key_only(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void remove_key_only(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   NOT_USED(value);
   size_t rem_pos = MagicValue;
@@ -84,7 +84,7 @@ static void remove_key_only(IntDict *const dict, IntDictKey const key, void *con
   }
 }
 
-static void remove_key_only_no_pos(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void remove_key_only_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   NOT_USED(value);
   bool success = intdict_remove(dict, key, NULL);
@@ -95,7 +95,7 @@ static void remove_key_only_no_pos(IntDict *const dict, IntDictKey const key, vo
   }
 }
 
-static void remove_key_and_get_value(IntDict *const dict, IntDictKey const key, void *value, size_t const pos)
+static void remove_key_and_get_value(IntDict *const dict, IntDictKey const key, _Optional void *value, size_t const pos)
 {
   if (pos == SIZE_MAX) {
     value = NULL;
@@ -107,7 +107,7 @@ static void remove_key_and_get_value(IntDict *const dict, IntDictKey const key, 
   }
 }
 
-static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey const key, void *value, size_t const pos)
+static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *value, size_t const pos)
 {
   if (pos == SIZE_MAX) {
     value = NULL;
@@ -115,7 +115,7 @@ static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey cons
   assert(intdict_remove_value(dict, key, NULL) == value);
 }
 
-static void remove_specific(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void remove_specific(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   size_t rem_pos = MagicValue;
   bool success = intdict_remove_specific(dict, key, value, &rem_pos);
@@ -127,7 +127,7 @@ static void remove_specific(IntDict *const dict, IntDictKey const key, void *con
   }
 }
 
-static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   bool success = intdict_remove_specific(dict, key, value, NULL);
   if (pos != SIZE_MAX) {
@@ -137,7 +137,7 @@ static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key, vo
   }
 }
 
-static void remove_index(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void remove_index(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   NOT_USED(key);
   NOT_USED(value);
@@ -146,7 +146,7 @@ static void remove_index(IntDict *const dict, IntDictKey const key, void *const 
   }
 }
 
-static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key, void *value, size_t const pos)
+static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key, _Optional void *value, size_t const pos)
 {
   NOT_USED(key);
   if (pos != SIZE_MAX) {
@@ -154,7 +154,7 @@ static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key
   }
 }
 
-static void check_find(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void check_find(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   assert(intdict_find(dict, key, NULL));
 
@@ -178,7 +178,7 @@ static void check_find(IntDict *const dict, IntDictKey const key, void *const va
   assert(intdict_get_value_at(dict, pos) == value);
 }
 
-static void check_not_found(IntDict *const dict, IntDictKey const key, void *const value)
+static void check_not_found(IntDict *const dict, IntDictKey const key, _Optional void *const value)
 {
   assert(intdict_find(dict, key, NULL) == false);
 
@@ -547,7 +547,7 @@ static void insert_null_common(insert_t *const insert_cb)
   }
 }
 
-static void try_insert(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void try_insert(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   bool success = false;
   size_t ins_pos = 0;
@@ -562,7 +562,7 @@ static void try_insert(IntDict *const dict, IntDictKey const key, void *const va
   assert(pos == ins_pos);
 }
 
-static void try_insert_no_pos(IntDict *const dict, IntDictKey const key, void *const value, size_t const pos)
+static void try_insert_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
 {
   NOT_USED(pos);
   bool success = false;
@@ -641,7 +641,7 @@ static void test9(void)
     intdict_insert(&dict, keys[i], &values[i], NULL);
   }
 
-  intdict_destroy(&dict, NULL, NULL);
+  intdict_destroy(&dict, (IntDictDestructorFn *)NULL, NULL);
   intdict_init(&dict);
 
   assert(intdict_count(&dict) == 0);
@@ -654,7 +654,7 @@ static void test9(void)
     assert("not empty" == NULL);
   }
 
-  intdict_destroy(&dict, NULL, NULL);
+  intdict_destroy(&dict, (IntDictDestructorFn *)NULL, NULL);
 }
 
 static void test10(void)
@@ -973,7 +973,7 @@ static void test35(void)
     assert(intdict_get_key_at(&dict, find_pos) == keys[j]);
 
     find_pos = MagicValue;
-    void *const value = intdict_find_value(&dict, keys[j], &find_pos);
+    _Optional void *const value = intdict_find_value(&dict, keys[j], &find_pos);
     bool found_value = false;
     for (size_t l = 0; l <= k && !found_value; ++l) {
       size_t const allowed_pos = j + (NumberOfKeys * l);
@@ -1135,7 +1135,7 @@ static void test38(void)
   }
 
   size_t i = 0;
-  for (void *value = intdictviter_all_init(&iter, &dict);
+  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
        value != NULL;
        value = intdictviter_advance(&iter))
   {
@@ -1186,11 +1186,11 @@ static void test39(void)
           IntDictKey const max_key = keys[i] + l;
 
           size_t vcount = 0;
-          int *got_values[NumberOfItems];
+          _Optional int *got_values[NumberOfItems];
 
           printf("min_key %ld, max_key %ld\n", min_key, max_key);
 
-          for (void *value = intdictviter_init(&iter, &dict, min_key, max_key);
+          for (_Optional void *value = intdictviter_init(&iter, &dict, min_key, max_key);
                value != NULL;
                value = intdictviter_advance(&iter))
           {
@@ -1247,7 +1247,7 @@ static void test40(void)
   }
 
   size_t count = 0;
-  for (void *value = intdictviter_all_init(&iter, &dict);
+  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
        value != NULL;
        value = intdictviter_advance(&iter), ++count)
   {

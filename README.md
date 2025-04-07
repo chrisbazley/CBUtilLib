@@ -1,7 +1,7 @@
 # CBUtilLib
 (C) 2018 Christopher Bazley
 
-Release 12 (07 Apr 2025)
+Release 12 (08 Apr 2025)
 
 Introduction
 ------------
@@ -198,7 +198,7 @@ Release 10 (18 May 2024)
 Release 11 (19 May 2024)
 - Improved the README.md file for Linux users.
 
-Release 12 (07 Apr 2025)
+Release 12 (08 Apr 2025)
 - Dogfooding the _Optional qualifier.
 
 Contact details

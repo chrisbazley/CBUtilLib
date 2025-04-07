@@ -46,21 +46,21 @@ enum
 static struct CBInfo
 {
   const char *key;
-  void *value;
-  void *arg;
+  _Optional void *value;
+  _Optional void *arg;
 }
 callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;
 
-static void record_callbacks(const char *key, void *value, void *arg)
+static void record_callbacks(const char *key, _Optional void *value, _Optional void *arg)
 {
   assert(callback_count < ARRAY_SIZE(callbacks));
   DEBUGF("Callback %zu: key %p (%s), value %p, arg %p\n", callback_count, (void *)key, key, value, arg);
   callbacks[callback_count++] = (struct CBInfo){.key = key, .value = value, .arg = arg};
 }
 
-static void never_call_me(const char *key, void *value, void *arg)
+static void never_call_me(const char *key, _Optional void *value, _Optional void *arg)
 {
   NOT_USED(key);
   NOT_USED(value);
@@ -68,13 +68,20 @@ static void never_call_me(const char *key, void *value, void *arg)
   assert("Dictionary isn't empty" == NULL);
 }
 
-typedef void remove_t(StrDict *, char const *, void *, size_t);
-typedef void insert_t(StrDict *, char const *, void *, size_t);
+static char *test_strdup(const char *const s)
+{
+  _Optional char *const dup = strdup(s);
+  assert(dup);
+  return &*dup;
+}
 
-static void remove_key_only(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+typedef void remove_t(StrDict *, char const *, _Optional void *, size_t);
+typedef void insert_t(StrDict *, char const *, _Optional void *, size_t);
+
+static void remove_key_only(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
   NOT_USED(value);
   size_t rem_pos = MagicValue;
   bool success = strdict_remove(dict, dup_key, &rem_pos);
@@ -87,10 +94,10 @@ static void remove_key_only(StrDict *const dict, char const *const key, void *co
   free(dup_key);
 }
 
-static void remove_key_only_no_pos(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+static void remove_key_only_no_pos(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
   NOT_USED(value);
   bool success = strdict_remove(dict, dup_key, NULL);
   if (pos != SIZE_MAX) {
@@ -101,10 +108,10 @@ static void remove_key_only_no_pos(StrDict *const dict, char const *const key, v
   free(dup_key);
 }
 
-static void remove_key_and_get_value(StrDict *const dict, char const *const key, void *value, size_t const pos)
+static void remove_key_and_get_value(StrDict *const dict, char const *const key, _Optional void *value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
   if (pos == SIZE_MAX) {
     value = NULL;
   }
@@ -116,10 +123,10 @@ static void remove_key_and_get_value(StrDict *const dict, char const *const key,
   free(dup_key);
 }
 
-static void remove_key_and_get_value_no_pos(StrDict *const dict, char const *const key, void *value, size_t const pos)
+static void remove_key_and_get_value_no_pos(StrDict *const dict, char const *const key, _Optional void *value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
   if (pos == SIZE_MAX) {
     value = NULL;
   }
@@ -127,10 +134,10 @@ static void remove_key_and_get_value_no_pos(StrDict *const dict, char const *con
   free(dup_key);
 }
 
-static void remove_specific(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+static void remove_specific(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
   size_t rem_pos = MagicValue;
   bool success = strdict_remove_specific(dict, dup_key, value, &rem_pos);
   if (pos != SIZE_MAX) {
@@ -142,10 +149,10 @@ static void remove_specific(StrDict *const dict, char const *const key, void *co
   free(dup_key);
 }
 
-static void remove_specific_no_pos(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+static void remove_specific_no_pos(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
   bool success = strdict_remove_specific(dict, dup_key, value, NULL);
   if (pos != SIZE_MAX) {
     assert(success);
@@ -155,7 +162,7 @@ static void remove_specific_no_pos(StrDict *const dict, char const *const key, v
   free(dup_key);
 }
 
-static void remove_index(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+static void remove_index(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   NOT_USED(key);
   NOT_USED(value);
@@ -164,7 +171,7 @@ static void remove_index(StrDict *const dict, char const *const key, void *const
   }
 }
 
-static void remove_index_and_get_value(StrDict *const dict, char const *const key, void *value, size_t const pos)
+static void remove_index_and_get_value(StrDict *const dict, char const *const key, _Optional void *value, size_t const pos)
 {
   NOT_USED(key);
   if (pos != SIZE_MAX) {
@@ -172,11 +179,10 @@ static void remove_index_and_get_value(StrDict *const dict, char const *const ke
   }
 }
 
-static void check_find(StrDict *const dict, char const *key, void *const value, size_t const pos)
+static void check_find(StrDict *const dict, char const *key, _Optional void *const value, size_t const pos)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
-
+  char *const dup_key = test_strdup(key);
   assert(strdict_find(dict, dup_key, NULL) == true);
 
   size_t found = MagicValue;
@@ -201,10 +207,10 @@ static void check_find(StrDict *const dict, char const *key, void *const value, 
   free(dup_key);
 }
 
-static void check_not_found(StrDict *const dict, char const *key, void *const value)
+static void check_not_found(StrDict *const dict, char const *key, _Optional void *const value)
 {
   // Duplicate the key to verify that the dictionary isn't simply comparing addresses
-  char *const dup_key = strdup(key);
+  char *const dup_key = test_strdup(key);
 
   assert(strdict_find(dict, dup_key, NULL) == false);
 
@@ -580,7 +586,7 @@ static void insert_null_common(insert_t *const insert_cb)
   }
 }
 
-static void try_insert(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+static void try_insert(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   size_t ins_pos;
   bool success = false;
@@ -595,7 +601,7 @@ static void try_insert(StrDict *const dict, char const *const key, void *const v
   assert(pos == ins_pos);
 }
 
-static void try_insert_no_pos(StrDict *const dict, char const *const key, void *const value, size_t const pos)
+static void try_insert_no_pos(StrDict *const dict, char const *const key, _Optional void *const value, size_t const pos)
 {
   NOT_USED(pos);
   bool success = false;
@@ -674,7 +680,7 @@ static void test9(void)
     strdict_insert(&dict, keys[i], &values[i], NULL);
   }
 
-  strdict_destroy(&dict, NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, NULL);
   strdict_init(&dict);
 
   assert(strdict_count(&dict) == 0);
@@ -687,7 +693,7 @@ static void test9(void)
     assert("not empty" == NULL);
   }
 
-  strdict_destroy(&dict, NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, NULL);
 }
 
 static void test10(void)
@@ -788,7 +794,7 @@ static void test26(void)
   {
     for (int k = -1; k < 1; ++k)
     {
-      char *const bisect_key = strdup(keys[i]);
+      char *const bisect_key = test_strdup(keys[i]);
       size_t const len = strlen(bisect_key);
       if (len > 0) {
         bisect_key[len - 1] += k;
@@ -842,7 +848,7 @@ static void test27(void)
   {
     for (int k = -1; k < 1; ++k)
     {
-      char *const bisect_key = strdup(keys[i]);
+      char *const bisect_key = test_strdup(keys[i]);
       size_t const len = strlen(bisect_key);
       if (len > 0) {
         bisect_key[len - 1] += k;
@@ -900,13 +906,13 @@ static void test28(void)
       {
         for (int l = -1; l <= 1; ++l)
         {
-          char *const min_key = strdup(keys[j]);
+          char *const min_key = test_strdup(keys[j]);
           size_t const min_len = strlen(min_key);
           if (min_len > 0) {
             min_key[min_len - 1] += k;
           }
 
-          char *const max_key = strdup(keys[i]);
+          char *const max_key = test_strdup(keys[i]);
           size_t const max_len = strlen(max_key);
           if (max_len > 0) {
             max_key[max_len - 1] += l;
@@ -1024,13 +1030,14 @@ static void test35(void)
     assert(strdict_get_key_at(&dict, ins_pos) == keys[j]);
     assert(strdict_get_value_at(&dict, ins_pos) == &values[i]);
 
-    char *const dup_key = strdup(keys[j]);
+    char *const dup_key = test_strdup(keys[j]);
+    assert(dup_key);
     size_t find_pos = MagicValue;
     assert(strdict_find(&dict, dup_key, &find_pos));
     assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
 
     find_pos = MagicValue;
-    void *const value = strdict_find_value(&dict, dup_key, &find_pos);
+    _Optional void *const value = strdict_find_value(&dict, dup_key, &find_pos);
     bool found_value = false;
     for (size_t l = 0; l <= k && !found_value; ++l) {
       size_t const allowed_pos = j + (NumberOfKeys * l);
@@ -1099,7 +1106,8 @@ static void test36(void)
   {
     size_t const j = i % NumberOfKeys;
     size_t const k = i / NumberOfKeys;
-    char *const dup_key = strdup(keys[j]);
+    char *const dup_key = test_strdup(keys[j]);
+    assert(dup_key);
 
     size_t find_pos = MagicValue;
     assert(strdict_find(&dict, dup_key, &find_pos));
@@ -1146,7 +1154,7 @@ static void test37(void)
   {
     size_t const j = i % NumberOfKeys;
     size_t const k = i / NumberOfKeys;
-    char *const dup_key = strdup(keys[j]);
+    char *const dup_key = test_strdup(keys[j]);
 
     size_t find_pos = MagicValue;
     assert(strdict_find(&dict, dup_key, &find_pos));
@@ -1199,7 +1207,7 @@ static void test38(void)
   }
 
   size_t i = 0;
-  for (void *value = strdictviter_all_init(&iter, &dict);
+  for (_Optional void *value = strdictviter_all_init(&iter, &dict);
        value != NULL;
        value = strdictviter_advance(&iter))
   {
@@ -1246,24 +1254,24 @@ static void test39(void)
       {
         for (int l = -1; l <= 1; ++l)
         {
-          char *const min_key = strdup(keys[j]);
+          char *const min_key = test_strdup(keys[j]);
           size_t const min_len = strlen(min_key);
           if (min_len > 0) {
             min_key[min_len - 1] += k;
           }
 
-          char *const max_key = strdup(keys[i]);
+          char *const max_key = test_strdup(keys[i]);
           size_t const max_len = strlen(max_key);
           if (max_len > 0) {
             max_key[max_len - 1] += l;
           }
 
           size_t vcount = 0;
-          int *got_values[NumberOfItems];
+          _Optional int *got_values[NumberOfItems];
 
           printf("min_key '%s', max_key '%s'\n", min_key, max_key);
 
-          for (void *value = strdictviter_init(&iter, &dict, min_key, max_key);
+          for (_Optional void *value = strdictviter_init(&iter, &dict, min_key, max_key);
                value != NULL;
                value = strdictviter_advance(&iter))
           {
@@ -1271,7 +1279,7 @@ static void test39(void)
           }
 
           size_t const min_index = strdict_bisect_left(&dict, min_key),
-                    max_index = strdict_bisect_right(&dict, max_key);
+                       max_index = strdict_bisect_right(&dict, max_key);
 
           if (max_index >= min_index) {
             assert(vcount == max_index - min_index);
@@ -1323,7 +1331,7 @@ static void test40(void)
   }
 
   size_t count = 0;
-  for (void *value = strdictviter_all_init(&iter, &dict);
+  for (_Optional void *value = strdictviter_all_init(&iter, &dict);
        value != NULL;
        value = strdictviter_advance(&iter), ++count)
   {

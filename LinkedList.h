@@ -160,9 +160,9 @@ bool linkedlist_is_member(const LinkedList */*list*/, const LinkedListItem */*it
     */
 
 #define LINKEDLIST_FOR_EACH(list, item) \
-  for (_Optional LinkedListItem *(item) = linkedlist_get_head(list); \
+  for (LinkedListItem *(item) = (LinkedListItem *)linkedlist_get_head(list); \
        (item) != NULL; \
-       (item) = linkedlist_get_next(&*item))
+       (item) = (LinkedListItem *)linkedlist_get_next(item))
    /*
     * Macro to be used for iterating over a linked list (or part of a list) in
     * cases where the current list item is not removed or invalidated within
@@ -171,9 +171,9 @@ bool linkedlist_is_member(const LinkedList */*list*/, const LinkedListItem */*it
     */
 
 #define LINKEDLIST_FOR_EACH_REVERSE(list, item) \
-  for (_Optional LinkedListItem *(item) = linkedlist_get_tail(list); \
+  for (LinkedListItem *(item) = (LinkedListItem *)linkedlist_get_tail(list); \
        (item) != NULL; \
-       (item) = linkedlist_get_prev(&*item))
+       (item) = (LinkedListItem *)linkedlist_get_prev(item))
    /*
     * Macro to be used for iterating backwards over a linked list
     * (or part of a list) in cases where the current list item is not removed
@@ -182,8 +182,8 @@ bool linkedlist_is_member(const LinkedList */*list*/, const LinkedListItem */*it
     */
 
 #define LINKEDLIST_FOR_EACH_SAFE(list, item, tmp) \
-  for (_Optional LinkedListItem *(item) = linkedlist_get_head(list), *(tmp); \
-       (tmp) = (item) ? linkedlist_get_next(&*item) : NULL, (item) != NULL; \
+  for (LinkedListItem *(item) = (LinkedListItem *)linkedlist_get_head(list), *(tmp); \
+       (tmp) = (item) ? (LinkedListItem *)linkedlist_get_next(item) : (LinkedListItem *)NULL, (item) != NULL; \
        (item) = (tmp))
    /*
     * Macro to be used for iterating over a linked list (or part of a list) in

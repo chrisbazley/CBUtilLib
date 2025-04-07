@@ -366,14 +366,17 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
 
 size_t strdict_bisect_right(StrDict *const dict, char const *const key)
 {
+  if (!dict->array) {
+    return 0;
+  }
+  StrDictItem const *const array = &*dict->array;
+
   size_t index = strdict_bisect_left(dict, key);
 
-  if (dict->array) {
-    DEBUGF("Searching for lowest key > '%s' in dictionary of size %zu\n", key,
-         dict->nitems);
-    while (index < dict->nitems && stricmp(dict->array[index].key, key) <= 0) {
-      ++index;
-    }
+  DEBUGF("Searching for lowest key > '%s' in dictionary of size %zu\n", key,
+        dict->nitems);
+  while (index < dict->nitems && stricmp(array[index].key, key) <= 0) {
+    ++index;
   }
 
   return index;

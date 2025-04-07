@@ -146,7 +146,7 @@ _Optional void *intdict_remove_value_at(IntDict *const dict, size_t const index)
 }
 
 bool intdict_find(IntDict *const dict, IntDictKey const key,
-  size_t *const pos)
+  _Optional size_t *const pos)
 {
   size_t const index = intdict_bisect_left(dict, key);
   if (!dict->array || index >= dict->nitems || dict->array[index].key != key) {
@@ -353,14 +353,17 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
 
 size_t intdict_bisect_right(IntDict *const dict, IntDictKey const key)
 {
+  if (!dict->array) {
+    return 0;
+  }
+  IntDictItem const *const array = &*dict->array;
+
   size_t index = intdict_bisect_left(dict, key);
 
-  if (dict->array) {
-    DEBUGF("Searching for lowest key > %" PRIIntDictKey
-          " in dictionary of size %zu\n", key, dict->nitems);
-    while (index < dict->nitems && dict->array[index].key <= key) {
-      ++index;
-    }
+  DEBUGF("Searching for lowest key > %" PRIIntDictKey
+        " in dictionary of size %zu\n", key, dict->nitems);
+  while (index < dict->nitems && array[index].key <= key) {
+    ++index;
   }
 
   return index;

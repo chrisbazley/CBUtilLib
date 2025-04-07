@@ -89,7 +89,7 @@ void intdict_destroy(IntDict */*dict*/, _Optional IntDictDestructorFn */*destruc
     * (if the callback function pointer is not null).
     */
 
-bool intdict_find(IntDict */*dict*/, IntDictKey /*key*/, size_t */*index*/);
+bool intdict_find(IntDict */*dict*/, IntDictKey /*key*/, _Optional size_t */*index*/);
    /*
     * Search for the first item with a given key in an integer dictionary.
     * Outputs the index of the item if the dictionary contains the key.

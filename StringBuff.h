@@ -96,9 +96,9 @@ void stringbuffer_finish_append(StringBuffer * /*buffer*/, size_t /*n*/);
     * previous append or truncation operation.
     */
 
-bool stringbuffer_append(StringBuffer * /*buffer*/,
-                         const char   * /*tail*/,
-                         size_t         /*n*/);
+bool stringbuffer_append(StringBuffer         * /*buffer*/,
+                         _Optional const char * /*tail*/,
+                         size_t                 /*n*/);
    /*
     * Appends up to 'n' characters from 'tail' at the end of the current
     * string in a given buffer. The buffer will be enlarged if necessary.

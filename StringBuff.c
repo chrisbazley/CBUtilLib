@@ -206,14 +206,14 @@ bool stringbuffer_append_separated(StringBuffer *const buffer,
 }
 
 bool stringbuffer_append(StringBuffer *const buffer,
-  const char *const tail, size_t const n)
+  _Optional const char *const tail, size_t const n)
 {
   size_t tail_len, extra_chars;
   bool success = true;
 
   assert(buffer != NULL);
   DEBUG_VERBOSEF("StringBuff: Appending '%.*s' to buffer %p ('%s')\n",
-         (int)HIGHEST(n, INT_MAX), tail, (void *)buffer,
+         (int)HIGHEST(n, INT_MAX), STRING_OR_NULL(tail), (void *)buffer,
          STRING_OR_NULL(buffer->buffer));
 
   /* If the string buffer contains the empty string "" then the length
@@ -228,7 +228,7 @@ bool stringbuffer_append(StringBuffer *const buffer,
   if (n > 0)
   {
     assert(tail != NULL);
-    tail_len = strlen(tail);
+    tail_len = strlen(STRING_OR_NULL(tail));
   }
   else
   {
@@ -250,7 +250,7 @@ bool stringbuffer_append(StringBuffer *const buffer,
 
       /* Copy characters from the tail string to the end of the existing
          string. */
-      memcpy(&*free_ptr, tail, extra_chars);
+      memcpy(&*free_ptr, STRING_OR_NULL(tail), extra_chars);
 
       /* Record the new string length and append a null terminator. */
       stringbuffer_finish_append(buffer, extra_chars);

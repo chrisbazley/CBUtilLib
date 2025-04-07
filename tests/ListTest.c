@@ -42,13 +42,13 @@ static struct
 {
   LinkedList *list;
   LinkedListItem *item;
-  void *arg;
+  _Optional void *arg;
 }
 callbacks[NumberOfItems];
 
 static size_t callback_count;
 
-static bool record_callbacks(LinkedList *list, LinkedListItem *item, void *arg)
+static bool record_callbacks(LinkedList *list, LinkedListItem *item, _Optional void *arg)
 {
   assert(list != NULL);
   assert(item != NULL);
@@ -58,16 +58,16 @@ static bool record_callbacks(LinkedList *list, LinkedListItem *item, void *arg)
   return false;
 }
 
-static bool stop_iteration(LinkedList *list, LinkedListItem *item, void *arg)
+static bool stop_iteration(LinkedList *list, LinkedListItem *item, _Optional void *arg)
 {
-  unsigned int *num_to_visit = arg;
+  _Optional unsigned int *num_to_visit = arg;
   assert(list != NULL);
   assert(item != NULL);
   assert(num_to_visit != NULL);
   return ++callback_count >= *num_to_visit;
 }
 
-static bool remove_in_callback(LinkedList *list, LinkedListItem *item, void *arg)
+static bool remove_in_callback(LinkedList *list, LinkedListItem *item, _Optional void *arg)
 {
   assert(list != NULL);
   assert(item != NULL);
@@ -79,7 +79,7 @@ static bool remove_in_callback(LinkedList *list, LinkedListItem *item, void *arg
   return false;
 }
 
-static bool never_call_me(LinkedList *list, LinkedListItem *item, void *arg)
+static bool never_call_me(LinkedList *list, LinkedListItem *item, _Optional void *arg)
 {
   NOT_USED(list);
   NOT_USED(item);
@@ -141,7 +141,8 @@ static void test3(void)
 {
   /* Insert at tail */
   LinkedList list;
-  LinkedListItem items[NumberOfItems], *prev = NULL;
+  LinkedListItem items[NumberOfItems];
+  _Optional LinkedListItem *prev = NULL;
 
   memset(&list, CHAR_MAX, sizeof(list));
   memset(items, CHAR_MAX, sizeof(items));
@@ -175,7 +176,8 @@ static void test4(void)
 {
   /* Insert in middle */
   LinkedList list;
-  LinkedListItem items[NumberOfItems], *prev = NULL;
+  LinkedListItem items[NumberOfItems];
+  _Optional LinkedListItem *prev = NULL;
 
   memset(&list, CHAR_MAX, sizeof(list));
   memset(items, CHAR_MAX, sizeof(items));
@@ -270,7 +272,8 @@ static void test7(void)
 {
   /* Remove tail */
   LinkedList list;
-  LinkedListItem items[NumberOfItems], *prev = NULL;
+  LinkedListItem items[NumberOfItems];
+  _Optional LinkedListItem *prev = NULL;
 
   memset(&list, CHAR_MAX, sizeof(list));
   memset(items, CHAR_MAX, sizeof(items));
@@ -439,9 +442,9 @@ static void test13(void)
   }
 
   size_t j = 0;
-  for (LinkedListItem *p = linkedlist_get_tail(&list);
+  for (_Optional LinkedListItem *p = linkedlist_get_tail(&list);
        p != NULL;
-       p = linkedlist_get_prev(p), ++j)
+       p = linkedlist_get_prev(&*p), ++j)
   {
     assert(j < ARRAY_SIZE(items));
     assert(p == &items[j]);
@@ -466,9 +469,9 @@ static void test14(void)
   }
 
   size_t j = 0;
-  for (LinkedListItem *p = linkedlist_get_head(&list);
+  for (_Optional LinkedListItem *p = linkedlist_get_head(&list);
        p != NULL;
-       p = linkedlist_get_next(p), ++j)
+       p = linkedlist_get_next(&*p), ++j)
   {
     assert(j < ARRAY_SIZE(items));
     assert(p == &items[ARRAY_SIZE(items) - 1 - j]);

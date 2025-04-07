@@ -80,7 +80,7 @@ size_t csv_parse_string(const char                *s,
 
   /* We handle empty records as a special case because we don't want to
      interpret them as a single field of value 0. */
-  if (s < end_of_record)
+  if (end_of_record && s < end_of_record)
   {
     const char *start_of_field = s;
 
@@ -143,7 +143,7 @@ size_t csv_parse_string(const char                *s,
   if (endp == NULL)
     return field; /* Return the number of fields read */
 
-  if (end_of_record == lf)
+  if (lf && end_of_record == lf)
   {
     /* Check for LF/CR line ending (VDU style). We can't just check the next
        character, in case the following line is blank and the line endings
@@ -159,7 +159,7 @@ size_t csv_parse_string(const char                *s,
       end_of_record ++; /* skip over the LF */
     }
   }
-  else if (end_of_record == cr)
+  else if (cr && end_of_record == cr)
   {
     /* Check for CR/LF line ending (DOS style). We can't just check the next
        character, in case the following line is blank and the line endings
