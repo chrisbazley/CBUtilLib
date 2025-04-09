@@ -26,6 +26,8 @@
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 09-Apr-25: Add missing const qualifier in bisect_left().
+                  Use a local alias for 'array' in find_specific().
  */
 
 #include <stdlib.h>
@@ -159,13 +161,18 @@ bool strdict_find(StrDict *const dict, char const *const key,
 bool strdict_find_specific(StrDict *const dict, char const *const key,
   _Optional void *const value, _Optional size_t *const pos)
 {
+  if (!dict->array) {
+    return false;
+  }
+  StrDictItem const *const array = &*dict->array;
+
   size_t index = strdict_bisect_left(dict, key);
-  if (!dict->array || index >= dict->nitems) {
+  if (index >= dict->nitems) {
     DEBUGF("Can't find key '%s' because it's too high\n", key);
     return false;
   }
 
-  int diff = stricmp(dict->array[index].key, key);
+  int diff = stricmp(array[index].key, key);
 
   if (diff != 0) {
     DEBUGF("Can't find non-existent key '%s'\n", key);
@@ -173,14 +180,14 @@ bool strdict_find_specific(StrDict *const dict, char const *const key,
   }
 
   while (diff == 0 &&
-         dict->array[index].value != value &&
+         array[index].value != value &&
          index + 1 < dict->nitems) {
     ++index;
     assert(index < dict->nitems);
-    diff = stricmp(dict->array[index].key, key);
+    diff = stricmp(array[index].key, key);
   }
 
-  if (diff != 0 || dict->array[index].value != value) {
+  if (diff != 0 || array[index].value != value) {
     DEBUGF("Can't find non-existent value %p with key '%s'\n", value, key);
     return false;
   }
@@ -279,7 +286,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
   if (!dict->array) {
     return 0;
   }
-  StrDictItem *const array = &*dict->array;
+  StrDictItem const *const array = &*dict->array;
 
   size_t index = 0;
 

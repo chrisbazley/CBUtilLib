@@ -1,7 +1,7 @@
 # CBUtilLib
 (C) 2018 Christopher Bazley
 
-Release 12 (08 Apr 2025)
+Release 13 (09 Apr 2025)
 
 Introduction
 ------------
@@ -200,6 +200,10 @@ Release 11 (19 May 2024)
 
 Release 12 (08 Apr 2025)
 - Dogfooding the _Optional qualifier.
+
+Release 13 (09 Apr 2025)
+- Add missing const qualifier in bisect_left().
+- Use a local alias for 'array' in find_specific().
 
 Contact details
 ---------------
