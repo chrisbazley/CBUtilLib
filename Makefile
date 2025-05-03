@@ -2,11 +2,11 @@
 include MakeCommon
 
 # Tools
-CC = gcc
+CC = clang
 LibFile = ar
 
 # Toolflags:
-CCCommonFlags =  -c -Wall -Wextra -Wsign-conversion -pedantic -std=c99 -MMD -MP -o $@
+CCCommonFlags =  -DUSE_OPTIONAL  -c -Wall -Wextra -Wsign-conversion -pedantic -std=c99 -MMD -MP -o $@
 CCFlags = $(CCCommonFlags) -DNDEBUG -O3
 CCDebugFlags = $(CCCommonFlags) -g -DDEBUG_OUTPUT
 LibFileFlags = -rcs $@

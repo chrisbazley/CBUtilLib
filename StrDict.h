@@ -31,6 +31,9 @@
                   strdictviter_remove now returns the removed item's index.
   CJB: 18-May-24: Corrected description of the return value of strdict_remove.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 26-Apr-25: Remove the _Optional qualifier from strdict_destroy's
+                  callback function argument, because it makes no sense to
+                  require callbacks to handle null values.
  */
 
 #ifndef StrDict_h
@@ -72,7 +75,7 @@ void strdict_init(StrDict */*dict*/);
     */
 
 typedef void StrDictDestructorFn(char const */*key*/,
-                                 _Optional void */*value*/, _Optional void */*arg*/);
+                                 _Optional void */*value*/, void */*arg*/);
    /*
     * Type of function called back to destroy each string dictionary item.
     * The value of 'arg' is that passed to the strdict_destroy function and
@@ -80,7 +83,7 @@ typedef void StrDictDestructorFn(char const */*key*/,
     */
 
 void strdict_destroy(StrDict */*dict*/, _Optional StrDictDestructorFn */*destructor*/,
-                     _Optional void */*arg*/);
+                     void */*arg*/);
    /*
     * Destroy a string dictionary, optionally calling a destructor function
     * (if the callback function pointer is not null).

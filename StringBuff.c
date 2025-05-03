@@ -39,6 +39,9 @@
   CJB: 24-Sep-23: Added functions to append a formatted string.
                   Moved undo function to a separate file.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 03-May-25: Fix pedantic warnings when the format specifies type
+                  'void *' but the argument has another type.
+                  No longer assume that vsnprintf will accept NULL.
 */
 
 /* ISO library headers */
@@ -66,7 +69,7 @@ static bool realloc_buffer(StringBuffer *const buffer,
   {
     free(buffer->buffer);
     DEBUGF("StringBuff: freed %p (%zu bytes)\n",
-           buffer->buffer, buffer->buffer_size);
+           (void *)buffer->buffer, buffer->buffer_size);
   }
   else
   {
@@ -74,13 +77,13 @@ static bool realloc_buffer(StringBuffer *const buffer,
     if (new_buffer != NULL)
     {
       DEBUGF("StringBuff: reallocated %p (%zu bytes) at %p (%zu bytes)\n",
-             buffer->buffer, buffer->buffer_size,
-             new_buffer, new_size);
+             (void *)buffer->buffer, buffer->buffer_size,
+             (void *)new_buffer, new_size);
     }
     else
     {
       DEBUGF("StringBuff: failed to reallocate %p (%zu to %zu bytes)\n",
-             buffer->buffer, buffer->buffer_size,
+             (void *)buffer->buffer, buffer->buffer_size,
              new_size);
       success = false;
     }
@@ -171,7 +174,7 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
   }
 
   DEBUG_VERBOSEF("StringBuff: %zu bytes prepared at %p\n",
-         *min_size, free_ptr);
+         *min_size, (void *)free_ptr);
 
   return free_ptr;
 }

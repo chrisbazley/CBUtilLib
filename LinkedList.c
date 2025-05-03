@@ -32,6 +32,9 @@
   CJB: 11-Aug-22: The LINKEDLIST_FOR_EACH_SAFE macro now requires an extra
                   parameter.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 26-Apr-25: Remove the _Optional qualifier from linkedlist_for_each's
+                  callback function argument, because it makes no sense to
+                  require callbacks to handle null values.
 */
 
 /* ISO library headers */
@@ -141,7 +144,7 @@ void linkedlist_remove(LinkedList *const list, LinkedListItem *const item)
 /* ----------------------------------------------------------------------- */
 
 _Optional LinkedListItem *linkedlist_for_each(LinkedList *const list,
-  LinkedListCallbackFn *const callback, _Optional void *const arg)
+  LinkedListCallbackFn *const callback, void *const arg)
 {
   validate_list(list);
   assert(callback);

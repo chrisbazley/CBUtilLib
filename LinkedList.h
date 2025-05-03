@@ -30,6 +30,9 @@ History:
                   parameter to make it clear when the next item pointer
                   shadows another variable declaration.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 26-Apr-25: Remove the _Optional qualifier from linkedlist_for_each's
+                  callback function argument, because it makes no sense to
+                  require callbacks to handle null values.
 */
 
 #ifndef linkedlist_h
@@ -131,7 +134,7 @@ void linkedlist_remove(LinkedList */*list*/, LinkedListItem */*item*/);
 
 typedef bool LinkedListCallbackFn(LinkedList */*list*/,
                                   LinkedListItem */*item*/,
-                                  _Optional void */*arg*/);
+                                  void *const /*arg*/);
    /*
     * Type of function called back for each list item. The value of 'arg' is
     * that passed to the linkedlist_for_each function and is expected to
@@ -142,7 +145,7 @@ typedef bool LinkedListCallbackFn(LinkedList */*list*/,
 
   _Optional LinkedListItem *linkedlist_for_each(LinkedList */*list*/,
                                                 LinkedListCallbackFn */*callback*/,
-                                                _Optional void */*arg*/);
+                                                void *const /*arg*/);
    /*
     * Calls a given function for each client data item in a linked list, in
     * order from head to tail. The value of 'arg' will be passed to the

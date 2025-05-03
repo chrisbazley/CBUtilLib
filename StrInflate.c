@@ -29,6 +29,9 @@
                   Minimized variable scope and mutability.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 03-May-25: Fix pedantic warnings when the format specifies type
+                  'void *' but the argument has another type.
+                  Treat the result of strchr as optional.
 */
 
 /* ISO library headers */
@@ -71,7 +74,7 @@ size_t strinflate(char *const s1, size_t const n, const char *s2,
 
     if (count + len < n)
     {
-      DEBUGF("Copying %zu bytes from %p to %p\n", len, s2, s1 + count);
+      DEBUGF("Copying %zu bytes from %p to %p\n", len, (void *)s2, (void *)(s1 + count));
       strncpy(s1 + count, s2, len);
     }
     else
@@ -84,12 +87,14 @@ size_t strinflate(char *const s1, size_t const n, const char *s2,
       break;
 
     /* Find the index of the inflatable character in the search string */
-    const char *const m = strchr(srch, *i);
+    _Optional const char *const m = strchr(srch, *i);
     assert(m != NULL);
     assert(m >= srch);
+    if (m == NULL)
+      break; // Should never happen
 
     /* Get a pointer to the corresponding replacement string */
-    const char *const r = rplc[m - srch];
+    const char *const r = rplc[&*m - srch];
 
     len = strlen(r);
     if (count + len < n)

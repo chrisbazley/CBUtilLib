@@ -1,7 +1,7 @@
 # CBUtilLib
 (C) 2018 Christopher Bazley
 
-Release 13 (09 Apr 2025)
+Release 14 (03 May 2025)
 
 Introduction
 ------------
@@ -204,6 +204,17 @@ Release 12 (08 Apr 2025)
 Release 13 (09 Apr 2025)
 - Add missing const qualifier in bisect_left().
 - Use a local alias for 'array' in find_specific().
+
+Release 14 (03 May 2025)
+- Fix pedantic warnings when the format specifies type
+  'void *' but the argument has another type.
+- Treat the result of strchr as optional.
+- Remove the _Optional qualifier from intdict_destroy, strdict_destroy
+  and linkedlist_for_each's callback function argument, because it
+  makes no sense to require callbacks to handle null values.
+- Moved the veneers to make standard library functions compatible with
+  _Optional from Internal/CBUtilMisc.h to a public header file
+  (except that for vsnprintf -- I'm not sure it should accept null).
 
 Contact details
 ---------------

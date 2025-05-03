@@ -32,6 +32,9 @@
                   intdictviter_remove now returns the removed item's index.
   CJB: 29-Aug-22: Commented out the last intdictviter_init parameter name.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 26-Apr-25: Remove the _Optional qualifier from intdict_destroy's
+                  callback function argument, because it makes no sense to
+                  require callbacks to handle null values.
  */
 
 #ifndef IntDict_h
@@ -75,7 +78,7 @@ void intdict_init(IntDict */*dict*/);
     */
 
 typedef void IntDictDestructorFn(IntDictKey /*key*/, _Optional void */*value*/,
-                                 _Optional void */*arg*/);
+                                 void *const /*arg*/);
    /*
     * Type of function called back to destroy each integer dictionary item.
     * The value of 'arg' is that passed to the intdict_destroy function and
@@ -83,7 +86,7 @@ typedef void IntDictDestructorFn(IntDictKey /*key*/, _Optional void */*value*/,
     */
 
 void intdict_destroy(IntDict */*dict*/, _Optional IntDictDestructorFn */*destructor*/,
-                     _Optional void */*arg*/);
+                     void *const /*arg*/);
    /*
     * Destroy an integer dictionary, optionally calling a destructor function
     * (if the callback function pointer is not null).

@@ -28,6 +28,9 @@
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 09-Apr-25: Add missing const qualifier in bisect_left().
                   Use a local alias for 'array' in find_specific().
+  CJB: 26-Apr-25: Remove the _Optional qualifier from strdict_destroy's
+                  callback function argument, because it makes no sense to
+                  require callbacks to handle null values.
  */
 
 #include <stdlib.h>
@@ -52,7 +55,7 @@ void strdict_init(StrDict *const dict)
 }
 
 void strdict_destroy(StrDict *const dict,
-  _Optional StrDictDestructorFn *const destructor, _Optional void *const arg)
+  _Optional StrDictDestructorFn *const destructor, void *const arg)
 {
   DEBUGF("Terminating string dictionary %p\n", (void *)dict);
   assert(dict);

@@ -52,7 +52,7 @@ _Optional TrigTable *TrigTable_make(int multiplier, int quarter_turn);
     *          structure, otherwise null (eg. when not enough space).
     */
 
-void TrigTable_destroy(TrigTable *table);
+void TrigTable_destroy(_Optional TrigTable *table);
    /*
     * Frees memory that was previously allocated for a trigonometric table.
     */

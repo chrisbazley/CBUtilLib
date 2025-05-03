@@ -31,6 +31,9 @@
   CJB: 08-Oct-23: Use strtol and strtod instead of atoi, atof and atod to
                   avoid undefined behaviour if the value is unrepresentable.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 03-May-25: Fix pedantic warnings when the format specifies type
+                  'void *' but the argument has another type.
+                  Treat the result of strchr as optional.
 */
 
 /* ISO library headers */
@@ -55,7 +58,7 @@ size_t csv_parse_string(const char                *s,
   _Optional const char *end_of_record, *cr, *lf;
   size_t field = 0;
 
-  DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n", s,
+  DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n", (void *)s,
         nmemb, output);
   assert(type == CSVOutputType_Int || type == CSVOutputType_Long || type == CSVOutputType_Double);
   assert(s != NULL);
@@ -74,29 +77,29 @@ size_t csv_parse_string(const char                *s,
     end_of_record = s + strlen(s);
   }
   DEBUGF("CSV: End of record is character %u at %p\n", *end_of_record,
-        end_of_record);
+        (void *)end_of_record);
 
   DEBUGF("CSV: Record is '%.*s'\n", (int)(end_of_record - s), s);
 
   /* We handle empty records as a special case because we don't want to
      interpret them as a single field of value 0. */
-  if (end_of_record && s < end_of_record)
+  if (end_of_record && s < &*end_of_record)
   {
     const char *start_of_field = s;
 
     /* Read fields from the input string until the end of the current record
        (change the comparison to '<' to ignore trailing commas) */
-    while (start_of_field <= end_of_record)
+    while (start_of_field <= &*end_of_record)
     {
-      DEBUGF("CSV: Start of field %zu : %p\n", field, start_of_field);
+      DEBUGF("CSV: Start of field %zu : %p\n", field, (void *)start_of_field);
 
       /* Find the comma or line ending at the end of this field */
-      const char *next_comma = strchr(start_of_field, ',');
-      if (next_comma == NULL || end_of_record < next_comma)
+      _Optional const char *next_comma = strchr(start_of_field, ',');
+      if (next_comma == NULL || &*end_of_record < &*next_comma)
         next_comma = &*end_of_record;
 
       DEBUGF("CSV: End of field %zu is character %u at %p\n", field, *next_comma,
-            next_comma);
+            (void *)next_comma);
 
       if (output != NULL && field < nmemb)
       {
@@ -130,7 +133,7 @@ size_t csv_parse_string(const char                *s,
       }
       field++;
 
-      start_of_field = next_comma + 1;
+      start_of_field = &*next_comma + 1;
     } /* next field */
 
     DEBUGF("CSV: End of record\n");

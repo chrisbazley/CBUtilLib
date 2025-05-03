@@ -47,20 +47,20 @@ static struct CBInfo
 {
   IntDictKey key;
   _Optional void *value;
-  _Optional void *arg;
+  void *arg;
 }
 callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;
 
-static void record_callbacks(IntDictKey key, _Optional void *value, _Optional void *arg)
+static void record_callbacks(IntDictKey key, _Optional void *value, void *arg)
 {
   assert(callback_count < ARRAY_SIZE(callbacks));
   DEBUGF("Callback %zu: key %" PRIIntDictKey ", value %p, arg %p\n", callback_count, key, value, arg);
   callbacks[callback_count++] = (struct CBInfo){.key = key, .value = value, .arg = arg};
 }
 
-static void never_call_me(IntDictKey key, _Optional void *value, _Optional void *arg)
+static void never_call_me(IntDictKey key, _Optional void *value, void *arg)
 {
   NOT_USED(key);
   NOT_USED(value);

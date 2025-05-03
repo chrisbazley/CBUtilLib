@@ -28,6 +28,9 @@
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 09-Apr-25: Add missing const qualifier in bisect_left().
                   Use a local alias for 'array' in find_specific().
+  CJB: 26-Apr-25: Remove the _Optional qualifier from intdict_destroy's
+                  callback function argument, because it makes no sense to
+                  require callbacks to handle null values.
  */
 
 #include <stdlib.h>
@@ -50,7 +53,7 @@ void intdict_init(IntDict *const dict)
 }
 
 void intdict_destroy(IntDict *const dict,
-  _Optional IntDictDestructorFn *const destructor, _Optional void *const arg)
+  _Optional IntDictDestructorFn *const destructor, void *const arg)
 {
   DEBUGF("Terminating integer dictionary %p\n", (void *)dict);
   assert(dict);

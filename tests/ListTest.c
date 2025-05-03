@@ -42,13 +42,13 @@ static struct
 {
   LinkedList *list;
   LinkedListItem *item;
-  _Optional void *arg;
+  void *arg;
 }
 callbacks[NumberOfItems];
 
 static size_t callback_count;
 
-static bool record_callbacks(LinkedList *list, LinkedListItem *item, _Optional void *arg)
+static bool record_callbacks(LinkedList *list, LinkedListItem *item, void *arg)
 {
   assert(list != NULL);
   assert(item != NULL);
@@ -58,7 +58,7 @@ static bool record_callbacks(LinkedList *list, LinkedListItem *item, _Optional v
   return false;
 }
 
-static bool stop_iteration(LinkedList *list, LinkedListItem *item, _Optional void *arg)
+static bool stop_iteration(LinkedList *list, LinkedListItem *item, void *arg)
 {
   _Optional unsigned int *num_to_visit = arg;
   assert(list != NULL);
@@ -67,7 +67,7 @@ static bool stop_iteration(LinkedList *list, LinkedListItem *item, _Optional voi
   return ++callback_count >= *num_to_visit;
 }
 
-static bool remove_in_callback(LinkedList *list, LinkedListItem *item, _Optional void *arg)
+static bool remove_in_callback(LinkedList *list, LinkedListItem *item, void *arg)
 {
   assert(list != NULL);
   assert(item != NULL);
@@ -79,7 +79,7 @@ static bool remove_in_callback(LinkedList *list, LinkedListItem *item, _Optional
   return false;
 }
 
-static bool never_call_me(LinkedList *list, LinkedListItem *item, _Optional void *arg)
+static bool never_call_me(LinkedList *list, LinkedListItem *item, void *arg)
 {
   NOT_USED(list);
   NOT_USED(item);

@@ -126,10 +126,13 @@ _Optional TrigTable *TrigTable_make(int const multiplier, int const quarter_turn
 
 /* ----------------------------------------------------------------------- */
 
-void TrigTable_destroy(TrigTable *const table)
+void TrigTable_destroy(_Optional TrigTable *const table)
 {
-  DEBUGF("Destroying trig. table at %p\n", (void *)table);
-  free(table);
+  if (table)
+  {
+    DEBUGF("Destroying trig. table at %p\n", (void *)table);
+    free(table);
+  }
 }
 
 /* ----------------------------------------------------------------------- */

@@ -52,65 +52,7 @@
 
 #endif /* USE_CBDEBUG */
 
-#ifdef USE_OPTIONAL
-#include <stdlib.h>
-#include <stdarg.h>
-
-#undef NULL
-#define NULL ((_Optional void *)0)
-
-static inline void optional_free(_Optional void *x)
-{
-    free((void *)x);
-}
-#undef free
-#define free(x) optional_free(x)
-
-static inline _Optional void *optional_malloc(size_t n)
-{
-    return malloc(n);
-}
-#undef malloc
-#define malloc(n) optional_malloc(n)
-
-static inline _Optional void *optional_calloc(size_t sz, size_t n)
-{
-    return calloc(sz, n);
-}
-#undef calloc
-#define calloc(n) optional_calloc(sz, n)
-
-static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
-{
-    return realloc((void *)p, n);
-}
-#undef realloc
-#define realloc(p, n) optional_realloc(p, n)
-
-static inline long optional_strtol(const char *str, char *_Optional *str_end, int base)
-{
-    return strtol(str, (char **)str_end, base);
-}
-#undef strtol
-#define strtol(str, str_end, base) optional_strtol(str, str_end, base)
-
-static inline double optional_strtod(const char *str, char *_Optional *str_end)
-{
-    return strtod(str, (char **)str_end);
-}
-#undef strtod
-#define strtod(str, str_end) optional_strtod(str, str_end)
-
-static inline int optional_vsnprintf(_Optional char *buffer, size_t sz, const char *format, va_list vlist)
-{
-    return vsnprintf((char *)buffer, sz, format, vlist);
-}
-#undef vsnprintf
-#define vsnprintf(buffer, sz, format, vlist) optional_vsnprintf(buffer, sz, format, vlist)
-
-#else
-#define _Optional
-#endif
+#include "Optional.h"
 
 #define PI (3.1415926535897896)
 

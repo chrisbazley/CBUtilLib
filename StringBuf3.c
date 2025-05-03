@@ -53,7 +53,7 @@ bool stringbuffer_vprintf(StringBuffer *const buffer,
   va_list args_copy;
   va_copy(args_copy, args);
 
-  int const extra_chars = vsnprintf(NULL, 0, format, args);
+  int const extra_chars = vsnprintf(&(char){'\0'}, 0, format, args);
   if (extra_chars < 0)
   {
     return false;
