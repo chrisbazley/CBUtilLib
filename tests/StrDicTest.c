@@ -257,7 +257,7 @@ static void remove_singleton_common(remove_t *const remove_cb)
   check_not_found(&dict, key, &value);
   assert(strdict_count(&dict) == 0);
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void remove_head_common(remove_t *const remove_cb)
@@ -292,7 +292,7 @@ static void remove_head_common(remove_t *const remove_cb)
     }
   }
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void remove_tail_common(remove_t *const remove_cb)
@@ -327,7 +327,7 @@ static void remove_tail_common(remove_t *const remove_cb)
     }
   }
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void remove_middle_common(remove_t *const remove_cb)
@@ -408,7 +408,7 @@ static void remove_null_common(remove_t *const remove_cb)
     }
   }
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void insert_head_common(insert_t *const insert_cb)
@@ -627,7 +627,7 @@ static void test1(void)
     assert("not empty" == NULL);
   }
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void test2(void)
@@ -680,7 +680,7 @@ static void test9(void)
     strdict_insert(&dict, keys[i], &values[i], NULL);
   }
 
-  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, &dict);
   strdict_init(&dict);
 
   assert(strdict_count(&dict) == 0);
@@ -693,7 +693,7 @@ static void test9(void)
     assert("not empty" == NULL);
   }
 
-  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, &dict);
 }
 
 static void test10(void)
@@ -1132,7 +1132,7 @@ static void test36(void)
     free(dup_key);
   }
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void test37(void)
@@ -1185,7 +1185,7 @@ static void test37(void)
     free(dup_key);
   }
 
-  strdict_destroy(&dict, never_call_me, NULL);
+  strdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void test38(void)

@@ -223,7 +223,7 @@ static void remove_singleton_common(remove_t *const remove_cb)
   check_not_found(&dict, key, &value);
   assert(intdict_count(&dict) == 0);
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void remove_head_common(remove_t *const remove_cb)
@@ -258,7 +258,7 @@ static void remove_head_common(remove_t *const remove_cb)
     }
   }
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void remove_tail_common(remove_t *const remove_cb)
@@ -293,7 +293,7 @@ static void remove_tail_common(remove_t *const remove_cb)
     }
   }
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void remove_middle_common(remove_t *const remove_cb)
@@ -373,7 +373,7 @@ static void remove_null_common(remove_t *const remove_cb)
     }
   }
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 
@@ -588,7 +588,7 @@ static void test1(void)
     assert("not empty" == NULL);
   }
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void test2(void)
@@ -641,7 +641,7 @@ static void test9(void)
     intdict_insert(&dict, keys[i], &values[i], NULL);
   }
 
-  intdict_destroy(&dict, (IntDictDestructorFn *)NULL, NULL);
+  intdict_destroy(&dict, (IntDictDestructorFn *)NULL, &dict);
   intdict_init(&dict);
 
   assert(intdict_count(&dict) == 0);
@@ -654,7 +654,7 @@ static void test9(void)
     assert("not empty" == NULL);
   }
 
-  intdict_destroy(&dict, (IntDictDestructorFn *)NULL, NULL);
+  intdict_destroy(&dict, (IntDictDestructorFn *)NULL, &dict);
 }
 
 static void test10(void)
@@ -1063,7 +1063,7 @@ static void test36(void)
     assert(intdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i - 1);
   }
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void test37(void)
@@ -1113,7 +1113,7 @@ static void test37(void)
     }
   }
 
-  intdict_destroy(&dict, never_call_me, NULL);
+  intdict_destroy(&dict, never_call_me, &dict);
 }
 
 static void test38(void)

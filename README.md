@@ -1,7 +1,7 @@
 # CBUtilLib
 (C) 2018 Christopher Bazley
 
-Release 14 (03 May 2025)
+Release 15 (05 May 2025)
 
 Introduction
 ------------
@@ -215,6 +215,12 @@ Release 14 (03 May 2025)
 - Moved the veneers to make standard library functions compatible with
   _Optional from Internal/CBUtilMisc.h to a public header file
   (except that for vsnprintf -- I'm not sure it should accept null).
+
+Release 15 (05 May 2025)
+- Use the new public header file, Optional.h, in tests.
+- Update tests to cope with the fact that null is no longer permitted as a
+  callback function argument.
+- Update tests to cope with fopen returning a pointer to an _Optional FILE.
 
 Contact details
 ---------------

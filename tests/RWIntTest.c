@@ -47,13 +47,19 @@ static const long int cases[] = {
   TEST
 };
 
+static FILE *test_fopen(const char *const filename, const char *const mode)
+{
+  _Optional FILE *const f = fopen(filename, mode);
+  if (f == NULL) perror("Failed to open file");
+  assert(f != NULL);
+  return &*f;
+}
+
 static void test1(void)
 {
   /* Read */
   for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
-    FILE *f = fopen(PATH, "wb");
-    if (f == NULL) perror("Failed to open file");
-    assert(f != NULL);
+    FILE *f = test_fopen(PATH, "wb");
 
     unsigned long int const uint = (unsigned long)cases[i];
     uint8_t c = (uint8_t)uint;
@@ -66,9 +72,7 @@ static void test1(void)
     assert(fputc(c, f) == c);
 
     assert(!fclose(f));
-    f = fopen(PATH, "rb");
-    if (f == NULL) perror("Failed to open file");
-    assert(f != NULL);
+    f = test_fopen(PATH, "rb");
 
     long int num = DUMMY;
     assert(fread_int32le(&num, f));
@@ -85,9 +89,7 @@ static void test2(void)
 {
   /* Write */
   for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
-    FILE *f = fopen(PATH, "wb");
-    if (f == NULL) perror("Failed to open file");
-    assert(f != NULL);
+    FILE *f = test_fopen(PATH, "wb");
 
     assert(fwrite_int32le(cases[i], f));
     assert(ftell(f) == sizeof(uint32_t));
@@ -95,9 +97,7 @@ static void test2(void)
     assert(!feof(f));
 
     assert(!fclose(f));
-    f = fopen(PATH, "rb");
-    if (f == NULL) perror("Failed to open file");
-    assert(f != NULL);
+    f = test_fopen(PATH, "rb");
 
     unsigned long int const uint = (unsigned long)cases[i];
     assert(fgetc(f) == (uint8_t)uint);
@@ -167,9 +167,7 @@ static void test5(void)
 {
   /* Round trip */
   for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
-    FILE *f = fopen(PATH, "wb");
-    if (f == NULL) perror("Failed to open file");
-    assert(f != NULL);
+    FILE *f = test_fopen(PATH, "wb");
 
     assert(fwrite_int32le(cases[i], f));
     assert(ftell(f) == sizeof(uint32_t));
@@ -177,9 +175,7 @@ static void test5(void)
     assert(!feof(f));
 
     assert(!fclose(f));
-    f = fopen(PATH, "rb");
-    if (f == NULL) perror("Failed to open file");
-    assert(f != NULL);
+    f = test_fopen(PATH, "rb");
 
     long int num = DUMMY;
     assert(fread_int32le(&num, f));

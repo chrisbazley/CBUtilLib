@@ -97,7 +97,7 @@ static void test1(void)
 
   linkedlist_init(&list);
 
-  linkedlist_for_each(&list, never_call_me, NULL);
+  linkedlist_for_each(&list, never_call_me, &list);
 
   assert(linkedlist_get_head(&list) == NULL);
   assert(linkedlist_get_tail(&list) == NULL);
@@ -222,7 +222,7 @@ static void test5(void)
   linkedlist_remove(&list, &item);
   assert(!linkedlist_is_member(&list, &item));
 
-  linkedlist_for_each(&list, never_call_me, NULL);
+  linkedlist_for_each(&list, never_call_me, &list);
 }
 
 static void test6(void)
@@ -359,7 +359,7 @@ static void test10(void)
 
   linkedlist_init(&list);
 
-  linkedlist_for_each(&list, never_call_me, NULL);
+  linkedlist_for_each(&list, never_call_me, &list);
 
   for (size_t i = 0; i < ARRAY_SIZE(items); ++i)
   {
@@ -407,7 +407,7 @@ static void test12(void)
   }
 
   callback_count = 0;
-  linkedlist_for_each(&list, remove_in_callback, NULL);
+  linkedlist_for_each(&list, remove_in_callback, &list);
   assert(callback_count == ARRAY_SIZE(items));
 
   callback_count = 0;
