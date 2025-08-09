@@ -24,7 +24,8 @@ Message tokens: None
 History:
   CJB: 25-Apr-25: New header file.
   CJB: 03-May-25: Added strtod, strstr and strchr.
-  ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush.
+  ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush,
+                  reallocarray.
 */
 
 #ifndef Optional_h
@@ -80,6 +81,15 @@ static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 }
 #undef realloc
 #define realloc(p, n) optional_realloc(p, n)
+
+#if __has_include(<unistd.h>)  // If we're on a POSIX system.
+static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n, size_t sz)
+{
+    return reallocarray((void *)p, n, sz);
+}
+# undef reallocarray
+# define reallocarray(p, n, sz) optional_reallocarray(p, n, sz)
+#endif
 
 static inline long optional_strtol(const char * restrict str, char *_Optional * restrict str_end, int base)
 {
