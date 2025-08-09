@@ -64,7 +64,7 @@ static inline _Optional void *optional_calloc(size_t sz, size_t n)
     return calloc(sz, n);
 }
 #undef calloc
-#define calloc(n) optional_calloc(sz, n)
+#define calloc(sz, n) optional_calloc(sz, n)
 
 static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 {
