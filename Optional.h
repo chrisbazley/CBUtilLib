@@ -24,7 +24,7 @@ Message tokens: None
 History:
   CJB: 25-Apr-25: New header file.
   CJB: 03-May-25: Added strtod, strstr and strchr.
-  AC: 09-Aug-25: Fix the calloc macro's parameter list.
+  ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush.
 */
 
 #ifndef Optional_h
@@ -45,6 +45,13 @@ static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 }
 #undef fopen
 #define fopen(p, n) optional_fopen(p, n)
+
+static inline int optional_fflush(_Optional FILE *stream)
+{
+    return fflush((FILE *) stream);
+}
+#undef fflush
+#define fflush(stream) optional_fflush(stream)
 
 static inline void optional_free(_Optional void *x)
 {
