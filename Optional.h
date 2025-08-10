@@ -25,7 +25,7 @@ History:
   CJB: 25-Apr-25: New header file.
   CJB: 03-May-25: Added strtod, strstr and strchr.
   ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush.
-  ACA: 10-Aug-25: Add setlocale.
+  ACA: 10-Aug-25: Add setlocale, time.
 */
 
 #ifndef Optional_h
@@ -37,6 +37,7 @@ History:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #undef NULL
 #define NULL ((_Optional void *)0)
@@ -117,6 +118,13 @@ static inline _Optional char *optional_setlocale(int cat, _Optional const char *
 }
 #undef setlocale
 #define setlocale(cat, l)  optional_setlocale(cat, l)
+
+static inline time_t optional_time(_Optional time_t *tp)
+{
+    return time((time_t *) tp);
+}
+#undef time
+#define time(tp)  optional_time(tp)
 
 #else
 #define _Optional
