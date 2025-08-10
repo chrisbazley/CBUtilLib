@@ -26,6 +26,7 @@ History:
   CJB: 03-May-25: Added strtod, strstr and strchr.
   ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush,
                   reallocarray.
+  ACA: 10-Aug-25: Add getgroups.
 */
 
 #ifndef Optional_h
@@ -36,6 +37,9 @@ History:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#if __has_include(<unistd.h>)
+# include <unistd.h>
+#endif
 
 #undef NULL
 #define NULL ((_Optional void *)0)
@@ -118,6 +122,15 @@ static inline _Optional char *optional_strchr(const char *str, int ch)
 }
 #undef strchr
 #define strchr(str, ch) optional_strchr(str, ch)
+
+#if __has_include(<unistd.h>)
+static inline int optional_getgroups(size_t n, _Optional gid_t gids[n])
+{
+    return getgroups(n, (gid_t *) gids);
+}
+# undef getgroups
+# define getgroups(n, gids)  optional_getgroups(n, gids)
+#endif
 
 #else
 #define _Optional
