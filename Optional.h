@@ -24,8 +24,9 @@ Message tokens: None
 History:
   CJB: 25-Apr-25: New header file.
   CJB: 03-May-25: Added strtod, strstr and strchr.
-  ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush.
-  ACA: 10-Aug-25: Add setlocale, time.
+  ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush,
+                  reallocarray, and freezero.
+  ACA: 10-Aug-25: Add setlocale, time, and getgroups.
 */
 
 #ifndef Optional_h
@@ -38,6 +39,9 @@ History:
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#if __has_include(<unistd.h>)
+# include <unistd.h>
+#endif
 
 #undef NULL
 #define NULL ((_Optional void *)0)
@@ -63,6 +67,15 @@ static inline void optional_free(_Optional void *x)
 #undef free
 #define free(x) optional_free(x)
 
+#if __has_include(<readpassphrase.h>)  // If we're on a BSD system.
+static inline void optional_freezero(_Optional void *p, size_t n)
+{
+    freezero((void *)p, n);
+}
+# undef freezero
+# define freezero(p, n) optional_freezero(p, n)
+#endif
+
 static inline _Optional void *optional_malloc(size_t n)
 {
     return malloc(n);
@@ -83,6 +96,15 @@ static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 }
 #undef realloc
 #define realloc(p, n) optional_realloc(p, n)
+
+#if __has_include(<unistd.h>)  // If we're on a POSIX system.
+static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n, size_t sz)
+{
+    return reallocarray((void *)p, n, sz);
+}
+# undef reallocarray
+# define reallocarray(p, n, sz) optional_reallocarray(p, n, sz)
+#endif
 
 static inline long optional_strtol(const char * restrict str, char *_Optional * restrict str_end, int base)
 {
@@ -125,6 +147,15 @@ static inline time_t optional_time(_Optional time_t *tp)
 }
 #undef time
 #define time(tp)  optional_time(tp)
+
+#if __has_include(<unistd.h>)
+static inline int optional_getgroups(size_t n, _Optional gid_t gids[n])
+{
+    return getgroups(n, (gid_t *) gids);
+}
+# undef getgroups
+# define getgroups(n, gids)  optional_getgroups(n, gids)
+#endif
 
 #else
 #define _Optional
