@@ -26,7 +26,7 @@ History:
   CJB: 03-May-25: Added strtod, strstr and strchr.
   ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush,
                   reallocarray, and freezero.
-  ACA: 10-Aug-25: Add getgroups.
+  ACA: 10-Aug-25: Add setlocale, time, and getgroups.
 */
 
 #ifndef Optional_h
@@ -34,9 +34,11 @@ History:
 
 #ifdef USE_OPTIONAL
 
+#include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #if __has_include(<unistd.h>)
 # include <unistd.h>
 #endif
@@ -131,6 +133,20 @@ static inline _Optional char *optional_strchr(const char *str, int ch)
 }
 #undef strchr
 #define strchr(str, ch) optional_strchr(str, ch)
+
+static inline _Optional char *optional_setlocale(int cat, _Optional const char *l)
+{
+    return setlocale(cat, (const char *) l);
+}
+#undef setlocale
+#define setlocale(cat, l)  optional_setlocale(cat, l)
+
+static inline time_t optional_time(_Optional time_t *tp)
+{
+    return time((time_t *) tp);
+}
+#undef time
+#define time(tp)  optional_time(tp)
 
 #if __has_include(<unistd.h>)
 static inline int optional_getgroups(size_t n, _Optional gid_t gids[n])
