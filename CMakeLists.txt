@@ -4,14 +4,14 @@ project(CBUtilLib C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
-add_compile_options(-Wsign-conversion -pedantic)
+add_compile_options(-pedantic)
 
 if(MSVC)
     # MSVC equivalent of -Wall -Wextra is /W4
     add_compile_options(/W4)
 else()
     # For GCC and Clang
-    add_compile_options(-Wall -Wextra)
+    add_compile_options(-Wall -Wextra -Wsign-conversion)
 endif()
 
 file(GLOB SOURCES "*.c")
