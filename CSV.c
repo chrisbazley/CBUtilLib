@@ -34,6 +34,7 @@
   CJB: 03-May-25: Fix pedantic warnings when the format specifies type
                   'void *' but the argument has another type.
                   Treat the result of strchr as optional.
+  CJB: 29-Apr-26: Stop dereferencing a pointer of type void *.
 */
 
 /* ISO library headers */
@@ -107,7 +108,7 @@ size_t csv_parse_string(const char                *s,
         {
           case CSVOutputType_Double:
             {
-              double *const output_f = &*output;
+              _Optional double *const output_f = output;
               output_f[field] = strtod(start_of_field, NULL);
               DEBUGF("CSV: Decoded field %zu as %f\n", field, output_f[field]);
             }
@@ -115,7 +116,7 @@ size_t csv_parse_string(const char                *s,
 
           case CSVOutputType_Long:
             {
-              long *const output_l = &*output;
+              _Optional long *const output_l = output;
               output_l[field] = strtol(start_of_field, NULL, 0);
               DEBUGF("CSV: Decoded field %zu as %li\n", field, output_l[field]);
             }
@@ -123,7 +124,7 @@ size_t csv_parse_string(const char                *s,
 
           case CSVOutputType_Int:
             {
-              int *const output_i = &*output;
+              _Optional int *const output_i = output;
               long int const tmp = strtol(start_of_field, NULL, 0);
               output_i[field] = (int)LOWEST(INT_MAX, HIGHEST(INT_MIN, tmp));
               DEBUGF("CSV: Decoded field %zu as %i\n", field, output_i[field]);
