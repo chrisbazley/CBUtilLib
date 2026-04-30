@@ -26,6 +26,9 @@ target_include_directories(CBUtil PUBLIC .)
 target_compile_definitions(CBUtil PRIVATE
     $<$<CONFIG:Debug>:DEBUG_OUTPUT>
     $<$<CONFIG:Release>:NDEBUG>
+)
+
+target_compile_options(CBUtil PRIVATE
     $<$<CONFIG:Release>:-O3>
 )
 
