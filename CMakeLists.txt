@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 project(CBUtilLib C)
 
 set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
 
 if(MSVC)
     # MSVC equivalent of -Wall -Wextra is /W4
@@ -24,7 +22,12 @@ set_target_properties(CBUtil PROPERTIES
 )
 
 target_include_directories(CBUtil PUBLIC .)
-target_compile_definitions(CBUtil PRIVATE $<$<CONFIG:Debug>:DEBUG_OUTPUT>)
+
+target_compile_definitions(CBUtil PRIVATE
+    $<$<CONFIG:Debug>:DEBUG_OUTPUT>
+    $<$<CONFIG:Release>:NDEBUG>
+    $<$<CONFIG:Release>:-O3>
+)
 
 install(TARGETS CBUtil
     ARCHIVE DESTINATION lib
