@@ -30,7 +30,6 @@
 /* Local headers */
 #include "Tests.h"
 
-#define PATH "<Wimp$ScrapDir>.RWIntTest"
 enum {
   TEST = 345769078,
   DUMMY = 1234567,
@@ -47,6 +46,8 @@ static const long int cases[] = {
   TEST
 };
 
+static char file_name[L_tmpnam];
+
 static FILE *test_fopen(const char *const filename, const char *const mode)
 {
   _Optional FILE *const f = fopen(filename, mode);
@@ -59,7 +60,7 @@ static void test1(void)
 {
   /* Read */
   for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
-    FILE *f = test_fopen(PATH, "wb");
+    FILE *f = test_fopen(file_name, "wb");
 
     unsigned long int const uint = (unsigned long)cases[i];
     uint8_t c = (uint8_t)uint;
@@ -72,7 +73,7 @@ static void test1(void)
     assert(fputc(c, f) == c);
 
     assert(!fclose(f));
-    f = test_fopen(PATH, "rb");
+    f = test_fopen(file_name, "rb");
 
     long int num = DUMMY;
     assert(fread_int32le(&num, f));
@@ -81,7 +82,7 @@ static void test1(void)
     assert(!feof(f));
     assert(num == cases[i]);
     assert(!fclose(f));
-    remove(PATH);
+    remove(file_name);
   }
 }
 
@@ -89,7 +90,7 @@ static void test2(void)
 {
   /* Write */
   for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
-    FILE *f = test_fopen(PATH, "wb");
+    FILE *f = test_fopen(file_name, "wb");
 
     assert(fwrite_int32le(cases[i], f));
     assert(ftell(f) == sizeof(uint32_t));
@@ -97,7 +98,7 @@ static void test2(void)
     assert(!feof(f));
 
     assert(!fclose(f));
-    f = test_fopen(PATH, "rb");
+    f = test_fopen(file_name, "rb");
 
     unsigned long int const uint = (unsigned long)cases[i];
     assert(fgetc(f) == (uint8_t)uint);
@@ -106,7 +107,7 @@ static void test2(void)
     assert(fgetc(f) == (uint8_t)(uint >> 24));
 
     assert(!fclose(f));
-    remove(PATH);
+    remove(file_name);
   }
 }
 
@@ -114,7 +115,7 @@ static void test3(void)
 {
 #ifdef FORTIFY
   /* Read fail */
-  FILE *f = fopen(PATH, "wb");
+  FILE *f = fopen(file_name, "wb");
   if (f == NULL) perror("Failed to open file");
   assert(f != NULL);
 
@@ -122,7 +123,7 @@ static void test3(void)
   assert(fwrite(data, sizeof(*data), ARRAY_SIZE(data), f));
 
   assert(!fclose(f));
-  f = fopen(PATH, "rb");
+  f = fopen(file_name, "rb");
   if (f == NULL) perror("Failed to open file");
   assert(f != NULL);
 
@@ -138,7 +139,7 @@ static void test3(void)
   assert(num == DUMMY);
 
   assert(!fclose(f));
-  remove(PATH);
+  remove(file_name);
 #endif
 }
 
@@ -146,7 +147,7 @@ static void test4(void)
 {
 #ifdef FORTIFY
   /* Write fail */
-  FILE *f = fopen(PATH, "wb");
+  FILE *f = fopen(file_name, "wb");
   if (f == NULL) perror("Failed to open file");
   assert(f != NULL);
 
@@ -159,7 +160,7 @@ static void test4(void)
   assert(!feof(f));
 
   if (fclose(f)) { perror("fclose failed"); }
-  remove(PATH);
+  remove(file_name);
 #endif
 }
 
@@ -167,7 +168,7 @@ static void test5(void)
 {
   /* Round trip */
   for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
-    FILE *f = test_fopen(PATH, "wb");
+    FILE *f = test_fopen(file_name, "wb");
 
     assert(fwrite_int32le(cases[i], f));
     assert(ftell(f) == sizeof(uint32_t));
@@ -175,7 +176,7 @@ static void test5(void)
     assert(!feof(f));
 
     assert(!fclose(f));
-    f = test_fopen(PATH, "rb");
+    f = test_fopen(file_name, "rb");
 
     long int num = DUMMY;
     assert(fread_int32le(&num, f));
@@ -185,7 +186,7 @@ static void test5(void)
     assert(num == cases[i]);
 
     assert(!fclose(f));
-    remove(PATH);
+    remove(file_name);
   }
 }
 
@@ -204,6 +205,8 @@ void FileRWInt_tests(void)
     { "Write fail", test4 },
     { "Round trip", test5 },
   };
+
+  tmpnam(file_name);
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count ++)
   {
