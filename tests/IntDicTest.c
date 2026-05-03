@@ -575,6 +575,16 @@ static void try_insert_no_pos(IntDict *const dict, IntDictKey const key, _Option
   assert(success);
 }
 
+static IntDictKey adjust_key(IntDictKey key, IntDictKey const offset)
+{
+  if ((key > INTDICTKEY_MIN || offset >= 0) && (key < INTDICTKEY_MAX || offset <= 0))
+  {
+    key += offset;
+  }
+  return key;
+}
+
+
 static void test1(void)
 {
   /* Initialize */
@@ -755,7 +765,7 @@ static void test26(void)
   {
     for (int k = -1; k < 1; ++k)
     {
-      IntDictKey const bisect_key = keys[i] + k;
+      IntDictKey const bisect_key = adjust_key(keys[i], k);
       size_t const bisect_index = intdict_bisect_left(&dict, bisect_key);
       assert(bisect_index <= intdict_count(&dict));
 
@@ -803,7 +813,7 @@ static void test27(void)
   {
     for (int k = -1; k < 1; ++k)
     {
-      IntDictKey const bisect_key = keys[i] + k;
+      IntDictKey const bisect_key = adjust_key(keys[i], k);
       size_t const bisect_index = intdict_bisect_right(&dict, bisect_key);
       assert(bisect_index <= intdict_count(&dict));
 
@@ -855,8 +865,8 @@ static void test28(void)
       {
         for (int l = -1; l <= 1; ++l)
         {
-          IntDictKey const min_key = keys[j] + k;
-          IntDictKey const max_key = keys[i] + l;
+          IntDictKey const min_key = adjust_key(keys[j], k);
+          IntDictKey const max_key = adjust_key(keys[i], l);
 
           size_t min_index = SIZE_MAX, max_index = 0;
 
@@ -1182,8 +1192,8 @@ static void test39(void)
       {
         for (int l = -1; l <= 1; ++l)
         {
-          IntDictKey const min_key = keys[j] + k;
-          IntDictKey const max_key = keys[i] + l;
+          IntDictKey const min_key = adjust_key(keys[j], k);
+          IntDictKey const max_key = adjust_key(keys[i], l);
 
           size_t vcount = 0;
           _Optional int *got_values[NumberOfItems];
