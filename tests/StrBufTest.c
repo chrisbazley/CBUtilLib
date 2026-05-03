@@ -18,11 +18,11 @@
  */
 
 /* ISO library headers */
+#include <limits.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
-#include <limits.h>
 
 /* CBUtilLib headers */
 #include "StringBuff.h"
@@ -64,11 +64,8 @@ static void test2(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] =
-  {
-    "Appends", "up", "to", "", "\tcharacters", "from", "'tail'",
-    "at", "the\r", "end\n"
-  };
+  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
+                                              "from",    "'tail'", "at", "the\r", "end\n"};
   char expected_s[NumberOfAppends * 16] = "";
 
   stringbuffer_init(&buffer);
@@ -185,11 +182,8 @@ static void test6(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] =
-  {
-    "Appends", "up", "to", "", "\tcharacters", "from", "'tail'",
-    "at", "the\r", "end\n"
-  };
+  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
+                                              "from",    "'tail'", "at", "the\r", "end\n"};
   char expected_s[NumberOfAppends * 16] = "";
 
   stringbuffer_init(&buffer);
@@ -340,10 +334,8 @@ static void test10(void)
   unsigned int i;
   bool success;
   const char *stem = "Podd can ";
-  static const char *tail[NumberOfAppends] =
-  {
-    "eat", "dance", "snore", "swim", "walk", "run", "yawn", "pop", "sleep", "stroll"
-  };
+  static const char *tail[NumberOfAppends] = {"eat", "dance", "snore", "swim",  "walk",
+                                              "run", "yawn",  "pop",   "sleep", "stroll"};
 
   stringbuffer_init(&buffer);
 
@@ -570,7 +562,6 @@ static void test17(void)
   assert(strcmp(s, "foo") == 0);
 
   stringbuffer_destroy(&buffer);
-
 }
 
 static void test18(void)
@@ -579,11 +570,8 @@ static void test18(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] =
-  {
-    "Appends", "up", "to", "", "\tcharacters", "from", "'tail'",
-    "at", "the\r", "end\n"
-  };
+  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
+                                              "from",    "'tail'", "at", "the\r", "end\n"};
   const char sep = '$';
   char expected_s[NumberOfAppends * 16] = "";
 
@@ -616,10 +604,8 @@ static void test19(void)
   unsigned int i;
   bool success;
   const char *stem = "Podd can ";
-  static const char *tail[NumberOfAppends] =
-  {
-    "eat", "dance", "snore", "swim", "walk", "run", "yawn", "pop", "sleep", "stroll"
-  };
+  static const char *tail[NumberOfAppends] = {"eat", "dance", "snore", "swim",  "walk",
+                                              "run", "yawn",  "pop",   "sleep", "stroll"};
   const char sep = ',';
 
   stringbuffer_init(&buffer);
@@ -651,11 +637,8 @@ static void test20(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] =
-  {
-    "Appends", "up", "to", "", "\tcharacters", "from", "'tail'",
-    "at", "the\r", "end\n"
-  };
+  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
+                                              "from",    "'tail'", "at", "the\r", "end\n"};
   const char sep = '\t';
   char expected_s[NumberOfAppends * 16] = "";
 
@@ -792,40 +775,35 @@ void StringBuffer_tests(void)
   {
     const char *test_name;
     void (*test_func)(void);
-  }
-  unit_tests[] =
-  {
-    { "Init/destroy", test1 },
-    { "Append strings", test2 },
-    { "Append substrings", test3 },
-    { "Append NULL", test4 },
-    { "Truncate", test5 },
-    { "Minimize after append", test6 },
-    { "Minimize after truncate", test7 },
-    { "Append fail recovery", test8 },
-    { "Minimize fail recovery", test9 },
-    { "Undo append", test10 },
-    { "Undo truncate", test11 },
-    { "Undo append after minimize", test12 },
-    { "Undo truncate after minimize", test13 },
-    { "Undo append twice", test14 },
-    { "Undo truncate twice", test15 },
-    { "Undo append no chars", test16 },
-    { "Undo truncate no chars", test17 },
-    { "Append separated", test18 },
-    { "Undo append separated", test19 },
-    { "Minimize after append separated", test20 },
-    { "Append separated fail recovery", test21 },
-    { "Append formatted", test22 },
-    { "Append formatted fail recovery", test23 },
+  } unit_tests[] = {
+    {"Init/destroy", test1},
+    {"Append strings", test2},
+    {"Append substrings", test3},
+    {"Append NULL", test4},
+    {"Truncate", test5},
+    {"Minimize after append", test6},
+    {"Minimize after truncate", test7},
+    {"Append fail recovery", test8},
+    {"Minimize fail recovery", test9},
+    {"Undo append", test10},
+    {"Undo truncate", test11},
+    {"Undo append after minimize", test12},
+    {"Undo truncate after minimize", test13},
+    {"Undo append twice", test14},
+    {"Undo truncate twice", test15},
+    {"Undo append no chars", test16},
+    {"Undo truncate no chars", test17},
+    {"Append separated", test18},
+    {"Undo append separated", test19},
+    {"Minimize after append separated", test20},
+    {"Append separated fail recovery", test21},
+    {"Append formatted", test22},
+    {"Append formatted fail recovery", test23},
   };
 
-  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count ++)
+  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n",
-           1 + count,
-           ARRAY_SIZE(unit_tests),
-           unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
 
     Fortify_EnterScope();
 

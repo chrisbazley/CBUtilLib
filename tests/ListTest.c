@@ -18,11 +18,11 @@
  */
 
 /* ISO library headers */
-#include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
-#include <limits.h>
 #include <assert.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 /* CBUtilLib headers */
 #include "LinkedList.h"
@@ -37,14 +37,12 @@ enum
   KeepInterval = 2,
 };
 
-
 static struct
 {
   LinkedList *list;
   LinkedListItem *item;
   void *arg;
-}
-callbacks[NumberOfItems];
+} callbacks[NumberOfItems];
 
 static size_t callback_count;
 
@@ -185,7 +183,7 @@ static void test4(void)
   linkedlist_init(&list);
 
   size_t i;
-  for (i = 0; i < ARRAY_SIZE(items)/MiddleDivider; ++i)
+  for (i = 0; i < ARRAY_SIZE(items) / MiddleDivider; ++i)
   {
     linkedlist_insert(&list, prev, &items[i]);
     prev = &items[i];
@@ -248,14 +246,14 @@ static void test6(void)
   {
     int dummy;
 
-    assert(linkedlist_is_member(&list, &items[i-1]));
-    linkedlist_remove(&list, &items[i-1]);
-    assert(!linkedlist_is_member(&list, &items[i-1]));
+    assert(linkedlist_is_member(&list, &items[i - 1]));
+    linkedlist_remove(&list, &items[i - 1]);
+    assert(!linkedlist_is_member(&list, &items[i - 1]));
 
     callback_count = 0;
     linkedlist_for_each(&list, record_callbacks, &dummy);
 
-    assert(callback_count == i-1);
+    assert(callback_count == i - 1);
 
     for (size_t j = 0; j < callback_count; ++j)
     {
@@ -290,9 +288,9 @@ static void test7(void)
 
   for (; i > 0; --i)
   {
-    assert(linkedlist_is_member(&list, &items[i-1]));
-    linkedlist_remove(&list, &items[i-1]);
-    assert(!linkedlist_is_member(&list, &items[i-1]));
+    assert(linkedlist_is_member(&list, &items[i - 1]));
+    linkedlist_remove(&list, &items[i - 1]);
+    assert(!linkedlist_is_member(&list, &items[i - 1]));
   }
 }
 
@@ -315,9 +313,9 @@ static void test8(void)
 
   /* List contains items[i-1], items[i-2], items[i-3] */
 
-  assert(linkedlist_is_member(&list, &items[i/MiddleDivider]));
-  linkedlist_remove(&list, &items[i/MiddleDivider]);
-  assert(!linkedlist_is_member(&list, &items[i/MiddleDivider]));
+  assert(linkedlist_is_member(&list, &items[i / MiddleDivider]));
+  linkedlist_remove(&list, &items[i / MiddleDivider]);
+  assert(!linkedlist_is_member(&list, &items[i / MiddleDivider]));
 }
 
 static void test9(void)
@@ -336,7 +334,7 @@ static void test9(void)
 
   for (size_t i = 0; i < ARRAY_SIZE(lists); ++i)
   {
-    linkedlist_insert(&lists[(i+1) % ARRAY_SIZE(lists)], NULL, &items[i]);
+    linkedlist_insert(&lists[(i + 1) % ARRAY_SIZE(lists)], NULL, &items[i]);
     assert(!linkedlist_is_member(&lists[i], &items[i]));
   }
 }
@@ -417,8 +415,7 @@ static void test12(void)
   for (size_t i = 0; i < callback_count; ++i)
   {
     assert(callbacks[i].list == &list);
-    assert(callbacks[i].item ==
-       &items[ARRAY_SIZE(items) - 1 - (i * KeepInterval)]);
+    assert(callbacks[i].item == &items[ARRAY_SIZE(items) - 1 - (i * KeepInterval)]);
 
     assert(callbacks[i].arg == &dummy);
   }
@@ -442,8 +439,7 @@ static void test13(void)
   }
 
   size_t j = 0;
-  for (_Optional LinkedListItem *p = linkedlist_get_tail(&list);
-       p != NULL;
+  for (_Optional LinkedListItem *p = linkedlist_get_tail(&list); p != NULL;
        p = linkedlist_get_prev(&*p), ++j)
   {
     assert(j < ARRAY_SIZE(items));
@@ -469,8 +465,7 @@ static void test14(void)
   }
 
   size_t j = 0;
-  for (_Optional LinkedListItem *p = linkedlist_get_head(&list);
-       p != NULL;
+  for (_Optional LinkedListItem *p = linkedlist_get_head(&list); p != NULL;
        p = linkedlist_get_next(&*p), ++j)
   {
     assert(j < ARRAY_SIZE(items));
@@ -543,33 +538,28 @@ void LinkedList_tests(void)
   {
     const char *test_name;
     void (*test_func)(void);
-  }
-  unit_tests[] =
-  {
-    { "Initialize", test1 },
-    { "Insert at head", test2 },
-    { "Insert at tail", test3 },
-    { "Insert in middle", test4 },
-    { "Remove singleton", test5 },
-    { "Remove head", test6 },
-    { "Remove tail", test7 },
-    { "Remove middle", test8 },
-    { "Is member of another list", test9 },
-    { "Reinitialize", test10 },
-    { "Stop iteration", test11 },
-    { "Remove in callback", test12 },
-    { "Get previous", test13 },
-    { "Get next", test14 },
-    { "For each", test15 },
-    { "Remove in for each", test16 },
+  } unit_tests[] = {
+    {"Initialize", test1},
+    {"Insert at head", test2},
+    {"Insert at tail", test3},
+    {"Insert in middle", test4},
+    {"Remove singleton", test5},
+    {"Remove head", test6},
+    {"Remove tail", test7},
+    {"Remove middle", test8},
+    {"Is member of another list", test9},
+    {"Reinitialize", test10},
+    {"Stop iteration", test11},
+    {"Remove in callback", test12},
+    {"Get previous", test13},
+    {"Get next", test14},
+    {"For each", test15},
+    {"Remove in for each", test16},
   };
 
-  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count ++)
+  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n",
-           1 + count,
-           ARRAY_SIZE(unit_tests),
-           unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

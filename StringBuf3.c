@@ -23,16 +23,15 @@
 */
 
 /* ISO library headers */
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdarg.h>
 
 /* Local headers */
-#include "StringBuff.h"
 #include "Internal/CBUtilMisc.h"
+#include "StringBuff.h"
 
-bool stringbuffer_vprintf(StringBuffer *const buffer,
-  const char *const format, va_list args)
+bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format, va_list args)
 {
   bool success = true;
 
@@ -62,7 +61,7 @@ bool stringbuffer_vprintf(StringBuffer *const buffer,
   /* Allocate space for the number of characters to be appended and a
      null terminator. */
   size_t min_size = (unsigned)extra_chars + 1;
-  _Optional char * const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
+  _Optional char *const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
   if (free_ptr != NULL)
   {
     assert(buffer->buffer != NULL);

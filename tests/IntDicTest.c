@@ -18,12 +18,12 @@
  */
 
 /* ISO library headers */
-#include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
-#include <limits.h>
-#include <stdint.h>
 #include <assert.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 /* CBUtilLib headers */
 #include "IntDict.h"
@@ -48,15 +48,15 @@ static struct CBInfo
   IntDictKey key;
   _Optional void *value;
   void *arg;
-}
-callbacks[NumberOfItems * NumberOfDuplicates];
+} callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;
 
 static void record_callbacks(IntDictKey key, _Optional void *value, void *arg)
 {
   assert(callback_count < ARRAY_SIZE(callbacks));
-  DEBUGF("Callback %zu: key %" PRIIntDictKey ", value %p, arg %p\n", callback_count, key, value, arg);
+  DEBUGF("Callback %zu: key %" PRIIntDictKey ", value %p, arg %p\n", callback_count, key, value,
+         arg);
   callbacks[callback_count++] = (struct CBInfo){.key = key, .value = value, .arg = arg};
 }
 
@@ -71,90 +71,116 @@ static void never_call_me(IntDictKey key, _Optional void *value, void *arg)
 typedef void remove_t(IntDict *, IntDictKey, _Optional void *, size_t);
 typedef void insert_t(IntDict *, IntDictKey, _Optional void *, size_t);
 
-static void remove_key_only(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void remove_key_only(IntDict *const dict, IntDictKey const key, _Optional void *const value,
+                            size_t const pos)
 {
   NOT_USED(value);
   size_t rem_pos = MagicValue;
   bool success = intdict_remove(dict, key, &rem_pos);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     assert(success);
     assert(rem_pos == pos);
-  } else {
+  }
+  else
+  {
     assert(!success);
   }
 }
 
-static void remove_key_only_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void remove_key_only_no_pos(IntDict *const dict, IntDictKey const key,
+                                   _Optional void *const value, size_t const pos)
 {
   NOT_USED(value);
   bool success = intdict_remove(dict, key, NULL);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     assert(success);
-  } else {
+  }
+  else
+  {
     assert(!success);
   }
 }
 
-static void remove_key_and_get_value(IntDict *const dict, IntDictKey const key, _Optional void *value, size_t const pos)
+static void remove_key_and_get_value(IntDict *const dict, IntDictKey const key,
+                                     _Optional void *value, size_t const pos)
 {
-  if (pos == SIZE_MAX) {
+  if (pos == SIZE_MAX)
+  {
     value = NULL;
   }
   size_t rem_pos = MagicValue;
   assert(intdict_remove_value(dict, key, &rem_pos) == value);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     assert(pos == rem_pos);
   }
 }
 
-static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *value, size_t const pos)
+static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey const key,
+                                            _Optional void *value, size_t const pos)
 {
-  if (pos == SIZE_MAX) {
+  if (pos == SIZE_MAX)
+  {
     value = NULL;
   }
   assert(intdict_remove_value(dict, key, NULL) == value);
 }
 
-static void remove_specific(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void remove_specific(IntDict *const dict, IntDictKey const key, _Optional void *const value,
+                            size_t const pos)
 {
   size_t rem_pos = MagicValue;
   bool success = intdict_remove_specific(dict, key, value, &rem_pos);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     assert(success);
     assert(pos == rem_pos);
-  } else {
+  }
+  else
+  {
     assert(!success);
   }
 }
 
-static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key,
+                                   _Optional void *const value, size_t const pos)
 {
   bool success = intdict_remove_specific(dict, key, value, NULL);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     assert(success);
-  } else {
+  }
+  else
+  {
     assert(!success);
   }
 }
 
-static void remove_index(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void remove_index(IntDict *const dict, IntDictKey const key, _Optional void *const value,
+                         size_t const pos)
 {
   NOT_USED(key);
   NOT_USED(value);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     intdict_remove_at(dict, pos);
   }
 }
 
-static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key, _Optional void *value, size_t const pos)
+static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key,
+                                       _Optional void *value, size_t const pos)
 {
   NOT_USED(key);
-  if (pos != SIZE_MAX) {
+  if (pos != SIZE_MAX)
+  {
     assert(intdict_remove_value_at(dict, pos) == value);
   }
 }
 
-static void check_find(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void check_find(IntDict *const dict, IntDictKey const key, _Optional void *const value,
+                       size_t const pos)
 {
   assert(intdict_find(dict, key, NULL));
 
@@ -250,7 +276,8 @@ static void remove_head_common(remove_t *const remove_cb)
     check_not_found(&dict, keys[i], &values[i]);
     assert(intdict_count(&dict) == NumberOfItems - i - 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(i + 1 + index < NumberOfItems);
       assert(intdict_get_key_at(&dict, index) == keys[i + 1 + index]);
@@ -285,7 +312,8 @@ static void remove_tail_common(remove_t *const remove_cb)
     check_not_found(&dict, keys[i], &values[i]);
     assert(intdict_count(&dict) == NumberOfItems - i - 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(index < NumberOfItems);
       assert(intdict_get_key_at(&dict, index) == keys[NumberOfItems - 1 - index]);
@@ -319,7 +347,8 @@ static void remove_middle_common(remove_t *const remove_cb)
   check_not_found(&dict, keys[j], &values[j]);
   assert(intdict_count(&dict) == NumberOfItems - 1);
 
-  for (size_t index = 0; index < intdict_count(&dict); ++index) {
+  for (size_t index = 0; index < intdict_count(&dict); ++index)
+  {
     assert(index < intdict_count(&dict));
     assert(index < NumberOfItems);
     size_t const k = (index >= j ? index + 1 : index);
@@ -365,7 +394,8 @@ static void remove_null_common(remove_t *const remove_cb)
     check_not_found(&dict, keys[i], NULL);
     assert(intdict_count(&dict) == NumberOfItems - i - 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(i + 1 + index < NumberOfItems);
       assert(intdict_get_key_at(&dict, index) == keys[i + 1 + index]);
@@ -375,7 +405,6 @@ static void remove_null_common(remove_t *const remove_cb)
 
   intdict_destroy(&dict, never_call_me, &dict);
 }
-
 
 static void insert_head_common(insert_t *const insert_cb)
 {
@@ -394,9 +423,10 @@ static void insert_head_common(insert_t *const insert_cb)
 
     insert_cb(&dict, keys[i], &values[i], 0);
     check_find(&dict, keys[i], &values[i], 0);
-    assert(intdict_count(&dict) == i+1);
+    assert(intdict_count(&dict) == i + 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(index <= i);
       assert(intdict_get_key_at(&dict, index) == keys[i - index]);
@@ -435,9 +465,10 @@ static void insert_tail_common(insert_t *const insert_cb)
 
     insert_cb(&dict, keys[i], &values[i], i);
     check_find(&dict, keys[i], &values[i], i);
-    assert(intdict_count(&dict) == i+1);
+    assert(intdict_count(&dict) == i + 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(index <= i);
       assert(intdict_get_key_at(&dict, index) == keys[index]);
@@ -469,7 +500,7 @@ static void insert_middle_common(insert_t *const insert_cb)
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
 
-  for (size_t i = 0; i < NumberOfItems/MiddleDivider; ++i)
+  for (size_t i = 0; i < NumberOfItems / MiddleDivider; ++i)
   {
     check_not_found(&dict, keys[i], &values[i]);
     assert(intdict_count(&dict) == i * 2);
@@ -487,7 +518,8 @@ static void insert_middle_common(insert_t *const insert_cb)
     check_find(&dict, keys[j], &values[j], i + 1);
     assert(intdict_count(&dict) == (i * 2) + 2);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       size_t const k = (index <= i ? index : j + (index - i - 1));
       assert(k < NumberOfItems);
@@ -523,9 +555,10 @@ static void insert_null_common(insert_t *const insert_cb)
     insert_cb(&dict, keys[i], NULL, i);
 
     check_find(&dict, keys[i], NULL, i);
-    assert(intdict_count(&dict) == i+1);
+    assert(intdict_count(&dict) == i + 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(index <= i);
       assert(intdict_get_key_at(&dict, index) == keys[index]);
@@ -547,7 +580,8 @@ static void insert_null_common(insert_t *const insert_cb)
   }
 }
 
-static void try_insert(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void try_insert(IntDict *const dict, IntDictKey const key, _Optional void *const value,
+                       size_t const pos)
 {
   bool success = false;
   size_t ins_pos = 0;
@@ -562,7 +596,8 @@ static void try_insert(IntDict *const dict, IntDictKey const key, _Optional void
   assert(pos == ins_pos);
 }
 
-static void try_insert_no_pos(IntDict *const dict, IntDictKey const key, _Optional void *const value, size_t const pos)
+static void try_insert_no_pos(IntDict *const dict, IntDictKey const key,
+                              _Optional void *const value, size_t const pos)
 {
   NOT_USED(pos);
   bool success = false;
@@ -584,7 +619,6 @@ static IntDictKey adjust_key(IntDictKey key, IntDictKey const offset)
   return key;
 }
 
-
 static void test1(void)
 {
   /* Initialize */
@@ -594,7 +628,8 @@ static void test1(void)
   intdict_init(&dict);
   assert(intdict_count(&dict) == 0);
 
-  for (size_t index = 0; index < intdict_count(&dict); ++index) {
+  for (size_t index = 0; index < intdict_count(&dict); ++index)
+  {
     assert("not empty" == NULL);
   }
 
@@ -660,7 +695,8 @@ static void test9(void)
     check_not_found(&dict, keys[i], &values[i]);
   }
 
-  for (size_t index = 0; index < intdict_count(&dict); ++index) {
+  for (size_t index = 0; index < intdict_count(&dict); ++index)
+  {
     assert("not empty" == NULL);
   }
 
@@ -769,12 +805,14 @@ static void test26(void)
       size_t const bisect_index = intdict_bisect_left(&dict, bisect_key);
       assert(bisect_index <= intdict_count(&dict));
 
-      for (size_t j = 0; j < bisect_index; ++j) {
+      for (size_t j = 0; j < bisect_index; ++j)
+      {
         IntDictKey const key = intdict_get_key_at(&dict, j);
         assert(key < bisect_key);
       }
 
-      for (size_t j = bisect_index; j < intdict_count(&dict); ++j) {
+      for (size_t j = bisect_index; j < intdict_count(&dict); ++j)
+      {
         IntDictKey const key = intdict_get_key_at(&dict, j);
         assert(key >= bisect_key);
       }
@@ -817,12 +855,14 @@ static void test27(void)
       size_t const bisect_index = intdict_bisect_right(&dict, bisect_key);
       assert(bisect_index <= intdict_count(&dict));
 
-      for (size_t j = 0; j < bisect_index; ++j) {
+      for (size_t j = 0; j < bisect_index; ++j)
+      {
         IntDictKey const key = intdict_get_key_at(&dict, j);
         assert(key <= bisect_key);
       }
 
-      for (size_t j = bisect_index; j < intdict_count(&dict); ++j) {
+      for (size_t j = bisect_index; j < intdict_count(&dict); ++j)
+      {
         IntDictKey const key = intdict_get_key_at(&dict, j);
         assert(key > bisect_key);
       }
@@ -876,11 +916,13 @@ static void test28(void)
           {
             assert(index <= intdict_count(&dict));
 
-            if (index < min_index) {
+            if (index < min_index)
+            {
               min_index = index;
             }
 
-            if (index > max_index) {
+            if (index > max_index)
+            {
               max_index = index;
             }
 
@@ -891,17 +933,21 @@ static void test28(void)
 
           printf("min_index %zu, max_index %zu\n", min_index, max_index);
 
-          if (min_key > max_key) {
+          if (min_key > max_key)
+          {
             assert(min_index > max_index);
           }
 
-          if (min_index <= max_index) {
-            for (size_t j = 0; j < min_index; ++j) {
+          if (min_index <= max_index)
+          {
+            for (size_t j = 0; j < min_index; ++j)
+            {
               IntDictKey key = intdict_get_key_at(&dict, j);
               assert(key < min_key);
             }
 
-            for (size_t j = max_index + 1; j < intdict_count(&dict); ++j) {
+            for (size_t j = max_index + 1; j < intdict_count(&dict); ++j)
+            {
               IntDictKey key = intdict_get_key_at(&dict, j);
               assert(key > max_key);
             }
@@ -985,23 +1031,26 @@ static void test35(void)
     find_pos = MagicValue;
     _Optional void *const value = intdict_find_value(&dict, keys[j], &find_pos);
     bool found_value = false;
-    for (size_t l = 0; l <= k && !found_value; ++l) {
+    for (size_t l = 0; l <= k && !found_value; ++l)
+    {
       size_t const allowed_pos = j + (NumberOfKeys * l);
       assert(allowed_pos < (NumberOfKeys * NumberOfDuplicates));
       printf("%zu: Consider %zu: %p\n", i, allowed_pos, (void *)&values[allowed_pos]);
-      if (value == &values[allowed_pos]) {
+      if (value == &values[allowed_pos])
+      {
         found_value = true;
       }
     }
     assert(found_value);
     assert(intdict_get_key_at(&dict, find_pos) == keys[j]);
 
-    assert(intdict_count(&dict) == i+1);
+    assert(intdict_count(&dict) == i + 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
       assert(index <= i);
-      assert(intdict_get_key_at(&dict, index) == keys[index / (k+1)]);
+      assert(intdict_get_key_at(&dict, index) == keys[index / (k + 1)]);
     }
   }
 
@@ -1018,11 +1067,13 @@ static void test35(void)
     assert(callbacks[i].key == keys[k]);
 
     bool found_value = false;
-    for (size_t l = 0; l < NumberOfDuplicates && !found_value; ++l) {
+    for (size_t l = 0; l < NumberOfDuplicates && !found_value; ++l)
+    {
       size_t const allowed_pos = k + (NumberOfKeys * l);
       assert(allowed_pos < (NumberOfKeys * NumberOfDuplicates));
       printf("%zu: Consider %zu: %p\n", i, allowed_pos, (void *)&values[allowed_pos]);
-      if (callbacks[i].value == &values[allowed_pos]) {
+      if (callbacks[i].value == &values[allowed_pos])
+      {
         found_value = true;
       }
     }
@@ -1063,9 +1114,12 @@ static void test36(void)
 
     find_pos = MagicValue;
     bool success = intdict_find(&dict, keys[j], &find_pos);
-    if (k == NumberOfDuplicates-1) {
+    if (k == NumberOfDuplicates - 1)
+    {
       assert(!success);
-    } else {
+    }
+    else
+    {
       assert(success);
       assert(intdict_get_key_at(&dict, find_pos) == keys[j]);
     }
@@ -1106,18 +1160,23 @@ static void test37(void)
 
     find_pos = MagicValue;
     bool success = intdict_find(&dict, keys[j], &find_pos);
-    if (k == NumberOfDuplicates-1) {
+    if (k == NumberOfDuplicates - 1)
+    {
       assert(!success);
-    } else {
+    }
+    else
+    {
       assert(success);
       assert(intdict_get_key_at(&dict, find_pos) == keys[j]);
     }
 
     assert(intdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i - 1);
 
-    for (size_t index = 0; index < intdict_count(&dict); ++index) {
+    for (size_t index = 0; index < intdict_count(&dict); ++index)
+    {
       assert(index < intdict_count(&dict));
-      for (size_t k = 0; k <= i; ++k) {
+      for (size_t k = 0; k <= i; ++k)
+      {
         assert(intdict_get_value_at(&dict, index) != &values[k]);
       }
     }
@@ -1145,8 +1204,7 @@ static void test38(void)
   }
 
   size_t i = 0;
-  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
-       value != NULL;
+  for (_Optional void *value = intdictviter_all_init(&iter, &dict); value != NULL;
        value = intdictviter_advance(&iter))
   {
     assert(value == &values[i++]);
@@ -1201,22 +1259,25 @@ static void test39(void)
           printf("min_key %ld, max_key %ld\n", min_key, max_key);
 
           for (_Optional void *value = intdictviter_init(&iter, &dict, min_key, max_key);
-               value != NULL;
-               value = intdictviter_advance(&iter))
+               value != NULL; value = intdictviter_advance(&iter))
           {
             got_values[vcount++] = value;
           }
 
           size_t const min_index = intdict_bisect_left(&dict, min_key),
-                    max_index = intdict_bisect_right(&dict, max_key);
+                       max_index = intdict_bisect_right(&dict, max_key);
 
-          if (max_index >= min_index) {
+          if (max_index >= min_index)
+          {
             assert(vcount == max_index - min_index);
-          } else {
+          }
+          else
+          {
             assert(vcount == 0);
           }
 
-          for (size_t i = 0; i < vcount; ++i) {
+          for (size_t i = 0; i < vcount; ++i)
+          {
             assert(&values[min_index + i] == got_values[i]);
           }
         }
@@ -1257,14 +1318,14 @@ static void test40(void)
   }
 
   size_t count = 0;
-  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
-       value != NULL;
+  for (_Optional void *value = intdictviter_all_init(&iter, &dict); value != NULL;
        value = intdictviter_advance(&iter), ++count)
   {
     assert(count < NumberOfItems);
     assert(value == &values[count]);
 
-    if (count % RemoveInterval) {
+    if (count % RemoveInterval)
+    {
       size_t const pos = intdictviter_remove(&iter);
       assert(pos == (count / RemoveInterval) + 1);
     }
@@ -1426,77 +1487,72 @@ void intdict_tests(void)
   {
     const char *test_name;
     void (*test_func)(void);
-  }
-  unit_tests[] =
-  {
-    { "Initialize", test1 },
-    { "Insert at head", test2 },
-    { "Insert at tail", test3 },
-    { "Insert in middle", test4 },
-    { "Remove key from singleton", test5 },
-    { "Remove key from head", test6 },
-    { "Remove key from tail", test7 },
-    { "Remove key from middle", test8 },
-    { "Reinitialize", test9 },
-    { "Remove key and get value from singleton", test10 },
-    { "Remove key and get value from head", test11 },
-    { "Remove key and get value from tail", test12 },
-    { "Remove key and get value from middle", test13 },
-    { "Remove specific value from singleton", test14 },
-    { "Remove specific value from head", test15 },
-    { "Remove specific value from tail", test16 },
-    { "Remove specific value from middle", test17 },
-    { "Remove index from singleton", test18 },
-    { "Remove index from head", test19 },
-    { "Remove index from tail", test20 },
-    { "Remove index from middle", test21 },
-    { "Remove index and get value from singleton", test22 },
-    { "Remove index and get value from head", test23 },
-    { "Remove index and get value from tail", test24 },
-    { "Remove index and get value from middle", test25 },
-    { "Bisect left", test26 },
-    { "Bisect right", test27 },
-    { "For each in range", test28 },
-    { "Insert null value", test29 },
-    { "Remove key with null value", test30 },
-    { "Remove key and get null value", test31 },
-    { "Remove specific null value", test32 },
-    { "Remove index of null value", test33 },
-    { "Remove index and get null value", test34 },
-    { "Insert duplicate", test35 },
-    { "Remove duplicate", test36 },
-    { "Remove duplicate key with specific value", test37 },
-    { "Iterate over all values", test38 },
-    { "Iterate over a range of values", test39 },
-    { "Iterate over values with removal", test40 },
-    { "For each", test41 },
-    { "Insert at head without position", test42 },
-    { "Insert at tail without position", test43 },
-    { "Insert in middle without position", test44 },
-    { "Insert null value without position", test45 },
-    { "Remove specific value from singleton without position", test46 },
-    { "Remove specific value from head without position", test47 },
-    { "Remove specific value from tail without position", test48 },
-    { "Remove specific value from middle without position", test49 },
-    { "Remove specific null value without position", test50 },
-    { "Remove key and get value from singleton without position", test51 },
-    { "Remove key and get value from head without position", test52 },
-    { "Remove key and get value from tail without position", test53 },
-    { "Remove key and get value from middle without position", test54 },
-    { "Remove key and get null value without position", test55 },
-    { "Remove key from singleton without position", test56 },
-    { "Remove key from head without position", test57 },
-    { "Remove key from tail without position", test58 },
-    { "Remove key from middle without position", test59 },
-    { "Remove key with null value without position", test60 },
+  } unit_tests[] = {
+    {"Initialize", test1},
+    {"Insert at head", test2},
+    {"Insert at tail", test3},
+    {"Insert in middle", test4},
+    {"Remove key from singleton", test5},
+    {"Remove key from head", test6},
+    {"Remove key from tail", test7},
+    {"Remove key from middle", test8},
+    {"Reinitialize", test9},
+    {"Remove key and get value from singleton", test10},
+    {"Remove key and get value from head", test11},
+    {"Remove key and get value from tail", test12},
+    {"Remove key and get value from middle", test13},
+    {"Remove specific value from singleton", test14},
+    {"Remove specific value from head", test15},
+    {"Remove specific value from tail", test16},
+    {"Remove specific value from middle", test17},
+    {"Remove index from singleton", test18},
+    {"Remove index from head", test19},
+    {"Remove index from tail", test20},
+    {"Remove index from middle", test21},
+    {"Remove index and get value from singleton", test22},
+    {"Remove index and get value from head", test23},
+    {"Remove index and get value from tail", test24},
+    {"Remove index and get value from middle", test25},
+    {"Bisect left", test26},
+    {"Bisect right", test27},
+    {"For each in range", test28},
+    {"Insert null value", test29},
+    {"Remove key with null value", test30},
+    {"Remove key and get null value", test31},
+    {"Remove specific null value", test32},
+    {"Remove index of null value", test33},
+    {"Remove index and get null value", test34},
+    {"Insert duplicate", test35},
+    {"Remove duplicate", test36},
+    {"Remove duplicate key with specific value", test37},
+    {"Iterate over all values", test38},
+    {"Iterate over a range of values", test39},
+    {"Iterate over values with removal", test40},
+    {"For each", test41},
+    {"Insert at head without position", test42},
+    {"Insert at tail without position", test43},
+    {"Insert in middle without position", test44},
+    {"Insert null value without position", test45},
+    {"Remove specific value from singleton without position", test46},
+    {"Remove specific value from head without position", test47},
+    {"Remove specific value from tail without position", test48},
+    {"Remove specific value from middle without position", test49},
+    {"Remove specific null value without position", test50},
+    {"Remove key and get value from singleton without position", test51},
+    {"Remove key and get value from head without position", test52},
+    {"Remove key and get value from tail without position", test53},
+    {"Remove key and get value from middle without position", test54},
+    {"Remove key and get null value without position", test55},
+    {"Remove key from singleton without position", test56},
+    {"Remove key from head without position", test57},
+    {"Remove key from tail without position", test58},
+    {"Remove key from middle without position", test59},
+    {"Remove key with null value without position", test60},
   };
 
-  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count ++)
+  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n",
-           1 + count,
-           ARRAY_SIZE(unit_tests),
-           unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

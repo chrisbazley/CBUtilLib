@@ -35,12 +35,12 @@ History:
 #ifdef USE_OPTIONAL
 
 #include <locale.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #if __has_include(<unistd.h>)
-# include <unistd.h>
+#include <unistd.h>
 #endif
 
 #undef NULL
@@ -48,113 +48,114 @@ History:
 
 static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 {
-    return fopen(name, mode);
+  return fopen(name, mode);
 }
 #undef fopen
 #define fopen(p, n) optional_fopen(p, n)
 
 static inline int optional_fflush(_Optional FILE *stream)
 {
-    return fflush((FILE *) stream);
+  return fflush((FILE *)stream);
 }
 #undef fflush
 #define fflush(stream) optional_fflush(stream)
 
 static inline void optional_free(_Optional void *x)
 {
-    free((void *)x);
+  free((void *)x);
 }
 #undef free
 #define free(x) optional_free(x)
 
-#if __has_include(<readpassphrase.h>)  // If we're on a BSD system.
+#if __has_include(<readpassphrase.h>) // If we're on a BSD system.
 static inline void optional_freezero(_Optional void *p, size_t n)
 {
-    freezero((void *)p, n);
+  freezero((void *)p, n);
 }
-# undef freezero
-# define freezero(p, n) optional_freezero(p, n)
+#undef freezero
+#define freezero(p, n) optional_freezero(p, n)
 #endif
 
 static inline _Optional void *optional_malloc(size_t n)
 {
-    return malloc(n);
+  return malloc(n);
 }
 #undef malloc
 #define malloc(n) optional_malloc(n)
 
 static inline _Optional void *optional_calloc(size_t sz, size_t n)
 {
-    return calloc(sz, n);
+  return calloc(sz, n);
 }
 #undef calloc
 #define calloc(sz, n) optional_calloc(sz, n)
 
 static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 {
-    return realloc((void *)p, n);
+  return realloc((void *)p, n);
 }
 #undef realloc
 #define realloc(p, n) optional_realloc(p, n)
 
-#if __has_include(<unistd.h>)  // If we're on a POSIX system.
+#if __has_include(<unistd.h>) // If we're on a POSIX system.
 static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n, size_t sz)
 {
-    return reallocarray((void *)p, n, sz);
+  return reallocarray((void *)p, n, sz);
 }
-# undef reallocarray
-# define reallocarray(p, n, sz) optional_reallocarray(p, n, sz)
+#undef reallocarray
+#define reallocarray(p, n, sz) optional_reallocarray(p, n, sz)
 #endif
 
-static inline long optional_strtol(const char * restrict str, char *_Optional * restrict str_end, int base)
+static inline long optional_strtol(const char *restrict str, char *_Optional *restrict str_end,
+                                   int base)
 {
-    return strtol(str, (char **)str_end, base);
+  return strtol(str, (char **)str_end, base);
 }
 #undef strtol
 #define strtol(str, str_end, base) optional_strtol(str, str_end, base)
 
-static inline double optional_strtod(const char * restrict str, char *_Optional * restrict str_end)
+static inline double optional_strtod(const char *restrict str, char *_Optional *restrict str_end)
 {
-    return strtod(str, (char **)str_end);
+  return strtod(str, (char **)str_end);
 }
 #undef strtod
 #define strtod(str, str_end) optional_strtod(str, str_end)
 
 static inline _Optional char *optional_strstr(const char *str, const char *substr)
 {
-    return strstr(str, substr);
+  return strstr(str, substr);
 }
 #undef strstr
 #define strstr(str, substr) optional_strstr(str, substr)
 
 static inline _Optional char *optional_strchr(const char *str, int ch)
 {
-    return strchr(str, ch);
+  return strchr(str, ch);
 }
 #undef strchr
 #define strchr(str, ch) optional_strchr(str, ch)
 
 static inline _Optional char *optional_setlocale(int cat, _Optional const char *l)
 {
-    return setlocale(cat, (const char *) l);
+  return setlocale(cat, (const char *)l);
 }
 #undef setlocale
-#define setlocale(cat, l)  optional_setlocale(cat, l)
+#define setlocale(cat, l) optional_setlocale(cat, l)
 
 static inline time_t optional_time(_Optional time_t *tp)
 {
-    return time((time_t *) tp);
+  return time((time_t *)tp);
 }
 #undef time
-#define time(tp)  optional_time(tp)
+#define time(tp) optional_time(tp)
 
 #if __has_include(<unistd.h>)
 static inline int optional_getgroups(size_t n, _Optional gid_t gids[n])
 {
-    return getgroups(n, (gid_t *) gids);
+  return getgroups(n, (gid_t *)gids);
 }
-# undef getgroups
-# define getgroups(n, gids)  optional_getgroups(n, gids)
+#undef getgroups
+#define getgroups(n, gids) optional_getgroups(n, gids)
 #endif
 
 #else

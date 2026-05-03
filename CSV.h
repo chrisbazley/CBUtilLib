@@ -50,26 +50,25 @@ typedef enum
   CSVOutputType_Int,
   CSVOutputType_Long,
   CSVOutputType_Double
-}
-CSVOutputType;
+} CSVOutputType;
 
 size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optional void *output,
-  CSVOutputType type, size_t nmemb);
-   /*
-    * Parses a string 's' that contains comma-separated numeric values and
-    * assigns these values to 'nmemb' members of the 'output' array. The 'type'
-    * argument specifies the type of the elements of this array. Internally,
-    * the ANSI library function 'strtol' or 'strtod' is used to convert
-    * the values. The input string will be read as far as the next line-ending;
-    * this may be carriage return ('\r'), line feed ('\n'), or combinations
-    * thereof. A pointer to the first character of the next line (i.e. the next
-    * record) will be stored in '*endp', unless 'endp' is NULL. If the end of
-    * the input string is reached then NULL will instead be stored in '*endp'.
-    * You can call this function with NULL instead of a pointer to an output
-    * array, to find out how many fields a given record has.
-    * Returns: The number of values that would have been read into the 'output'
-    *          array if it had been specified and 'nmemb' was big enough.
-    */
+                        CSVOutputType type, size_t nmemb);
+/*
+ * Parses a string 's' that contains comma-separated numeric values and
+ * assigns these values to 'nmemb' members of the 'output' array. The 'type'
+ * argument specifies the type of the elements of this array. Internally,
+ * the ANSI library function 'strtol' or 'strtod' is used to convert
+ * the values. The input string will be read as far as the next line-ending;
+ * this may be carriage return ('\r'), line feed ('\n'), or combinations
+ * thereof. A pointer to the first character of the next line (i.e. the next
+ * record) will be stored in '*endp', unless 'endp' is NULL. If the end of
+ * the input string is reached then NULL will instead be stored in '*endp'.
+ * You can call this function with NULL instead of a pointer to an output
+ * array, to find out how many fields a given record has.
+ * Returns: The number of values that would have been read into the 'output'
+ *          array if it had been specified and 'nmemb' was big enough.
+ */
 
 static inline size_t csv_parse_as_int(const char *const s, _Optional char *_Optional *const endp,
                                       _Optional int *const output, size_t const nmemb)
@@ -90,7 +89,7 @@ static inline size_t csv_parse_as_double(const char *const s, _Optional char *_O
 }
 
 /* Deprecated type and enumeration constant names */
-#define parse_csv_type    CSVOutputType
+#define parse_csv_type CSVOutputType
 #define CSV_OUTPUT_TYPE_I CSVOutputType_Int
 #define CSV_OUTPUT_TYPE_L CSVOutputType_Long
 #define CSV_OUTPUT_TYPE_F CSVOutputType_Double

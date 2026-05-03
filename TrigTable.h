@@ -42,39 +42,39 @@ History:
 typedef struct TrigTable TrigTable;
 
 _Optional TrigTable *TrigTable_make(int multiplier, int quarter_turn);
-   /*
-    * Creates a trigonometric table by multiplying the sine of different
-    * angles by the specified 'multiplier' (the magnitude of which dictates
-    * the fractional accuracy of the sine values). The size of the table is
-    * dictated by 'quarter_turn', which gives the number of sine values that
-    * will be available for angles between 0 and 90 degrees.
-    * Returns: On successful completion, pointer to a trigonometric table
-    *          structure, otherwise null (eg. when not enough space).
-    */
+/*
+ * Creates a trigonometric table by multiplying the sine of different
+ * angles by the specified 'multiplier' (the magnitude of which dictates
+ * the fractional accuracy of the sine values). The size of the table is
+ * dictated by 'quarter_turn', which gives the number of sine values that
+ * will be available for angles between 0 and 90 degrees.
+ * Returns: On successful completion, pointer to a trigonometric table
+ *          structure, otherwise null (eg. when not enough space).
+ */
 
 void TrigTable_destroy(_Optional TrigTable *table);
-   /*
-    * Frees memory that was previously allocated for a trigonometric table.
-    */
+/*
+ * Frees memory that was previously allocated for a trigonometric table.
+ */
 
 int TrigTable_look_up_cosine(const TrigTable *table, int angle);
-   /*
-    * Looks up the cosine of a specified angle, in a table of pre-calculated
-    * values. The 'angle' value is interpreted according to the 'quarter_turn'
-    * value specified when the table was generated (i.e. a full revolution
-    * would be 4 * quarter_turn, rather than 360).
-    * Returns: The cosine of the angle as an integral value (to convert to a
-    *          fractional value, you must divide by the 'multiplier').
-    */
+/*
+ * Looks up the cosine of a specified angle, in a table of pre-calculated
+ * values. The 'angle' value is interpreted according to the 'quarter_turn'
+ * value specified when the table was generated (i.e. a full revolution
+ * would be 4 * quarter_turn, rather than 360).
+ * Returns: The cosine of the angle as an integral value (to convert to a
+ *          fractional value, you must divide by the 'multiplier').
+ */
 
 int TrigTable_look_up_sine(const TrigTable *table, int angle);
-   /*
-    * Looks up the cosine of a specified angle, in a table of pre-calculated
-    * values. The 'angle' value is interpreted according to the 'quarter_turn'
-    * value specified when the table was generated (i.e. a full revolution
-    * would be 4 * quarter_turn, rather than 360).
-    * Returns: The sine of the angle as an integral value (to convert to a
-    *          fractional value, you must divide by the 'multiplier').
-    */
+/*
+ * Looks up the cosine of a specified angle, in a table of pre-calculated
+ * values. The 'angle' value is interpreted according to the 'quarter_turn'
+ * value specified when the table was generated (i.e. a full revolution
+ * would be 4 * quarter_turn, rather than 360).
+ * Returns: The sine of the angle as an integral value (to convert to a
+ *          fractional value, you must divide by the 'multiplier').
+ */
 
 #endif

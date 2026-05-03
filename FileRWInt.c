@@ -32,9 +32,9 @@
 */
 
 /* ISO library headers */
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 /* Local headers */
 #include "FileRWInt.h"
@@ -53,24 +53,33 @@ bool fread_int32le(long int *num, FILE *in)
   assert(in != NULL);
 
   n = fread(bytes, sizeof(bytes), 1, in);
-  if (n != 1) {
+  if (n != 1)
+  {
     DEBUGF("FileRWInt: fread from %p failed (%zu)\n", (void *)in, n);
-  } else {
+  }
+  else
+  {
     /* Assemble a 32 bit integer from 4 bytes, assuming
        little-endian order (least significant byte first) */
-    uint32_t const unum = bytes[0] | ((uint32_t)bytes[1] << 8) |
-        ((uint32_t)bytes[2] << 16) | ((uint32_t)bytes[3] << 24);
+    uint32_t const unum = bytes[0] | ((uint32_t)bytes[1] << 8) | ((uint32_t)bytes[2] << 16) |
+                          ((uint32_t)bytes[3] << 24);
 
     int32_t snum = 0;
 
-    if (unum <= INT32_MAX) {
+    if (unum <= INT32_MAX)
+    {
       snum = (int32_t)unum;
-    } else {
+    }
+    else
+    {
       /* Beware that -INT32_MIN may be unrepresentable as int32_t. */
       uint32_t const neg = -unum;
-      if (neg <= INT32_MAX) {
+      if (neg <= INT32_MAX)
+      {
         snum = -(int32_t)neg;
-      } else {
+      }
+      else
+      {
         snum = INT32_MIN;
       }
     }

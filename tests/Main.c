@@ -18,8 +18,8 @@
  */
 
 /* ISO library headers */
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* Local headers */
@@ -31,14 +31,10 @@ int main(int argc, char *argv[])
   {
     const char *test_name;
     void (*test_func)(void);
-  }
-  test_groups[] =
-  {
-    { "LinkedList", LinkedList_tests },
-    { "StringBuffer", StringBuffer_tests },
-    { "FileRWInt", FileRWInt_tests },
-    { "IntDict", intdict_tests },
-    { "StrDict", strdict_tests },
+  } test_groups[] = {
+    {"LinkedList", LinkedList_tests}, {"StringBuffer", StringBuffer_tests},
+    {"FileRWInt", FileRWInt_tests},   {"IntDict", intdict_tests},
+    {"StrDict", strdict_tests},
   };
 
   NOT_USED(argc);
@@ -46,13 +42,13 @@ int main(int argc, char *argv[])
 
   DEBUG_SET_OUTPUT(DebugOutput_StdOut, "");
 
-  for (size_t count = 0; count < ARRAY_SIZE(test_groups); count ++)
+  for (size_t count = 0; count < ARRAY_SIZE(test_groups); count++)
   {
     /* Print title of this group of tests, then underline it */
     const size_t len = strlen(test_groups[count].test_name);
     puts(test_groups[count].test_name);
     for (size_t i = 0; i < len; i++)
-        putchar('-');
+      putchar('-');
     putchar('\n');
 
     /* Call a function to perform the group of tests */

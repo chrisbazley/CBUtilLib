@@ -41,9 +41,8 @@
 #include <stddef.h>
 
 /* Local headers */
-#include "LinkedList.h"
 #include "Internal/CBUtilMisc.h"
-
+#include "LinkedList.h"
 
 /* ----------------------------------------------------------------------- */
 /*                       Function prototypes                               */
@@ -67,14 +66,15 @@ void linkedlist_init(LinkedList *const list)
 /* ----------------------------------------------------------------------- */
 
 void linkedlist_insert(LinkedList *const list, _Optional LinkedListItem *const prev,
-  LinkedListItem *const item)
+                       LinkedListItem *const item)
 {
   assert(item != NULL);
-  DEBUGF("LinkedList: Inserting item %p into list %p after item %p\n",
-         (void *)item, (void *)list, (void *)prev);
+  DEBUGF("LinkedList: Inserting item %p into list %p after item %p\n", (void *)item, (void *)list,
+         (void *)prev);
 
   assert(!linkedlist_is_member(list, item));
-  if (prev != NULL) {
+  if (prev != NULL)
+  {
     assert(linkedlist_is_member(list, &*prev));
   }
 
@@ -113,8 +113,8 @@ void linkedlist_insert(LinkedList *const list, _Optional LinkedListItem *const p
 void linkedlist_remove(LinkedList *const list, LinkedListItem *const item)
 {
   assert(item != NULL);
-  DEBUGF("LinkedList: Removing item %p (prev %p, next %p) from list %p\n",
-         (void *)item, (void *)item->prev, (void *)item->next, (void *)list);
+  DEBUGF("LinkedList: Removing item %p (prev %p, next %p) from list %p\n", (void *)item,
+         (void *)item->prev, (void *)item->next, (void *)list);
 
   assert(linkedlist_is_member(list, item));
 
@@ -144,36 +144,32 @@ void linkedlist_remove(LinkedList *const list, LinkedListItem *const item)
 /* ----------------------------------------------------------------------- */
 
 _Optional LinkedListItem *linkedlist_for_each(LinkedList *const list,
-  LinkedListCallbackFn *const callback, void *const arg)
+                                              LinkedListCallbackFn *const callback, void *const arg)
 {
   validate_list(list);
   assert(callback);
-  DEBUG_VERBOSEF("LinkedList: Calling function with %p for all items in list %p\n",
-         arg, (void *)list);
+  DEBUG_VERBOSEF("LinkedList: Calling function with %p for all items in list %p\n", arg,
+                 (void *)list);
 
   LINKEDLIST_FOR_EACH_SAFE(list, foo, bar)
   {
-    DEBUG_VERBOSEF("LinkedList: Visiting item %p in list %p\n",
-      (void *)foo, (void *)list);
+    DEBUG_VERBOSEF("LinkedList: Visiting item %p in list %p\n", (void *)foo, (void *)list);
 
     if (callback(list, &*foo, arg))
     {
-      DEBUG_VERBOSEF("LinkedList: Callback terminated iteration over list %p\n",
-        (void *)list);
+      DEBUG_VERBOSEF("LinkedList: Callback terminated iteration over list %p\n", (void *)list);
       return foo;
     }
   }
 
-  DEBUG_VERBOSEF("LinkedList: Iteration over list %p finished with no callback\n",
-    (void *)list);
+  DEBUG_VERBOSEF("LinkedList: Iteration over list %p finished with no callback\n", (void *)list);
 
   return NULL;
 }
 
 /* ----------------------------------------------------------------------- */
 
-bool linkedlist_is_member(const LinkedList *const list,
-  const LinkedListItem *const item)
+bool linkedlist_is_member(const LinkedList *const list, const LinkedListItem *const item)
 {
   validate_list(list);
   assert(item != NULL);

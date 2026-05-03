@@ -18,11 +18,11 @@
  */
 
 /* ISO library headers */
-#include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 /* CBUtilLib headers */
 #include "FileRWInt.h"
@@ -30,28 +30,22 @@
 /* Local headers */
 #include "Tests.h"
 
-enum {
+enum
+{
   TEST = 345769078,
   DUMMY = 1234567,
 };
 
-static const long int cases[] = {
-  INT32_MAX,
-  INT32_MIN,
-  INT32_MAX - 1,
-  INT32_MIN + 1,
-  0,
-  1,
-  -1,
-  TEST
-};
+static const long int cases[] = {INT32_MAX, INT32_MIN, INT32_MAX - 1, INT32_MIN + 1, 0,
+                                 1,         -1,        TEST};
 
 static char file_name[L_tmpnam];
 
 static FILE *test_fopen(const char *const filename, const char *const mode)
 {
   _Optional FILE *const f = fopen(filename, mode);
-  if (f == NULL) perror("Failed to open file");
+  if (f == NULL)
+    perror("Failed to open file");
   assert(f != NULL);
   return &*f;
 }
@@ -59,7 +53,8 @@ static FILE *test_fopen(const char *const filename, const char *const mode)
 static void test1(void)
 {
   /* Read */
-  for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
+  for (size_t i = 0; i < ARRAY_SIZE(cases); ++i)
+  {
     FILE *f = test_fopen(file_name, "wb");
 
     unsigned long int const uint = (unsigned long)cases[i];
@@ -89,7 +84,8 @@ static void test1(void)
 static void test2(void)
 {
   /* Write */
-  for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
+  for (size_t i = 0; i < ARRAY_SIZE(cases); ++i)
+  {
     FILE *f = test_fopen(file_name, "wb");
 
     assert(fwrite_int32le(cases[i], f));
@@ -116,7 +112,8 @@ static void test3(void)
 #ifdef FORTIFY
   /* Read fail */
   FILE *f = fopen(file_name, "wb");
-  if (f == NULL) perror("Failed to open file");
+  if (f == NULL)
+    perror("Failed to open file");
   assert(f != NULL);
 
   static uint8_t const data[] = {1, 2, 3, 4};
@@ -124,7 +121,8 @@ static void test3(void)
 
   assert(!fclose(f));
   f = fopen(file_name, "rb");
-  if (f == NULL) perror("Failed to open file");
+  if (f == NULL)
+    perror("Failed to open file");
   assert(f != NULL);
 
   long int num = DUMMY;
@@ -148,7 +146,8 @@ static void test4(void)
 #ifdef FORTIFY
   /* Write fail */
   FILE *f = fopen(file_name, "wb");
-  if (f == NULL) perror("Failed to open file");
+  if (f == NULL)
+    perror("Failed to open file");
   assert(f != NULL);
 
   Fortify_SetNumAllocationsLimit(0);
@@ -159,7 +158,10 @@ static void test4(void)
   assert(ferror(f));
   assert(!feof(f));
 
-  if (fclose(f)) { perror("fclose failed"); }
+  if (fclose(f))
+  {
+    perror("fclose failed");
+  }
   remove(file_name);
 #endif
 }
@@ -167,7 +169,8 @@ static void test4(void)
 static void test5(void)
 {
   /* Round trip */
-  for (size_t i = 0; i < ARRAY_SIZE(cases); ++i) {
+  for (size_t i = 0; i < ARRAY_SIZE(cases); ++i)
+  {
     FILE *f = test_fopen(file_name, "wb");
 
     assert(fwrite_int32le(cases[i], f));
@@ -196,24 +199,16 @@ void FileRWInt_tests(void)
   {
     const char *test_name;
     void (*test_func)(void);
-  }
-  unit_tests[] =
-  {
-    { "Read", test1 },
-    { "Write", test2 },
-    { "Read fail", test3 },
-    { "Write fail", test4 },
-    { "Round trip", test5 },
+  } unit_tests[] = {
+    {"Read", test1},       {"Write", test2},      {"Read fail", test3},
+    {"Write fail", test4}, {"Round trip", test5},
   };
 
   tmpnam(file_name);
 
-  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count ++)
+  for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n",
-           1 + count,
-           ARRAY_SIZE(unit_tests),
-           unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

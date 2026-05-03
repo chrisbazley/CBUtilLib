@@ -29,8 +29,8 @@ History:
 #define FileRWInt_h
 
 /* ISO library headers */
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 bool fread_int32le(long int *num, FILE *in);
 /*

@@ -29,8 +29,8 @@
 #include <ctype.h>
 
 /* Local headers */
-#include "StrExtra.h"
 #include "Internal/CBUtilMisc.h"
+#include "StrExtra.h"
 
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */
@@ -45,10 +45,9 @@ int stricmp(const char *s1, const char *s2)
   do
   {
     i = *s1++, j = *s2++;
-    i = toupper (i);
-    j = toupper (j);
-  }
-  while (i && i == j);
+    i = toupper(i);
+    j = toupper(j);
+  } while (i && i == j);
 
   return (i - j);
 }

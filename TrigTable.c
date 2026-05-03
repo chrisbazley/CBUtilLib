@@ -38,14 +38,14 @@
  */
 
 /* ISO library headers */
+#include <math.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
 
 /* Local headers */
-#include "TrigTable.h"
 #include "Internal/CBUtilMisc.h"
+#include "TrigTable.h"
 
 struct TrigTable
 {
@@ -99,14 +99,14 @@ static int look_up_sine(const TrigTable *const table, int angle)
 
 _Optional TrigTable *TrigTable_make(int const multiplier, int const quarter_turn)
 {
-  DEBUGF("Generating sine look-up table of size %d with scaler %d\n",
-        quarter_turn + 1, multiplier);
+  DEBUGF("Generating sine look-up table of size %d with scaler %d\n", quarter_turn + 1, multiplier);
   assert(multiplier > 0);
   assert(quarter_turn > 0);
 
   /* Allocate memory for a table of sine values */
-  _Optional TrigTable *const table = malloc(offsetof(TrigTable, sine_values) +
-                 ((unsigned)quarter_turn + 1) * sizeof(table->sine_values[0]));
+  _Optional TrigTable *const table =
+    malloc(offsetof(TrigTable, sine_values) +
+           ((unsigned)quarter_turn + 1) * sizeof(table->sine_values[0]));
   if (table == NULL)
     return NULL;
 
@@ -118,8 +118,7 @@ _Optional TrigTable *TrigTable_make(int const multiplier, int const quarter_turn
   for (int index = 0; index <= quarter_turn; index++)
   {
     double radians = (index * 2.0 * PI) / (int)(quarter_turn * 4);
-    table->sine_values[index] = (int)floor(sin(radians) * (double)multiplier +
-                                           0.5);
+    table->sine_values[index] = (int)floor(sin(radians) * (double)multiplier + 0.5);
   }
   return table;
 }
@@ -141,9 +140,8 @@ int TrigTable_look_up_cosine(const TrigTable *const table, int const angle)
 {
   int const cosine = look_up_sine(table, angle + table->quarter_turn);
 
-  DEBUGF("Cosine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n",
-         angle, to_deg(table, angle), (void *)table,
-         cosine, (double)cosine / table->multiplier);
+  DEBUGF("Cosine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n", angle,
+         to_deg(table, angle), (void *)table, cosine, (double)cosine / table->multiplier);
 
   return cosine;
 }
@@ -154,9 +152,8 @@ int TrigTable_look_up_sine(const TrigTable *const table, int angle)
 {
   int const sine = look_up_sine(table, angle);
 
-  DEBUGF("Sine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n",
-         angle, to_deg(table, angle), (void *)table,
-         sine, (double)sine / table->multiplier);
+  DEBUGF("Sine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n", angle,
+         to_deg(table, angle), (void *)table, sine, (double)sine / table->multiplier);
 
   return sine;
 }

@@ -29,7 +29,7 @@
 #include "Internal/CBUtilMisc.h"
 
 _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
-  IntDictKey const min_key, IntDictKey const max_key)
+                                  IntDictKey const min_key, IntDictKey const max_key)
 {
   assert(iter);
   assert(dict);
@@ -46,13 +46,12 @@ _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
   return intdictviter_advance(iter);
 }
 
-_Optional void *intdictviter_all_init(IntDictVIter *const iter,
-                                      IntDict *const dict)
+_Optional void *intdictviter_all_init(IntDictVIter *const iter, IntDict *const dict)
 {
   assert(iter);
   assert(dict);
-  DEBUGF("Start iterating over values in dictionary %p of %zu\n",
-          (void *)dict, intdict_count(dict));
+  DEBUGF("Start iterating over values in dictionary %p of %zu\n", (void *)dict,
+         intdict_count(dict));
 
   *iter = (IntDictVIter){
     .dict = dict,
@@ -68,7 +67,8 @@ _Optional void *intdictviter_advance(IntDictVIter *const iter)
   assert(iter);
   assert(iter->dict);
 
-  if (iter->next_index < iter->end) {
+  if (iter->next_index < iter->end)
+  {
     DEBUGF("Advanced to index %zu\n", iter->next_index);
     return intdict_get_value_at(iter->dict, iter->next_index++);
   }

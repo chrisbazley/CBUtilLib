@@ -24,19 +24,17 @@
 */
 
 /* ISO library header files */
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 /* My library files */
 #include "ArgUtils.h"
 #include "Internal/CBUtilMisc.h"
 
-bool get_long_arg(const char *const name, long int *const value,
-                  const long int min, const long int max,
-                  int const argc, const char *const argv[],
-                  int const n)
+bool get_long_arg(const char *const name, long int *const value, const long int min,
+                  const long int max, int const argc, const char *const argv[], int const n)
 {
   assert(name != NULL);
   assert(*name != '\0');
@@ -46,31 +44,31 @@ bool get_long_arg(const char *const name, long int *const value,
   assert(argv != NULL);
   assert(n >= 0);
 
-  if (n >= argc || argv[n][0] == '-') {
+  if (n >= argc || argv[n][0] == '-')
+  {
     fprintf(stderr, "Missing value for %s\n", name);
     return false;
   }
 
   char *endptr;
   *value = strtol(argv[n], &endptr, 0 /* integer constant */);
-  if (*endptr != '\0') {
+  if (*endptr != '\0')
+  {
     fprintf(stderr, "Bad value for %s\n", name);
     return false;
   }
 
-  if (*value < min || *value > max) {
-    fprintf(stderr, "Value for %s is out of range %ld..%ld\n",
-            name, min, max);
+  if (*value < min || *value > max)
+  {
+    fprintf(stderr, "Value for %s is out of range %ld..%ld\n", name, min, max);
     return false;
   }
 
   return true;
 }
 
-bool get_double_arg(const char *const name, double *const value,
-                    const double min, const double max,
-                    int const argc, const char *const argv[],
-                    int const n)
+bool get_double_arg(const char *const name, double *const value, const double min, const double max,
+                    int const argc, const char *const argv[], int const n)
 {
   assert(name != NULL);
   assert(*name != '\0');
@@ -80,29 +78,30 @@ bool get_double_arg(const char *const name, double *const value,
   assert(argv != NULL);
   assert(n >= 0);
 
-  if (n >= argc || argv[n][0] == '-') {
+  if (n >= argc || argv[n][0] == '-')
+  {
     fprintf(stderr, "Missing value for %s\n", name);
     return false;
   }
 
   char *endptr;
   *value = strtod(argv[n], &endptr);
-  if (*endptr != '\0') {
+  if (*endptr != '\0')
+  {
     fprintf(stderr, "Bad value for %s\n", name);
     return false;
   }
 
-  if (*value < min || *value > max) {
-    fprintf(stderr, "Value for %s is out of range %f..%f\n",
-            name, min, max);
+  if (*value < min || *value > max)
+  {
+    fprintf(stderr, "Value for %s is out of range %f..%f\n", name, min, max);
     return false;
   }
 
   return true;
 }
 
-bool is_switch(const char * const arg, const char * const name,
-               const size_t min)
+bool is_switch(const char *const arg, const char *const name, const size_t min)
 {
   /* Allow any abbreviation of the canonical switch name
      no shorter than min characters */
@@ -112,7 +111,5 @@ bool is_switch(const char * const arg, const char * const name,
 
   const size_t arg_len = strlen(arg);
 
-  return (arg_len >= min) &&
-         (arg_len <= strlen(name)) &&
-         (strncmp(arg, name, arg_len) == 0);
+  return (arg_len >= min) && (arg_len <= strlen(name)) && (strncmp(arg, name, arg_len) == 0);
 }

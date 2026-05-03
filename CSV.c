@@ -50,17 +50,14 @@
                          Public library functions
 */
 
-size_t csv_parse_string(const char                *s,
-                        _Optional char *_Optional *endp,
-                        _Optional void            *output,
-                        CSVOutputType              type,
-                        size_t                     nmemb)
+size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optional void *output,
+                        CSVOutputType type, size_t nmemb)
 {
   _Optional const char *end_of_record, *cr, *lf;
   size_t field = 0;
 
-  DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n", (void *)s,
-        nmemb, output);
+  DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n", (void *)s, nmemb,
+         output);
   assert(type == CSVOutputType_Int || type == CSVOutputType_Long || type == CSVOutputType_Double);
   assert(s != NULL);
 
@@ -77,8 +74,7 @@ size_t csv_parse_string(const char                *s,
     DEBUGF("CSV: Last record is unterminated\n");
     end_of_record = s + strlen(s);
   }
-  DEBUGF("CSV: End of record is character %u at %p\n", *end_of_record,
-        (void *)end_of_record);
+  DEBUGF("CSV: End of record is character %u at %p\n", *end_of_record, (void *)end_of_record);
 
   DEBUGF("CSV: Record is '%.*s'\n", (int)(end_of_record - s), s);
 
@@ -100,36 +96,36 @@ size_t csv_parse_string(const char                *s,
         next_comma = &*end_of_record;
 
       DEBUGF("CSV: End of field %zu is character %u at %p\n", field, *next_comma,
-            (void *)next_comma);
+             (void *)next_comma);
 
       if (output != NULL && field < nmemb)
       {
         switch (type)
         {
           case CSVOutputType_Double:
-            {
-              _Optional double *const output_f = output;
-              output_f[field] = strtod(start_of_field, NULL);
-              DEBUGF("CSV: Decoded field %zu as %f\n", field, output_f[field]);
-            }
-            break;
+          {
+            _Optional double *const output_f = output;
+            output_f[field] = strtod(start_of_field, NULL);
+            DEBUGF("CSV: Decoded field %zu as %f\n", field, output_f[field]);
+          }
+          break;
 
           case CSVOutputType_Long:
-            {
-              _Optional long *const output_l = output;
-              output_l[field] = strtol(start_of_field, NULL, 0);
-              DEBUGF("CSV: Decoded field %zu as %li\n", field, output_l[field]);
-            }
-            break;
+          {
+            _Optional long *const output_l = output;
+            output_l[field] = strtol(start_of_field, NULL, 0);
+            DEBUGF("CSV: Decoded field %zu as %li\n", field, output_l[field]);
+          }
+          break;
 
           case CSVOutputType_Int:
-            {
-              _Optional int *const output_i = output;
-              long int const tmp = strtol(start_of_field, NULL, 0);
-              output_i[field] = (int)LOWEST(INT_MAX, HIGHEST(INT_MIN, tmp));
-              DEBUGF("CSV: Decoded field %zu as %i\n", field, output_i[field]);
-            }
-            break;
+          {
+            _Optional int *const output_i = output;
+            long int const tmp = strtol(start_of_field, NULL, 0);
+            output_i[field] = (int)LOWEST(INT_MAX, HIGHEST(INT_MIN, tmp));
+            DEBUGF("CSV: Decoded field %zu as %i\n", field, output_i[field]);
+          }
+          break;
         }
       }
       field++;
@@ -160,7 +156,7 @@ size_t csv_parse_string(const char                *s,
     else
     {
       DEBUGF("CSV: Line ending is LF (RISC OS style)\n");
-      end_of_record ++; /* skip over the LF */
+      end_of_record++; /* skip over the LF */
     }
   }
   else if (cr && end_of_record == cr)
@@ -176,7 +172,7 @@ size_t csv_parse_string(const char                *s,
     else
     {
       DEBUGF("CSV: Line ending is CR (Mac style)\n");
-      end_of_record ++; /* skip over the CR */
+      end_of_record++; /* skip over the CR */
     }
   }
   else

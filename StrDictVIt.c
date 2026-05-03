@@ -25,11 +25,11 @@
  */
 
 /* Local headers */
-#include "StrDict.h"
 #include "Internal/CBUtilMisc.h"
+#include "StrDict.h"
 
 _Optional void *strdictviter_init(StrDictVIter *const iter, StrDict *const dict,
-  char const *const min_key, char const *const max_key)
+                                  char const *const min_key, char const *const max_key)
 {
   assert(iter);
   assert(dict);
@@ -48,13 +48,12 @@ _Optional void *strdictviter_init(StrDictVIter *const iter, StrDict *const dict,
   return strdictviter_advance(iter);
 }
 
-_Optional void *strdictviter_all_init(StrDictVIter *const iter,
-                                      StrDict *const dict)
+_Optional void *strdictviter_all_init(StrDictVIter *const iter, StrDict *const dict)
 {
   assert(iter);
   assert(dict);
-  DEBUGF("Start iterating over values in dictionary %p of %zu\n",
-          (void *)dict, strdict_count(dict));
+  DEBUGF("Start iterating over values in dictionary %p of %zu\n", (void *)dict,
+         strdict_count(dict));
 
   *iter = (StrDictVIter){
     .dict = dict,
@@ -70,7 +69,8 @@ _Optional void *strdictviter_advance(StrDictVIter *const iter)
   assert(iter);
   assert(iter->dict);
 
-  if (iter->next_index < iter->end) {
+  if (iter->next_index < iter->end)
+  {
     DEBUGF("Advanced to index %zu\n", iter->next_index);
     return strdict_get_value_at(iter->dict, iter->next_index++);
   }

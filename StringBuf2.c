@@ -27,14 +27,14 @@
 #include <stddef.h>
 
 /* Local headers */
-#include "StringBuff.h"
 #include "Internal/CBUtilMisc.h"
+#include "StringBuff.h"
 
 void stringbuffer_undo(StringBuffer *const buffer)
 {
   assert(buffer != NULL);
-  DEBUGF("StringBuff: Undoing last operation on buffer %p ('%s')\n",
-         (void *)buffer, STRING_OR_NULL(buffer->buffer));
+  DEBUGF("StringBuff: Undoing last operation on buffer %p ('%s')\n", (void *)buffer,
+         STRING_OR_NULL(buffer->buffer));
 
   /* If the string buffer contains the empty string "" then the length
      may be zero (no allocated memory) as a special case. */
@@ -48,8 +48,7 @@ void stringbuffer_undo(StringBuffer *const buffer)
   if (buffer->undo_len < buffer->string_len)
   {
     /* Undo append by storing a null terminator at the old place. */
-    DEBUGF("StringBuff: Undoing append (truncating to %zu)\n",
-           buffer->undo_len);
+    DEBUGF("StringBuff: Undoing append (truncating to %zu)\n", buffer->undo_len);
 
     if (buffer->buffer)
     {
@@ -60,8 +59,7 @@ void stringbuffer_undo(StringBuffer *const buffer)
   {
     /* Undo truncation by reinstating the character previously overwritten
        by a null terminator. Pre-truncation terminator must be intact. */
-    DEBUGF("StringBuff: Undoing truncation (extending to %zu)\n",
-           buffer->undo_len);
+    DEBUGF("StringBuff: Undoing truncation (extending to %zu)\n", buffer->undo_len);
 
     assert(buffer->undo_len < buffer->buffer_size);
     if (buffer->buffer)
@@ -72,12 +70,10 @@ void stringbuffer_undo(StringBuffer *const buffer)
   }
   else
   {
-    DEBUGF("StringBuff: Nothing to undo (length %zu)\n",
-           buffer->undo_len);
+    DEBUGF("StringBuff: Nothing to undo (length %zu)\n", buffer->undo_len);
   }
 
   buffer->string_len = buffer->undo_len;
 
-  DEBUGF("StringBuff: buffer now contains '%s'\n",
-         STRING_OR_NULL(buffer->buffer));
+  DEBUGF("StringBuff: buffer now contains '%s'\n", STRING_OR_NULL(buffer->buffer));
 }

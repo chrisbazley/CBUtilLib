@@ -26,12 +26,12 @@
  */
 
 /* ISO library headers */
-#include <stddef.h>
 #include <ctype.h>
+#include <stddef.h>
 
 /* Local headers */
-#include "StrExtra.h"
 #include "Internal/CBUtilMisc.h"
+#include "StrExtra.h"
 
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */
@@ -49,10 +49,9 @@ int strnicmp(const char *s1, const char *s2, size_t n)
   do
   {
     i = *s1++, j = *s2++;
-    i = toupper (i);
-    j = toupper (j);
-  }
-  while (i && i == j && --n);
+    i = toupper(i);
+    j = toupper(j);
+  } while (i && i == j && --n);
 
   return (i - j);
 }

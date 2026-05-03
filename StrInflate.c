@@ -39,11 +39,11 @@
 #include <string.h>
 
 /* Local headers */
-#include "StrExtra.h"
 #include "Internal/CBUtilMisc.h"
+#include "StrExtra.h"
 
-size_t strinflate(char *const s1, size_t const n, const char *s2,
-                  const char *const srch, const char *rplc[])
+size_t strinflate(char *const s1, size_t const n, const char *s2, const char *const srch,
+                  const char *rplc[])
 {
   assert(s2 != NULL);
   assert(s1 != NULL || n == 0);

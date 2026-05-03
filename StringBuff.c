@@ -45,21 +45,20 @@
 */
 
 /* ISO library headers */
+#include <limits.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdarg.h>
 
 /* Local headers */
-#include "StringBuff.h"
 #include "Internal/CBUtilMisc.h"
+#include "StringBuff.h"
 
 #define GROWTH_FACTOR 2
 
-static bool realloc_buffer(StringBuffer *const buffer,
-  size_t const new_size)
+static bool realloc_buffer(StringBuffer *const buffer, size_t const new_size)
 {
   _Optional char *new_buffer = NULL;
   bool success = true;
@@ -68,23 +67,20 @@ static bool realloc_buffer(StringBuffer *const buffer,
   if (new_size == 0)
   {
     free(buffer->buffer);
-    DEBUGF("StringBuff: freed %p (%zu bytes)\n",
-           (void *)buffer->buffer, buffer->buffer_size);
+    DEBUGF("StringBuff: freed %p (%zu bytes)\n", (void *)buffer->buffer, buffer->buffer_size);
   }
   else
   {
     new_buffer = realloc(buffer->buffer, new_size);
     if (new_buffer != NULL)
     {
-      DEBUGF("StringBuff: reallocated %p (%zu bytes) at %p (%zu bytes)\n",
-             (void *)buffer->buffer, buffer->buffer_size,
-             (void *)new_buffer, new_size);
+      DEBUGF("StringBuff: reallocated %p (%zu bytes) at %p (%zu bytes)\n", (void *)buffer->buffer,
+             buffer->buffer_size, (void *)new_buffer, new_size);
     }
     else
     {
-      DEBUGF("StringBuff: failed to reallocate %p (%zu to %zu bytes)\n",
-             (void *)buffer->buffer, buffer->buffer_size,
-             new_size);
+      DEBUGF("StringBuff: failed to reallocate %p (%zu to %zu bytes)\n", (void *)buffer->buffer,
+             buffer->buffer_size, new_size);
       success = false;
     }
   }
@@ -105,8 +101,7 @@ static bool ensure_size(StringBuffer *const buffer, size_t const min_size)
   assert(buffer != NULL);
   if (min_size > buffer->buffer_size)
   {
-    const size_t new_size = HIGHEST(min_size,
-                                    buffer->buffer_size * GROWTH_FACTOR);
+    const size_t new_size = HIGHEST(min_size, buffer->buffer_size * GROWTH_FACTOR);
     success = realloc_buffer(buffer, new_size);
   }
 
@@ -141,16 +136,15 @@ void stringbuffer_init(StringBuffer *const buffer)
   buffer->undo_len = 0;
 }
 
-_Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
-  size_t *const min_size)
+_Optional char *stringbuffer_prepare_append(StringBuffer *const buffer, size_t *const min_size)
 {
   _Optional char *free_ptr = NULL;
   size_t size;
 
   assert(buffer != NULL);
   assert(min_size != NULL);
-  DEBUG_VERBOSEF("StringBuff: Preparing to append %zu bytes to buffer %p ('%s')\n",
-         *min_size, (void *)buffer, STRING_OR_NULL(buffer->buffer));
+  DEBUG_VERBOSEF("StringBuff: Preparing to append %zu bytes to buffer %p ('%s')\n", *min_size,
+                 (void *)buffer, STRING_OR_NULL(buffer->buffer));
 
   /* If the string buffer contains the empty string "" then the length
      may be zero (no allocated memory) as a special case. */
@@ -173,8 +167,7 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
     *min_size = 0;
   }
 
-  DEBUG_VERBOSEF("StringBuff: %zu bytes prepared at %p\n",
-         *min_size, (void *)free_ptr);
+  DEBUG_VERBOSEF("StringBuff: %zu bytes prepared at %p\n", *min_size, (void *)free_ptr);
 
   return free_ptr;
 }
@@ -183,12 +176,12 @@ void stringbuffer_finish_append(StringBuffer *const buffer, size_t const n)
 {
   assert(buffer != NULL);
   set_len(buffer, buffer->string_len + n);
-  DEBUGF("StringBuff: Finished appending %zu bytes to buffer %p ('%s')\n",
-         n, (void *)buffer, STRING_OR_NULL(buffer->buffer));
+  DEBUGF("StringBuff: Finished appending %zu bytes to buffer %p ('%s')\n", n, (void *)buffer,
+         STRING_OR_NULL(buffer->buffer));
 }
 
-bool stringbuffer_append_separated(StringBuffer *const buffer,
-  const char sep, const char *const tail)
+bool stringbuffer_append_separated(StringBuffer *const buffer, const char sep,
+                                   const char *const tail)
 {
   assert(buffer != NULL);
   assert(sep != '\0');
@@ -197,7 +190,7 @@ bool stringbuffer_append_separated(StringBuffer *const buffer,
   bool success = false;
   const size_t tail_len = strlen(tail);
   size_t buff_size = tail_len + 2;
-  _Optional char * const s = stringbuffer_prepare_append(buffer, &buff_size);
+  _Optional char *const s = stringbuffer_prepare_append(buffer, &buff_size);
   if (s != NULL)
   {
     *s = sep;
@@ -208,16 +201,15 @@ bool stringbuffer_append_separated(StringBuffer *const buffer,
   return success;
 }
 
-bool stringbuffer_append(StringBuffer *const buffer,
-  _Optional const char *const tail, size_t const n)
+bool stringbuffer_append(StringBuffer *const buffer, _Optional const char *const tail,
+                         size_t const n)
 {
   size_t tail_len, extra_chars;
   bool success = true;
 
   assert(buffer != NULL);
-  DEBUG_VERBOSEF("StringBuff: Appending '%.*s' to buffer %p ('%s')\n",
-         (int)HIGHEST(n, INT_MAX), STRING_OR_NULL(tail), (void *)buffer,
-         STRING_OR_NULL(buffer->buffer));
+  DEBUG_VERBOSEF("StringBuff: Appending '%.*s' to buffer %p ('%s')\n", (int)HIGHEST(n, INT_MAX),
+                 STRING_OR_NULL(tail), (void *)buffer, STRING_OR_NULL(buffer->buffer));
 
   /* If the string buffer contains the empty string "" then the length
      may be zero (no allocated memory) as a special case. */
@@ -246,7 +238,7 @@ bool stringbuffer_append(StringBuffer *const buffer,
     /* Allocate space for the number of characters to be appended and a
        null terminator. */
     size_t min_size = extra_chars + 1;
-    _Optional char * const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
+    _Optional char *const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
     if (free_ptr != NULL)
     {
       assert(buffer->buffer != NULL);
@@ -275,8 +267,8 @@ bool stringbuffer_append(StringBuffer *const buffer,
 void stringbuffer_truncate(StringBuffer *const buffer, size_t const len)
 {
   assert(buffer != NULL);
-  DEBUGF("StringBuff: Truncating buffer %p ('%s') to %zu bytes\n",
-         (void *)buffer, STRING_OR_NULL(buffer->buffer), len);
+  DEBUGF("StringBuff: Truncating buffer %p ('%s') to %zu bytes\n", (void *)buffer,
+         STRING_OR_NULL(buffer->buffer), len);
 
   /* If the string buffer contains the empty string "" then the length
      may be zero (no allocated memory) as a special case. */
@@ -293,7 +285,7 @@ void stringbuffer_truncate(StringBuffer *const buffer, size_t const len)
   {
     /* Record the new string length and store a null terminator at
        the appropriate place (remembering the character overwritten). */
-     set_len(buffer, len);
+    set_len(buffer, len);
   }
   else
   {

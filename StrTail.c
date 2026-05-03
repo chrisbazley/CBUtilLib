@@ -30,8 +30,8 @@
 #include <string.h>
 
 /* Local headers */
-#include "StrExtra.h"
 #include "Internal/CBUtilMisc.h"
+#include "StrExtra.h"
 
 char *strtail(const char *s, int c, size_t n)
 {
@@ -40,7 +40,8 @@ char *strtail(const char *s, int c, size_t n)
   const char *ptr = s + strlen(s); /* terminator */
   size_t count = 0;
 
-  while (ptr > s && count < n) {
+  while (ptr > s && count < n)
+  {
     ptr--; /* scan string backwards from terminator */
     if (*ptr == (unsigned char)c)
       ++count;

@@ -32,8 +32,8 @@
 #include <string.h>
 
 /* Local headers */
-#include "StrExtra.h"
 #include "Internal/CBUtilMisc.h"
+#include "StrExtra.h"
 
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */

@@ -28,16 +28,14 @@ History:
 #ifndef ArgUtils_h
 #define ArgUtils_h
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
-bool get_long_arg(const char *name, long int *value,
-                  long int min, long int max,
-                  int argc, const char *const argv[], int n);
+bool get_long_arg(const char *name, long int *value, long int min, long int max, int argc,
+                  const char *const argv[], int n);
 
-bool get_double_arg(const char *name, double *value,
-                    double min, double max,
-                    int argc, const char *const argv[], int n);
+bool get_double_arg(const char *name, double *value, double min, double max, int argc,
+                    const char *const argv[], int n);
 
 bool is_switch(const char *arg, const char *name, size_t min);
 
