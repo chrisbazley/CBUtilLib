@@ -3,6 +3,7 @@ BasedOnStyle: LLVM
 
 AlignConsecutiveDeclarations: false
 AlignConsecutiveAssignments: false
+AllowShortFunctionsOnASingleLine: None
 
 PointerAlignment: Right
 
