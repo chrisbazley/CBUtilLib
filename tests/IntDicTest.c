@@ -1202,9 +1202,9 @@ static void test37(void)
     for (size_t index = 0; index < intdict_count(&dict); ++index)
     {
       assert(index < intdict_count(&dict));
-      for (size_t k = 0; k <= i; ++k)
+      for (size_t l = 0; l <= i; ++l)
       {
-        assert(intdict_get_value_at(&dict, index) != &values[k]);
+        assert(intdict_get_value_at(&dict, index) != &values[l]);
       }
     }
   }
