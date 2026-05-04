@@ -1305,11 +1305,13 @@ static void test38(void)
     strdict_insert(&dict, keys[i], &values[i], NULL);
   }
 
-  size_t i = 0;
-  for (_Optional void *value = strdictviter_all_init(&iter, &dict);
-       value != NULL; value = strdictviter_advance(&iter))
   {
-    assert(value == &values[i++]);
+    size_t i = 0;
+    for (_Optional void *value = strdictviter_all_init(&iter, &dict);
+         value != NULL; value = strdictviter_advance(&iter))
+    {
+      assert(value == &values[i++]);
+    }
   }
 
   callback_count = 0;
@@ -1391,9 +1393,9 @@ static void test39(void)
             assert(vcount == 0);
           }
 
-          for (size_t i = 0; i < vcount; ++i)
+          for (size_t m = 0; m < vcount; ++m)
           {
-            assert(&values[min_index + i] == got_values[i]);
+            assert(&values[min_index + m] == got_values[m]);
           }
 
           free(min_key);
