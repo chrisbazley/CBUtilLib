@@ -50,15 +50,17 @@
                          Public library functions
 */
 
-size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optional void *output,
-                        CSVOutputType type, size_t nmemb)
+size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
+                        _Optional void *output, CSVOutputType type,
+                        size_t nmemb)
 {
   _Optional const char *end_of_record, *cr, *lf;
   size_t field = 0;
 
-  DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n", (void *)s, nmemb,
-         output);
-  assert(type == CSVOutputType_Int || type == CSVOutputType_Long || type == CSVOutputType_Double);
+  DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n",
+         (void *)s, nmemb, output);
+  assert(type == CSVOutputType_Int || type == CSVOutputType_Long ||
+         type == CSVOutputType_Double);
   assert(s != NULL);
 
   /* Find the carriage return or linefeed at the end of this record */
@@ -74,7 +76,8 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optiona
     DEBUGF("CSV: Last record is unterminated\n");
     end_of_record = s + strlen(s);
   }
-  DEBUGF("CSV: End of record is character %u at %p\n", *end_of_record, (void *)end_of_record);
+  DEBUGF("CSV: End of record is character %u at %p\n", *end_of_record,
+         (void *)end_of_record);
 
   DEBUGF("CSV: Record is '%.*s'\n", (int)(end_of_record - s), s);
 
@@ -95,8 +98,8 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optiona
       if (next_comma == NULL || &*end_of_record < &*next_comma)
         next_comma = &*end_of_record;
 
-      DEBUGF("CSV: End of field %zu is character %u at %p\n", field, *next_comma,
-             (void *)next_comma);
+      DEBUGF("CSV: End of field %zu is character %u at %p\n", field,
+             *next_comma, (void *)next_comma);
 
       if (output != NULL && field < nmemb)
       {

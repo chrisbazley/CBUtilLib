@@ -65,7 +65,8 @@ static bool stop_iteration(LinkedList *list, LinkedListItem *item, void *arg)
   return ++callback_count >= *num_to_visit;
 }
 
-static bool remove_in_callback(LinkedList *list, LinkedListItem *item, void *arg)
+static bool remove_in_callback(LinkedList *list, LinkedListItem *item,
+                               void *arg)
 {
   assert(list != NULL);
   assert(item != NULL);
@@ -415,7 +416,8 @@ static void test12(void)
   for (size_t i = 0; i < callback_count; ++i)
   {
     assert(callbacks[i].list == &list);
-    assert(callbacks[i].item == &items[ARRAY_SIZE(items) - 1 - (i * KeepInterval)]);
+    assert(callbacks[i].item ==
+           &items[ARRAY_SIZE(items) - 1 - (i * KeepInterval)]);
 
     assert(callbacks[i].arg == &dummy);
   }
@@ -559,7 +561,8 @@ void LinkedList_tests(void)
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests),
+           unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

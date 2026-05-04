@@ -36,8 +36,8 @@ enum
   DUMMY = 1234567,
 };
 
-static const long int cases[] = {INT32_MAX, INT32_MIN, INT32_MAX - 1, INT32_MIN + 1, 0,
-                                 1,         -1,        TEST};
+static const long int cases[] = {
+  INT32_MAX, INT32_MIN, INT32_MAX - 1, INT32_MIN + 1, 0, 1, -1, TEST};
 
 static char file_name[L_tmpnam];
 
@@ -208,7 +208,8 @@ void FileRWInt_tests(void)
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests),
+           unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

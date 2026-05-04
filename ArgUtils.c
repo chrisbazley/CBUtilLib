@@ -33,8 +33,9 @@
 #include "ArgUtils.h"
 #include "Internal/CBUtilMisc.h"
 
-bool get_long_arg(const char *const name, long int *const value, const long int min,
-                  const long int max, int const argc, const char *const argv[], int const n)
+bool get_long_arg(const char *const name, long int *const value,
+                  const long int min, const long int max, int const argc,
+                  const char *const argv[], int const n)
 {
   assert(name != NULL);
   assert(*name != '\0');
@@ -67,8 +68,9 @@ bool get_long_arg(const char *const name, long int *const value, const long int 
   return true;
 }
 
-bool get_double_arg(const char *const name, double *const value, const double min, const double max,
-                    int const argc, const char *const argv[], int const n)
+bool get_double_arg(const char *const name, double *const value,
+                    const double min, const double max, int const argc,
+                    const char *const argv[], int const n)
 {
   assert(name != NULL);
   assert(*name != '\0');
@@ -111,5 +113,6 @@ bool is_switch(const char *const arg, const char *const name, const size_t min)
 
   const size_t arg_len = strlen(arg);
 
-  return (arg_len >= min) && (arg_len <= strlen(name)) && (strncmp(arg, name, arg_len) == 0);
+  return (arg_len >= min) && (arg_len <= strlen(name)) &&
+         (strncmp(arg, name, arg_len) == 0);
 }

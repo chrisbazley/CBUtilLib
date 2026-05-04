@@ -97,9 +97,11 @@ static int look_up_sine(const TrigTable *const table, int angle)
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */
 
-_Optional TrigTable *TrigTable_make(int const multiplier, int const quarter_turn)
+_Optional TrigTable *TrigTable_make(int const multiplier,
+                                    int const quarter_turn)
 {
-  DEBUGF("Generating sine look-up table of size %d with scaler %d\n", quarter_turn + 1, multiplier);
+  DEBUGF("Generating sine look-up table of size %d with scaler %d\n",
+         quarter_turn + 1, multiplier);
   assert(multiplier > 0);
   assert(quarter_turn > 0);
 
@@ -118,7 +120,8 @@ _Optional TrigTable *TrigTable_make(int const multiplier, int const quarter_turn
   for (int index = 0; index <= quarter_turn; index++)
   {
     double radians = (index * 2.0 * PI) / (int)(quarter_turn * 4);
-    table->sine_values[index] = (int)floor(sin(radians) * (double)multiplier + 0.5);
+    table->sine_values[index] =
+      (int)floor(sin(radians) * (double)multiplier + 0.5);
   }
   return table;
 }
@@ -140,8 +143,9 @@ int TrigTable_look_up_cosine(const TrigTable *const table, int const angle)
 {
   int const cosine = look_up_sine(table, angle + table->quarter_turn);
 
-  DEBUGF("Cosine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n", angle,
-         to_deg(table, angle), (void *)table, cosine, (double)cosine / table->multiplier);
+  DEBUGF("Cosine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n",
+         angle, to_deg(table, angle), (void *)table, cosine,
+         (double)cosine / table->multiplier);
 
   return cosine;
 }
@@ -153,7 +157,8 @@ int TrigTable_look_up_sine(const TrigTable *const table, int angle)
   int const sine = look_up_sine(table, angle);
 
   DEBUGF("Sine of angle %d (%f deg.) in trig. table at %p is %d (%f)\n", angle,
-         to_deg(table, angle), (void *)table, sine, (double)sine / table->multiplier);
+         to_deg(table, angle), (void *)table, sine,
+         (double)sine / table->multiplier);
 
   return sine;
 }

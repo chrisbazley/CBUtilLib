@@ -87,14 +87,16 @@ typedef void IntDictDestructorFn(IntDictKey /*key*/, _Optional void * /*value*/,
  * is expected to point to any additional parameters.
  */
 
-void intdict_destroy(IntDict * /*dict*/, _Optional IntDictDestructorFn * /*destructor*/,
+void intdict_destroy(IntDict * /*dict*/,
+                     _Optional IntDictDestructorFn * /*destructor*/,
                      void *const /*arg*/);
 /*
  * Destroy an integer dictionary, optionally calling a destructor function
  * (if the callback function pointer is not null).
  */
 
-bool intdict_find(IntDict * /*dict*/, IntDictKey /*key*/, _Optional size_t * /*index*/);
+bool intdict_find(IntDict * /*dict*/, IntDictKey /*key*/,
+                  _Optional size_t * /*index*/);
 /*
  * Search for the first item with a given key in an integer dictionary.
  * Outputs the index of the item if the dictionary contains the key.
@@ -103,7 +105,8 @@ bool intdict_find(IntDict * /*dict*/, IntDictKey /*key*/, _Optional size_t * /*i
  * Returns: true if the dictionary contains the key, otherwise false.
  */
 
-bool intdict_find_specific(IntDict * /*dict*/, IntDictKey /*key*/, _Optional void * /*value*/,
+bool intdict_find_specific(IntDict * /*dict*/, IntDictKey /*key*/,
+                           _Optional void * /*value*/,
                            _Optional size_t * /*index*/);
 /*
  * Search for the first item with a given key and value in an integer
@@ -114,8 +117,8 @@ bool intdict_find_specific(IntDict * /*dict*/, IntDictKey /*key*/, _Optional voi
  *          otherwise false.
  */
 
-bool intdict_insert(IntDict * /*dict*/, IntDictKey /*key*/, _Optional void * /*value*/,
-                    _Optional size_t * /*index*/);
+bool intdict_insert(IntDict * /*dict*/, IntDictKey /*key*/,
+                    _Optional void * /*value*/, _Optional size_t * /*index*/);
 /*
  * Insert an item and value pair into an integer dictionary. If the new
  * item's key is not unique then its position is indeterminate relative
@@ -135,7 +138,8 @@ static inline size_t intdict_count(IntDict const *const dict)
  * Returns: number of items.
  */
 
-static inline IntDictKey intdict_get_key_at(IntDict const *const dict, size_t const index)
+static inline IntDictKey intdict_get_key_at(IntDict const *const dict,
+                                            size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
@@ -147,7 +151,8 @@ static inline IntDictKey intdict_get_key_at(IntDict const *const dict, size_t co
  * Returns: the key with the given index.
  */
 
-static inline _Optional void *intdict_get_value_at(IntDict const *const dict, size_t const index)
+static inline _Optional void *intdict_get_value_at(IntDict const *const dict,
+                                                   size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
@@ -193,7 +198,8 @@ size_t intdict_bisect_right(IntDict * /*dict*/, IntDictKey /*key*/);
  *          keys can be found.
  */
 
-static inline _Optional void *intdict_find_value(IntDict *const dict, IntDictKey const key,
+static inline _Optional void *intdict_find_value(IntDict *const dict,
+                                                 IntDictKey const key,
                                                  _Optional size_t *const index)
 {
   size_t pos;
@@ -238,8 +244,9 @@ static inline bool intdict_remove(IntDict *const dict, IntDictKey const key,
  * Returns: true if the dictionary contained the key, otherwise false.
  */
 
-static inline _Optional void *intdict_remove_value(IntDict *const dict, IntDictKey const key,
-                                                   _Optional size_t *const index)
+static inline _Optional void *
+intdict_remove_value(IntDict *const dict, IntDictKey const key,
+                     _Optional size_t *const index)
 {
   size_t pos;
   if (!intdict_find(dict, key, &pos))
@@ -260,7 +267,8 @@ static inline _Optional void *intdict_remove_value(IntDict *const dict, IntDictK
  *          if the key was not found.
  */
 
-static inline bool intdict_remove_specific(IntDict *dict, IntDictKey key, _Optional void *value,
+static inline bool intdict_remove_specific(IntDict *dict, IntDictKey key,
+                                           _Optional void *value,
                                            _Optional size_t *index)
 {
   size_t pos;
@@ -282,8 +290,9 @@ static inline bool intdict_remove_specific(IntDict *dict, IntDictKey key, _Optio
  *          otherwise false.
  */
 
-#define INTDICT_FOR_EACH(dict, index, tmp)                                                         \
-  for (size_t(index) = 0, (tmp) = intdict_count(dict); (index) < (tmp); ++(index))
+#define INTDICT_FOR_EACH(dict, index, tmp)                                     \
+  for (size_t(index) = 0, (tmp) = intdict_count(dict); (index) < (tmp);        \
+       ++(index))
 /*
  * Macro to be used for iterating over an integer dictionary. The
  * dictionary must not be modified within the body of the loop. Indices
@@ -291,9 +300,9 @@ static inline bool intdict_remove_specific(IntDict *dict, IntDictKey key, _Optio
  * body of the loop and points to the current item.
  */
 
-#define INTDICT_FOR_EACH_IN_RANGE(dict, min_key, max_key, index, tmp)                              \
-  for (size_t(index) = intdict_bisect_left((dict), (min_key)),                                     \
-      (tmp) = intdict_bisect_right((dict), (max_key));                                             \
+#define INTDICT_FOR_EACH_IN_RANGE(dict, min_key, max_key, index, tmp)          \
+  for (size_t(index) = intdict_bisect_left((dict), (min_key)),                 \
+      (tmp) = intdict_bisect_right((dict), (max_key));                         \
        (index) < (tmp); ++(index))
 /*
  * Macro to be used for iterating over a range of keys within an integer
@@ -315,7 +324,8 @@ typedef struct
  */
 
 _Optional void *intdictviter_init(IntDictVIter * /*iter*/, IntDict * /*dict*/,
-                                  IntDictKey /*min_key*/, IntDictKey /*max_key*/);
+                                  IntDictKey /*min_key*/,
+                                  IntDictKey /*max_key*/);
 /*
  * Initialise an iterator object in preparation for iterating over the
  * values associated with a given range of keys in an integer dictionary.
@@ -327,7 +337,8 @@ _Optional void *intdictviter_init(IntDictVIter * /*iter*/, IntDict * /*dict*/,
  *          given range, or NULL if the range is empty.
  */
 
-_Optional void *intdictviter_all_init(IntDictVIter * /*iter*/, IntDict * /*dict*/);
+_Optional void *intdictviter_all_init(IntDictVIter * /*iter*/,
+                                      IntDict * /*dict*/);
 /*
  * Initialise an iterator object in preparation for iterating over all the
  * values stored in an integer dictionary. Modifying the dictionary

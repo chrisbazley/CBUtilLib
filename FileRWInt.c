@@ -61,7 +61,8 @@ bool fread_int32le(long int *num, FILE *in)
   {
     /* Assemble a 32 bit integer from 4 bytes, assuming
        little-endian order (least significant byte first) */
-    uint32_t const unum = bytes[0] | ((uint32_t)bytes[1] << 8) | ((uint32_t)bytes[2] << 16) |
+    uint32_t const unum = bytes[0] | ((uint32_t)bytes[1] << 8) |
+                          ((uint32_t)bytes[2] << 16) |
                           ((uint32_t)bytes[3] << 24);
 
     int32_t snum = 0;

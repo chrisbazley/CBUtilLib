@@ -46,12 +46,12 @@
 #include <stdio.h>
 
 #ifdef DEBUG_OUTPUT
-#define DEBUGF                                                                                     \
-  if (1)                                                                                           \
+#define DEBUGF                                                                 \
+  if (1)                                                                       \
   printf
 #else
-#define DEBUGF                                                                                     \
-  if (0)                                                                                           \
+#define DEBUGF                                                                 \
+  if (0)                                                                       \
   printf
 #endif /* DEBUG_OUTPUT */
 

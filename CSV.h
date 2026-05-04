@@ -52,8 +52,9 @@ typedef enum
   CSVOutputType_Double
 } CSVOutputType;
 
-size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optional void *output,
-                        CSVOutputType type, size_t nmemb);
+size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
+                        _Optional void *output, CSVOutputType type,
+                        size_t nmemb);
 /*
  * Parses a string 's' that contains comma-separated numeric values and
  * assigns these values to 'nmemb' members of the 'output' array. The 'type'
@@ -70,20 +71,26 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp, _Optiona
  *          array if it had been specified and 'nmemb' was big enough.
  */
 
-static inline size_t csv_parse_as_int(const char *const s, _Optional char *_Optional *const endp,
-                                      _Optional int *const output, size_t const nmemb)
+static inline size_t csv_parse_as_int(const char *const s,
+                                      _Optional char *_Optional *const endp,
+                                      _Optional int *const output,
+                                      size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Int, nmemb);
 }
 
-static inline size_t csv_parse_as_long(const char *const s, _Optional char *_Optional *const endp,
-                                       _Optional long int *const output, size_t const nmemb)
+static inline size_t csv_parse_as_long(const char *const s,
+                                       _Optional char *_Optional *const endp,
+                                       _Optional long int *const output,
+                                       size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Long, nmemb);
 }
 
-static inline size_t csv_parse_as_double(const char *const s, _Optional char *_Optional *const endp,
-                                         _Optional double *const output, size_t const nmemb)
+static inline size_t csv_parse_as_double(const char *const s,
+                                         _Optional char *_Optional *const endp,
+                                         _Optional double *const output,
+                                         size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Double, nmemb);
 }

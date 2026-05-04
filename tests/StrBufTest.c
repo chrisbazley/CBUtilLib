@@ -64,8 +64,9 @@ static void test2(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
-                                              "from",    "'tail'", "at", "the\r", "end\n"};
+  static const char *tail[NumberOfAppends] = {
+    "Appends", "up",     "to", "",      "\tcharacters",
+    "from",    "'tail'", "at", "the\r", "end\n"};
   char expected_s[NumberOfAppends * 16] = "";
 
   stringbuffer_init(&buffer);
@@ -93,7 +94,8 @@ static void test3(void)
   /* Append substrings */
   StringBuffer buffer;
   size_t i, expected_len = 0;
-  static const char *tail = "The boy stood on the burning deck whence all but he had fled";
+  static const char *tail =
+    "The boy stood on the burning deck whence all but he had fled";
   char expected_s[128] = "";
 
   stringbuffer_init(&buffer);
@@ -146,7 +148,8 @@ static void test5(void)
   StringBuffer buffer;
   bool success;
   size_t i;
-  char string[] = "The boy stood on the burning deck whence all but he had fled";
+  char string[] =
+    "The boy stood on the burning deck whence all but he had fled";
 
   stringbuffer_init(&buffer);
 
@@ -182,8 +185,9 @@ static void test6(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
-                                              "from",    "'tail'", "at", "the\r", "end\n"};
+  static const char *tail[NumberOfAppends] = {
+    "Appends", "up",     "to", "",      "\tcharacters",
+    "from",    "'tail'", "at", "the\r", "end\n"};
   char expected_s[NumberOfAppends * 16] = "";
 
   stringbuffer_init(&buffer);
@@ -217,7 +221,8 @@ static void test7(void)
   bool success;
   size_t i, len;
   const char *s;
-  char string[] = "The boy stood on the burning deck whence all but he had fled";
+  char string[] =
+    "The boy stood on the burning deck whence all but he had fled";
 
   stringbuffer_init(&buffer);
 
@@ -334,8 +339,9 @@ static void test10(void)
   unsigned int i;
   bool success;
   const char *stem = "Podd can ";
-  static const char *tail[NumberOfAppends] = {"eat", "dance", "snore", "swim",  "walk",
-                                              "run", "yawn",  "pop",   "sleep", "stroll"};
+  static const char *tail[NumberOfAppends] = {"eat",   "dance", "snore", "swim",
+                                              "walk",  "run",   "yawn",  "pop",
+                                              "sleep", "stroll"};
 
   stringbuffer_init(&buffer);
 
@@ -365,7 +371,8 @@ static void test11(void)
   StringBuffer buffer;
   bool success;
   size_t i;
-  const char *string = "The boy stood on the burning deck whence all but he had fled";
+  const char *string =
+    "The boy stood on the burning deck whence all but he had fled";
 
   stringbuffer_init(&buffer);
 
@@ -570,8 +577,9 @@ static void test18(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
-                                              "from",    "'tail'", "at", "the\r", "end\n"};
+  static const char *tail[NumberOfAppends] = {
+    "Appends", "up",     "to", "",      "\tcharacters",
+    "from",    "'tail'", "at", "the\r", "end\n"};
   const char sep = '$';
   char expected_s[NumberOfAppends * 16] = "";
 
@@ -604,8 +612,9 @@ static void test19(void)
   unsigned int i;
   bool success;
   const char *stem = "Podd can ";
-  static const char *tail[NumberOfAppends] = {"eat", "dance", "snore", "swim",  "walk",
-                                              "run", "yawn",  "pop",   "sleep", "stroll"};
+  static const char *tail[NumberOfAppends] = {"eat",   "dance", "snore", "swim",
+                                              "walk",  "run",   "yawn",  "pop",
+                                              "sleep", "stroll"};
   const char sep = ',';
 
   stringbuffer_init(&buffer);
@@ -637,8 +646,9 @@ static void test20(void)
   StringBuffer buffer;
   unsigned int i;
   size_t expected_len = 0;
-  static const char *tail[NumberOfAppends] = {"Appends", "up",     "to", "",      "\tcharacters",
-                                              "from",    "'tail'", "at", "the\r", "end\n"};
+  static const char *tail[NumberOfAppends] = {
+    "Appends", "up",     "to", "",      "\tcharacters",
+    "from",    "'tail'", "at", "the\r", "end\n"};
   const char sep = '\t';
   char expected_s[NumberOfAppends * 16] = "";
 
@@ -803,7 +813,8 @@ void StringBuffer_tests(void)
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests),
+           unit_tests[count].test_name);
 
     Fortify_EnterScope();
 

@@ -55,9 +55,10 @@ static size_t callback_count;
 static void record_callbacks(IntDictKey key, _Optional void *value, void *arg)
 {
   assert(callback_count < ARRAY_SIZE(callbacks));
-  DEBUGF("Callback %zu: key %" PRIIntDictKey ", value %p, arg %p\n", callback_count, key, value,
-         arg);
-  callbacks[callback_count++] = (struct CBInfo){.key = key, .value = value, .arg = arg};
+  DEBUGF("Callback %zu: key %" PRIIntDictKey ", value %p, arg %p\n",
+         callback_count, key, value, arg);
+  callbacks[callback_count++] =
+    (struct CBInfo){.key = key, .value = value, .arg = arg};
 }
 
 static void never_call_me(IntDictKey key, _Optional void *value, void *arg)
@@ -71,8 +72,8 @@ static void never_call_me(IntDictKey key, _Optional void *value, void *arg)
 typedef void remove_t(IntDict *, IntDictKey, _Optional void *, size_t);
 typedef void insert_t(IntDict *, IntDictKey, _Optional void *, size_t);
 
-static void remove_key_only(IntDict *const dict, IntDictKey const key, _Optional void *const value,
-                            size_t const pos)
+static void remove_key_only(IntDict *const dict, IntDictKey const key,
+                            _Optional void *const value, size_t const pos)
 {
   NOT_USED(value);
   size_t rem_pos = MagicValue;
@@ -89,7 +90,8 @@ static void remove_key_only(IntDict *const dict, IntDictKey const key, _Optional
 }
 
 static void remove_key_only_no_pos(IntDict *const dict, IntDictKey const key,
-                                   _Optional void *const value, size_t const pos)
+                                   _Optional void *const value,
+                                   size_t const pos)
 {
   NOT_USED(value);
   bool success = intdict_remove(dict, key, NULL);
@@ -118,8 +120,10 @@ static void remove_key_and_get_value(IntDict *const dict, IntDictKey const key,
   }
 }
 
-static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey const key,
-                                            _Optional void *value, size_t const pos)
+static void remove_key_and_get_value_no_pos(IntDict *const dict,
+                                            IntDictKey const key,
+                                            _Optional void *value,
+                                            size_t const pos)
 {
   if (pos == SIZE_MAX)
   {
@@ -128,8 +132,8 @@ static void remove_key_and_get_value_no_pos(IntDict *const dict, IntDictKey cons
   assert(intdict_remove_value(dict, key, NULL) == value);
 }
 
-static void remove_specific(IntDict *const dict, IntDictKey const key, _Optional void *const value,
-                            size_t const pos)
+static void remove_specific(IntDict *const dict, IntDictKey const key,
+                            _Optional void *const value, size_t const pos)
 {
   size_t rem_pos = MagicValue;
   bool success = intdict_remove_specific(dict, key, value, &rem_pos);
@@ -145,7 +149,8 @@ static void remove_specific(IntDict *const dict, IntDictKey const key, _Optional
 }
 
 static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key,
-                                   _Optional void *const value, size_t const pos)
+                                   _Optional void *const value,
+                                   size_t const pos)
 {
   bool success = intdict_remove_specific(dict, key, value, NULL);
   if (pos != SIZE_MAX)
@@ -158,8 +163,8 @@ static void remove_specific_no_pos(IntDict *const dict, IntDictKey const key,
   }
 }
 
-static void remove_index(IntDict *const dict, IntDictKey const key, _Optional void *const value,
-                         size_t const pos)
+static void remove_index(IntDict *const dict, IntDictKey const key,
+                         _Optional void *const value, size_t const pos)
 {
   NOT_USED(key);
   NOT_USED(value);
@@ -169,7 +174,8 @@ static void remove_index(IntDict *const dict, IntDictKey const key, _Optional vo
   }
 }
 
-static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key,
+static void remove_index_and_get_value(IntDict *const dict,
+                                       IntDictKey const key,
                                        _Optional void *value, size_t const pos)
 {
   NOT_USED(key);
@@ -179,8 +185,8 @@ static void remove_index_and_get_value(IntDict *const dict, IntDictKey const key
   }
 }
 
-static void check_find(IntDict *const dict, IntDictKey const key, _Optional void *const value,
-                       size_t const pos)
+static void check_find(IntDict *const dict, IntDictKey const key,
+                       _Optional void *const value, size_t const pos)
 {
   assert(intdict_find(dict, key, NULL));
 
@@ -204,7 +210,8 @@ static void check_find(IntDict *const dict, IntDictKey const key, _Optional void
   assert(intdict_get_value_at(dict, pos) == value);
 }
 
-static void check_not_found(IntDict *const dict, IntDictKey const key, _Optional void *const value)
+static void check_not_found(IntDict *const dict, IntDictKey const key,
+                            _Optional void *const value)
 {
   assert(intdict_find(dict, key, NULL) == false);
 
@@ -257,7 +264,8 @@ static void remove_head_common(remove_t *const remove_cb)
   /* Remove head */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -293,7 +301,8 @@ static void remove_tail_common(remove_t *const remove_cb)
   /* Remove tail */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MAX, 12, 0, -1, -123, INTDICTKEY_MIN};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MAX, 12, 0, -1, -123,
+                                          INTDICTKEY_MIN};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -316,8 +325,10 @@ static void remove_tail_common(remove_t *const remove_cb)
     {
       assert(index < intdict_count(&dict));
       assert(index < NumberOfItems);
-      assert(intdict_get_key_at(&dict, index) == keys[NumberOfItems - 1 - index]);
-      assert(intdict_get_value_at(&dict, index) == &values[NumberOfItems - 1 - index]);
+      assert(intdict_get_key_at(&dict, index) ==
+             keys[NumberOfItems - 1 - index]);
+      assert(intdict_get_value_at(&dict, index) ==
+             &values[NumberOfItems - 1 - index]);
     }
   }
 
@@ -329,7 +340,8 @@ static void remove_middle_common(remove_t *const remove_cb)
   /* Remove middle */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -375,7 +387,8 @@ static void remove_null_common(remove_t *const remove_cb)
 {
   /* Remove head with null value */
   IntDict dict;
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -411,7 +424,8 @@ static void insert_head_common(insert_t *const insert_cb)
   /* Insert at head */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MAX, 12, 0, -1, -123, INTDICTKEY_MIN};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MAX, 12, 0, -1, -123,
+                                          INTDICTKEY_MIN};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -453,7 +467,8 @@ static void insert_tail_common(insert_t *const insert_cb)
   /* Insert at tail */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -495,7 +510,8 @@ static void insert_middle_common(insert_t *const insert_cb)
   /* Insert in middle */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -545,7 +561,8 @@ static void insert_middle_common(insert_t *const insert_cb)
 static void insert_null_common(insert_t *const insert_cb)
 {
   IntDict dict;
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -580,12 +597,13 @@ static void insert_null_common(insert_t *const insert_cb)
   }
 }
 
-static void try_insert(IntDict *const dict, IntDictKey const key, _Optional void *const value,
-                       size_t const pos)
+static void try_insert(IntDict *const dict, IntDictKey const key,
+                       _Optional void *const value, size_t const pos)
 {
   bool success = false;
   size_t ins_pos = 0;
-  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success; ++limit)
+  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success;
+       ++limit)
   {
     Fortify_SetNumAllocationsLimit(limit);
     ins_pos = MagicValue;
@@ -601,7 +619,8 @@ static void try_insert_no_pos(IntDict *const dict, IntDictKey const key,
 {
   NOT_USED(pos);
   bool success = false;
-  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success; ++limit)
+  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success;
+       ++limit)
   {
     Fortify_SetNumAllocationsLimit(limit);
     success = intdict_insert(dict, key, value, NULL);
@@ -612,7 +631,8 @@ static void try_insert_no_pos(IntDict *const dict, IntDictKey const key,
 
 static IntDictKey adjust_key(IntDictKey key, IntDictKey const offset)
 {
-  if ((key > INTDICTKEY_MIN || offset >= 0) && (key < INTDICTKEY_MAX || offset <= 0))
+  if ((key > INTDICTKEY_MIN || offset >= 0) &&
+      (key < INTDICTKEY_MAX || offset <= 0))
   {
     key += offset;
   }
@@ -676,7 +696,8 @@ static void test9(void)
   /* Reinitialize */
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -787,7 +808,8 @@ static void test26(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -837,7 +859,8 @@ static void test27(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -887,7 +910,8 @@ static void test28(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -910,7 +934,8 @@ static void test28(void)
 
           size_t min_index = SIZE_MAX, max_index = 0;
 
-          printf("min_key %" PRIIntDictKey ", max_key %" PRIIntDictKey "\n", min_key, max_key);
+          printf("min_key %" PRIIntDictKey ", max_key %" PRIIntDictKey "\n",
+                 min_key, max_key);
 
           INTDICT_FOR_EACH_IN_RANGE(&dict, min_key, max_key, index, tmp)
           {
@@ -1035,7 +1060,8 @@ static void test35(void)
     {
       size_t const allowed_pos = j + (NumberOfKeys * l);
       assert(allowed_pos < (NumberOfKeys * NumberOfDuplicates));
-      printf("%zu: Consider %zu: %p\n", i, allowed_pos, (void *)&values[allowed_pos]);
+      printf("%zu: Consider %zu: %p\n", i, allowed_pos,
+             (void *)&values[allowed_pos]);
       if (value == &values[allowed_pos])
       {
         found_value = true;
@@ -1071,7 +1097,8 @@ static void test35(void)
     {
       size_t const allowed_pos = k + (NumberOfKeys * l);
       assert(allowed_pos < (NumberOfKeys * NumberOfDuplicates));
-      printf("%zu: Consider %zu: %p\n", i, allowed_pos, (void *)&values[allowed_pos]);
+      printf("%zu: Consider %zu: %p\n", i, allowed_pos,
+             (void *)&values[allowed_pos]);
       if (callbacks[i].value == &values[allowed_pos])
       {
         found_value = true;
@@ -1189,7 +1216,8 @@ static void test38(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -1204,8 +1232,8 @@ static void test38(void)
   }
 
   size_t i = 0;
-  for (_Optional void *value = intdictviter_all_init(&iter, &dict); value != NULL;
-       value = intdictviter_advance(&iter))
+  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
+       value != NULL; value = intdictviter_advance(&iter))
   {
     assert(value == &values[i++]);
   }
@@ -1228,7 +1256,8 @@ static void test39(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -1258,7 +1287,8 @@ static void test39(void)
 
           printf("min_key %ld, max_key %ld\n", min_key, max_key);
 
-          for (_Optional void *value = intdictviter_init(&iter, &dict, min_key, max_key);
+          for (_Optional void *value =
+                 intdictviter_init(&iter, &dict, min_key, max_key);
                value != NULL; value = intdictviter_advance(&iter))
           {
             got_values[vcount++] = value;
@@ -1303,7 +1333,8 @@ static void test40(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -1318,8 +1349,8 @@ static void test40(void)
   }
 
   size_t count = 0;
-  for (_Optional void *value = intdictviter_all_init(&iter, &dict); value != NULL;
-       value = intdictviter_advance(&iter), ++count)
+  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
+       value != NULL; value = intdictviter_advance(&iter), ++count)
   {
     assert(count < NumberOfItems);
     assert(value == &values[count]);
@@ -1350,7 +1381,8 @@ static void test41(void)
 {
   IntDict dict;
   int values[NumberOfItems];
-  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12, INTDICTKEY_MAX};
+  IntDictKey const keys[NumberOfItems] = {INTDICTKEY_MIN, -123, -1, 0, 12,
+                                          INTDICTKEY_MAX};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   intdict_init(&dict);
@@ -1552,7 +1584,8 @@ void intdict_tests(void)
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests),
+           unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

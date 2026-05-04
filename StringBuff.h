@@ -76,7 +76,8 @@ void stringbuffer_init(StringBuffer * /*buffer*/);
  * content will be the empty string.
  */
 
-_Optional char *stringbuffer_prepare_append(StringBuffer * /*buffer*/, size_t * /*min_size*/);
+_Optional char *stringbuffer_prepare_append(StringBuffer * /*buffer*/,
+                                            size_t * /*min_size*/);
 /*
  * Prepares to append at the end of the current string in a given buffer
  * by reserving space for at least 'min_size' bytes (which must include
@@ -94,7 +95,8 @@ void stringbuffer_finish_append(StringBuffer * /*buffer*/, size_t /*n*/);
  * previous append or truncation operation.
  */
 
-bool stringbuffer_append(StringBuffer * /*buffer*/, _Optional const char * /*tail*/, size_t /*n*/);
+bool stringbuffer_append(StringBuffer * /*buffer*/,
+                         _Optional const char * /*tail*/, size_t /*n*/);
 /*
  * Appends up to 'n' characters from 'tail' at the end of the current
  * string in a given buffer. The buffer will be enlarged if necessary.
@@ -105,7 +107,8 @@ bool stringbuffer_append(StringBuffer * /*buffer*/, _Optional const char * /*tai
  *          but could not be allocated.
  */
 
-static inline bool stringbuffer_append_all(StringBuffer *const buffer, const char *const tail)
+static inline bool stringbuffer_append_all(StringBuffer *const buffer,
+                                           const char *const tail)
 {
   return stringbuffer_append(buffer, tail, SIZE_MAX);
 }
@@ -118,8 +121,8 @@ static inline bool stringbuffer_append_all(StringBuffer *const buffer, const cha
  *          but could not be allocated.
  */
 
-bool stringbuffer_append_separated(StringBuffer * /*buffer*/, const char /*sep*/,
-                                   const char * /*tail*/);
+bool stringbuffer_append_separated(StringBuffer * /*buffer*/,
+                                   const char /*sep*/, const char * /*tail*/);
 /*
  * Appends a given separator character followed by all characters of
  * 'tail' at the end of the current string in a given buffer. The buffer
@@ -130,7 +133,8 @@ bool stringbuffer_append_separated(StringBuffer * /*buffer*/, const char /*sep*/
  *          but could not be allocated.
  */
 
-bool stringbuffer_vprintf(StringBuffer * /*buffer*/, const char * /*format*/, va_list /*args*/);
+bool stringbuffer_vprintf(StringBuffer * /*buffer*/, const char * /*format*/,
+                          va_list /*args*/);
 /*
  * Appends a string formatted according to 'format' with parameter
  * substitution from 'args' at the end of the current string in a given
@@ -142,7 +146,8 @@ bool stringbuffer_vprintf(StringBuffer * /*buffer*/, const char * /*format*/, va
  *          but could not be allocated.
  */
 
-static inline bool stringbuffer_printf(StringBuffer *const buffer, const char *const format, ...)
+static inline bool stringbuffer_printf(StringBuffer *const buffer,
+                                       const char *const format, ...)
 {
   va_list args;
   va_start(args, format);

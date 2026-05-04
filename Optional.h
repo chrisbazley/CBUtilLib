@@ -98,7 +98,8 @@ static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 #define realloc(p, n) optional_realloc(p, n)
 
 #if __has_include(<unistd.h>) // If we're on a POSIX system.
-static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n, size_t sz)
+static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
+                                                    size_t sz)
 {
   return reallocarray((void *)p, n, sz);
 }
@@ -106,22 +107,24 @@ static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
 #define reallocarray(p, n, sz) optional_reallocarray(p, n, sz)
 #endif
 
-static inline long optional_strtol(const char *restrict str, char *_Optional *restrict str_end,
-                                   int base)
+static inline long optional_strtol(const char *restrict str,
+                                   char *_Optional *restrict str_end, int base)
 {
   return strtol(str, (char **)str_end, base);
 }
 #undef strtol
 #define strtol(str, str_end, base) optional_strtol(str, str_end, base)
 
-static inline double optional_strtod(const char *restrict str, char *_Optional *restrict str_end)
+static inline double optional_strtod(const char *restrict str,
+                                     char *_Optional *restrict str_end)
 {
   return strtod(str, (char **)str_end);
 }
 #undef strtod
 #define strtod(str, str_end) optional_strtod(str, str_end)
 
-static inline _Optional char *optional_strstr(const char *str, const char *substr)
+static inline _Optional char *optional_strstr(const char *str,
+                                              const char *substr)
 {
   return strstr(str, substr);
 }
@@ -135,7 +138,8 @@ static inline _Optional char *optional_strchr(const char *str, int ch)
 #undef strchr
 #define strchr(str, ch) optional_strchr(str, ch)
 
-static inline _Optional char *optional_setlocale(int cat, _Optional const char *l)
+static inline _Optional char *optional_setlocale(int cat,
+                                                 _Optional const char *l)
 {
   return setlocale(cat, (const char *)l);
 }

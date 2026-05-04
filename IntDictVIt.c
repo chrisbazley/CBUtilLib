@@ -29,7 +29,8 @@
 #include "Internal/CBUtilMisc.h"
 
 _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
-                                  IntDictKey const min_key, IntDictKey const max_key)
+                                  IntDictKey const min_key,
+                                  IntDictKey const max_key)
 {
   assert(iter);
   assert(dict);
@@ -46,7 +47,8 @@ _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
   return intdictviter_advance(iter);
 }
 
-_Optional void *intdictviter_all_init(IntDictVIter *const iter, IntDict *const dict)
+_Optional void *intdictviter_all_init(IntDictVIter *const iter,
+                                      IntDict *const dict)
 {
   assert(iter);
   assert(dict);

@@ -29,7 +29,8 @@
 #include "StrDict.h"
 
 _Optional void *strdictviter_init(StrDictVIter *const iter, StrDict *const dict,
-                                  char const *const min_key, char const *const max_key)
+                                  char const *const min_key,
+                                  char const *const max_key)
 {
   assert(iter);
   assert(dict);
@@ -48,7 +49,8 @@ _Optional void *strdictviter_init(StrDictVIter *const iter, StrDict *const dict,
   return strdictviter_advance(iter);
 }
 
-_Optional void *strdictviter_all_init(StrDictVIter *const iter, StrDict *const dict)
+_Optional void *strdictviter_all_init(StrDictVIter *const iter,
+                                      StrDict *const dict)
 {
   assert(iter);
   assert(dict);

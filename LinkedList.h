@@ -71,7 +71,8 @@ void linkedlist_init(LinkedList * /*list*/);
  * space for the 'list' control structure. The initialized list is empty.
  */
 
-static inline _Optional LinkedListItem *linkedlist_get_head(LinkedList const *const list)
+static inline _Optional LinkedListItem *
+linkedlist_get_head(LinkedList const *const list)
 {
   assert(list);
   assert(list->head == NULL || list->head->prev == NULL);
@@ -82,7 +83,8 @@ static inline _Optional LinkedListItem *linkedlist_get_head(LinkedList const *co
  * Returns: pointer to the head item of the list, or NULL if the list is empty.
  */
 
-static inline _Optional LinkedListItem *linkedlist_get_tail(LinkedList const *const list)
+static inline _Optional LinkedListItem *
+linkedlist_get_tail(LinkedList const *const list)
 {
   assert(list);
   assert(list->tail == NULL || list->tail->next == NULL);
@@ -93,7 +95,8 @@ static inline _Optional LinkedListItem *linkedlist_get_tail(LinkedList const *co
  * Returns: pointer to the tail item of the list, or NULL if the list is empty.
  */
 
-static inline _Optional LinkedListItem *linkedlist_get_next(LinkedListItem const *const item)
+static inline _Optional LinkedListItem *
+linkedlist_get_next(LinkedListItem const *const item)
 {
   assert(item);
   assert(item->next == NULL || item->next->prev == item);
@@ -104,7 +107,8 @@ static inline _Optional LinkedListItem *linkedlist_get_next(LinkedListItem const
  * Returns: pointer to the next item, or NULL if at the tail of the list.
  */
 
-static inline _Optional LinkedListItem *linkedlist_get_prev(LinkedListItem const *const item)
+static inline _Optional LinkedListItem *
+linkedlist_get_prev(LinkedListItem const *const item)
 {
   assert(item);
   assert(item->prev == NULL || item->prev->next == item);
@@ -115,7 +119,8 @@ static inline _Optional LinkedListItem *linkedlist_get_prev(LinkedListItem const
  * Returns: pointer to the previous item, or NULL if at the head of the list.
  */
 
-void linkedlist_insert(LinkedList * /*list*/, _Optional LinkedListItem * /*prev*/,
+void linkedlist_insert(LinkedList * /*list*/,
+                       _Optional LinkedListItem * /*prev*/,
                        LinkedListItem * /*item*/);
 /*
  * Adds an item to a linked list after the specified 'prev' item. If 'prev'
@@ -129,7 +134,8 @@ void linkedlist_remove(LinkedList * /*list*/, LinkedListItem * /*item*/);
  * the list item is the caller's responsibility.
  */
 
-typedef bool LinkedListCallbackFn(LinkedList * /*list*/, LinkedListItem * /*item*/,
+typedef bool LinkedListCallbackFn(LinkedList * /*list*/,
+                                  LinkedListItem * /*item*/,
                                   void *const /*arg*/);
 /*
  * Type of function called back for each list item. The value of 'arg' is
@@ -139,9 +145,9 @@ typedef bool LinkedListCallbackFn(LinkedList * /*list*/, LinkedListItem * /*item
  * Returns: true to stop iterating over the list, otherwise false.
  */
 
-_Optional LinkedListItem *linkedlist_for_each(LinkedList * /*list*/,
-                                              LinkedListCallbackFn * /*callback*/,
-                                              void *const /*arg*/);
+_Optional LinkedListItem *
+linkedlist_for_each(LinkedList * /*list*/, LinkedListCallbackFn * /*callback*/,
+                    void *const /*arg*/);
 /*
  * Calls a given function for each client data item in a linked list, in
  * order from head to tail. The value of 'arg' will be passed to the
@@ -152,15 +158,16 @@ _Optional LinkedListItem *linkedlist_for_each(LinkedList * /*list*/,
  *          NULL if the callback function never returned true.
  */
 
-bool linkedlist_is_member(const LinkedList * /*list*/, const LinkedListItem * /*item*/);
+bool linkedlist_is_member(const LinkedList * /*list*/,
+                          const LinkedListItem * /*item*/);
 /*
  * Finds out whether or not a given item is a member of a list.
  * Returns: false if the item is not a member of the list, otherwise true.
  */
 
-#define LINKEDLIST_FOR_EACH(list, item)                                                            \
-  for (LinkedListItem * (item) = (LinkedListItem *)linkedlist_get_head(list); (item) != NULL;      \
-       (item) = (LinkedListItem *)linkedlist_get_next(item))
+#define LINKEDLIST_FOR_EACH(list, item)                                        \
+  for (LinkedListItem * (item) = (LinkedListItem *)linkedlist_get_head(list);  \
+       (item) != NULL; (item) = (LinkedListItem *)linkedlist_get_next(item))
 /*
  * Macro to be used for iterating over a linked list (or part of a list) in
  * cases where the current list item is not removed or invalidated within
@@ -168,9 +175,9 @@ bool linkedlist_is_member(const LinkedList * /*list*/, const LinkedListItem * /*
  * and points to the current list item.
  */
 
-#define LINKEDLIST_FOR_EACH_REVERSE(list, item)                                                    \
-  for (LinkedListItem * (item) = (LinkedListItem *)linkedlist_get_tail(list); (item) != NULL;      \
-       (item) = (LinkedListItem *)linkedlist_get_prev(item))
+#define LINKEDLIST_FOR_EACH_REVERSE(list, item)                                \
+  for (LinkedListItem * (item) = (LinkedListItem *)linkedlist_get_tail(list);  \
+       (item) != NULL; (item) = (LinkedListItem *)linkedlist_get_prev(item))
 /*
  * Macro to be used for iterating backwards over a linked list
  * (or part of a list) in cases where the current list item is not removed
@@ -178,10 +185,12 @@ bool linkedlist_is_member(const LinkedList * /*list*/, const LinkedListItem * /*
  * the body of the loop and points to the current list item.
  */
 
-#define LINKEDLIST_FOR_EACH_SAFE(list, item, tmp)                                                  \
-  for (LinkedListItem * (item) = (LinkedListItem *)linkedlist_get_head(list), *(tmp);              \
-       (tmp) = (item) ? (LinkedListItem *)linkedlist_get_next(item) : (LinkedListItem *)NULL,      \
-                        (item) != NULL;                                                            \
+#define LINKEDLIST_FOR_EACH_SAFE(list, item, tmp)                              \
+  for (LinkedListItem * (item) = (LinkedListItem *)linkedlist_get_head(list),  \
+                        *(tmp);                                                \
+       (tmp) = (item) ? (LinkedListItem *)linkedlist_get_next(item)            \
+                      : (LinkedListItem *)NULL,                                \
+                        (item) != NULL;                                        \
        (item) = (tmp))
 /*
  * Macro to be used for iterating over a linked list (or part of a list) in

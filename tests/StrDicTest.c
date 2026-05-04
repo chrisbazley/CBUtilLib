@@ -55,9 +55,10 @@ static size_t callback_count;
 static void record_callbacks(const char *key, _Optional void *value, void *arg)
 {
   assert(callback_count < ARRAY_SIZE(callbacks));
-  DEBUGF("Callback %zu: key %p (%s), value %p, arg %p\n", callback_count, (void *)key, key, value,
-         arg);
-  callbacks[callback_count++] = (struct CBInfo){.key = key, .value = value, .arg = arg};
+  DEBUGF("Callback %zu: key %p (%s), value %p, arg %p\n", callback_count,
+         (void *)key, key, value, arg);
+  callbacks[callback_count++] =
+    (struct CBInfo){.key = key, .value = value, .arg = arg};
 }
 
 static void never_call_me(const char *key, _Optional void *value, void *arg)
@@ -78,10 +79,11 @@ static char *test_strdup(const char *const s)
 typedef void remove_t(StrDict *, char const *, _Optional void *, size_t);
 typedef void insert_t(StrDict *, char const *, _Optional void *, size_t);
 
-static void remove_key_only(StrDict *const dict, char const *const key, _Optional void *const value,
-                            size_t const pos)
+static void remove_key_only(StrDict *const dict, char const *const key,
+                            _Optional void *const value, size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   NOT_USED(value);
   size_t rem_pos = MagicValue;
@@ -99,9 +101,11 @@ static void remove_key_only(StrDict *const dict, char const *const key, _Optiona
 }
 
 static void remove_key_only_no_pos(StrDict *const dict, char const *const key,
-                                   _Optional void *const value, size_t const pos)
+                                   _Optional void *const value,
+                                   size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   NOT_USED(value);
   bool success = strdict_remove(dict, dup_key, NULL);
@@ -119,7 +123,8 @@ static void remove_key_only_no_pos(StrDict *const dict, char const *const key,
 static void remove_key_and_get_value(StrDict *const dict, char const *const key,
                                      _Optional void *value, size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   if (pos == SIZE_MAX)
   {
@@ -134,10 +139,13 @@ static void remove_key_and_get_value(StrDict *const dict, char const *const key,
   free(dup_key);
 }
 
-static void remove_key_and_get_value_no_pos(StrDict *const dict, char const *const key,
-                                            _Optional void *value, size_t const pos)
+static void remove_key_and_get_value_no_pos(StrDict *const dict,
+                                            char const *const key,
+                                            _Optional void *value,
+                                            size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   if (pos == SIZE_MAX)
   {
@@ -147,10 +155,11 @@ static void remove_key_and_get_value_no_pos(StrDict *const dict, char const *con
   free(dup_key);
 }
 
-static void remove_specific(StrDict *const dict, char const *const key, _Optional void *const value,
-                            size_t const pos)
+static void remove_specific(StrDict *const dict, char const *const key,
+                            _Optional void *const value, size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   size_t rem_pos = MagicValue;
   bool success = strdict_remove_specific(dict, dup_key, value, &rem_pos);
@@ -167,9 +176,11 @@ static void remove_specific(StrDict *const dict, char const *const key, _Optiona
 }
 
 static void remove_specific_no_pos(StrDict *const dict, char const *const key,
-                                   _Optional void *const value, size_t const pos)
+                                   _Optional void *const value,
+                                   size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   bool success = strdict_remove_specific(dict, dup_key, value, NULL);
   if (pos != SIZE_MAX)
@@ -183,8 +194,8 @@ static void remove_specific_no_pos(StrDict *const dict, char const *const key,
   free(dup_key);
 }
 
-static void remove_index(StrDict *const dict, char const *const key, _Optional void *const value,
-                         size_t const pos)
+static void remove_index(StrDict *const dict, char const *const key,
+                         _Optional void *const value, size_t const pos)
 {
   NOT_USED(key);
   NOT_USED(value);
@@ -194,7 +205,8 @@ static void remove_index(StrDict *const dict, char const *const key, _Optional v
   }
 }
 
-static void remove_index_and_get_value(StrDict *const dict, char const *const key,
+static void remove_index_and_get_value(StrDict *const dict,
+                                       char const *const key,
                                        _Optional void *value, size_t const pos)
 {
   NOT_USED(key);
@@ -204,10 +216,11 @@ static void remove_index_and_get_value(StrDict *const dict, char const *const ke
   }
 }
 
-static void check_find(StrDict *const dict, char const *key, _Optional void *const value,
-                       size_t const pos)
+static void check_find(StrDict *const dict, char const *key,
+                       _Optional void *const value, size_t const pos)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
   assert(strdict_find(dict, dup_key, NULL) == true);
 
@@ -233,9 +246,11 @@ static void check_find(StrDict *const dict, char const *key, _Optional void *con
   free(dup_key);
 }
 
-static void check_not_found(StrDict *const dict, char const *key, _Optional void *const value)
+static void check_not_found(StrDict *const dict, char const *key,
+                            _Optional void *const value)
 {
-  // Duplicate the key to verify that the dictionary isn't simply comparing addresses
+  // Duplicate the key to verify that the dictionary isn't simply comparing
+  // addresses
   char *const dup_key = test_strdup(key);
 
   assert(strdict_find(dict, dup_key, NULL) == false);
@@ -291,7 +306,8 @@ static void remove_head_common(remove_t *const remove_cb)
   /* Remove head */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -327,7 +343,8 @@ static void remove_tail_common(remove_t *const remove_cb)
   /* Remove tail */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"zebra", "YAK", "Camel", "bison", "Aardvark", ""};
+  char const *const keys[NumberOfItems] = {"zebra", "YAK",      "Camel",
+                                           "bison", "Aardvark", ""};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -350,8 +367,10 @@ static void remove_tail_common(remove_t *const remove_cb)
     {
       assert(index < strdict_count(&dict));
       assert(index < NumberOfItems);
-      assert(strdict_get_key_at(&dict, index) == keys[NumberOfItems - 1 - index]);
-      assert(strdict_get_value_at(&dict, index) == &values[NumberOfItems - 1 - index]);
+      assert(strdict_get_key_at(&dict, index) ==
+             keys[NumberOfItems - 1 - index]);
+      assert(strdict_get_value_at(&dict, index) ==
+             &values[NumberOfItems - 1 - index]);
     }
   }
 
@@ -363,7 +382,8 @@ static void remove_middle_common(remove_t *const remove_cb)
   /* Remove middle */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -410,7 +430,8 @@ static void remove_null_common(remove_t *const remove_cb)
 {
   /* Remove head with null value */
   StrDict dict;
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -446,7 +467,8 @@ static void insert_head_common(insert_t *const insert_cb)
   /* Insert at head */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"zebra", "YAK", "Camel", "bison", "Aardvark", ""};
+  char const *const keys[NumberOfItems] = {"zebra", "YAK",      "Camel",
+                                           "bison", "Aardvark", ""};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -489,7 +511,8 @@ static void insert_tail_common(insert_t *const insert_cb)
   /* Insert at tail */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -532,7 +555,8 @@ static void insert_middle_common(insert_t *const insert_cb)
   /* Insert in middle */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -584,7 +608,8 @@ static void insert_middle_common(insert_t *const insert_cb)
 static void insert_null_common(insert_t *const insert_cb)
 {
   StrDict dict;
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -619,12 +644,13 @@ static void insert_null_common(insert_t *const insert_cb)
   }
 }
 
-static void try_insert(StrDict *const dict, char const *const key, _Optional void *const value,
-                       size_t const pos)
+static void try_insert(StrDict *const dict, char const *const key,
+                       _Optional void *const value, size_t const pos)
 {
   size_t ins_pos;
   bool success = false;
-  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success; ++limit)
+  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success;
+       ++limit)
   {
     Fortify_SetNumAllocationsLimit(limit);
     ins_pos = MagicValue;
@@ -640,7 +666,8 @@ static void try_insert_no_pos(StrDict *const dict, char const *const key,
 {
   NOT_USED(pos);
   bool success = false;
-  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success; ++limit)
+  for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success;
+       ++limit)
   {
     Fortify_SetNumAllocationsLimit(limit);
     success = strdict_insert(dict, key, value, NULL);
@@ -706,7 +733,8 @@ static void test9(void)
   /* Reinitialize */
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -817,7 +845,8 @@ static void test26(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -874,7 +903,8 @@ static void test27(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -931,7 +961,8 @@ static void test28(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -1094,7 +1125,8 @@ static void test35(void)
     {
       size_t const allowed_pos = j + (NumberOfKeys * l);
       assert(allowed_pos < (NumberOfKeys * NumberOfDuplicates));
-      printf("%zu: Consider %zu: %p\n", i, allowed_pos, (void *)&values[allowed_pos]);
+      printf("%zu: Consider %zu: %p\n", i, allowed_pos,
+             (void *)&values[allowed_pos]);
       if (value == &values[allowed_pos])
       {
         found_value = true;
@@ -1109,7 +1141,8 @@ static void test35(void)
     {
       assert(index < strdict_count(&dict));
       assert(index <= i);
-      assert(stricmp(strdict_get_key_at(&dict, index), keys[index / (k + 1)]) == 0);
+      assert(stricmp(strdict_get_key_at(&dict, index), keys[index / (k + 1)]) ==
+             0);
     }
     free(dup_key);
   }
@@ -1131,7 +1164,8 @@ static void test35(void)
     {
       size_t const allowed_pos = k + (NumberOfKeys * l);
       assert(allowed_pos < (NumberOfKeys * NumberOfDuplicates));
-      printf("%zu: Consider %zu: %p\n", i, allowed_pos, (void *)&values[allowed_pos]);
+      printf("%zu: Consider %zu: %p\n", i, allowed_pos,
+             (void *)&values[allowed_pos]);
       if (callbacks[i].value == &values[allowed_pos])
       {
         found_value = true;
@@ -1256,7 +1290,8 @@ static void test38(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -1271,8 +1306,8 @@ static void test38(void)
   }
 
   size_t i = 0;
-  for (_Optional void *value = strdictviter_all_init(&iter, &dict); value != NULL;
-       value = strdictviter_advance(&iter))
+  for (_Optional void *value = strdictviter_all_init(&iter, &dict);
+       value != NULL; value = strdictviter_advance(&iter))
   {
     assert(value == &values[i++]);
   }
@@ -1295,7 +1330,8 @@ static void test39(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -1336,7 +1372,8 @@ static void test39(void)
 
           printf("min_key '%s', max_key '%s'\n", min_key, max_key);
 
-          for (_Optional void *value = strdictviter_init(&iter, &dict, min_key, max_key);
+          for (_Optional void *value =
+                 strdictviter_init(&iter, &dict, min_key, max_key);
                value != NULL; value = strdictviter_advance(&iter))
           {
             got_values[vcount++] = value;
@@ -1384,7 +1421,8 @@ static void test40(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -1399,8 +1437,8 @@ static void test40(void)
   }
 
   size_t count = 0;
-  for (_Optional void *value = strdictviter_all_init(&iter, &dict); value != NULL;
-       value = strdictviter_advance(&iter), ++count)
+  for (_Optional void *value = strdictviter_all_init(&iter, &dict);
+       value != NULL; value = strdictviter_advance(&iter), ++count)
   {
     assert(count < NumberOfItems);
     assert(value == &values[count]);
@@ -1431,7 +1469,8 @@ static void test41(void)
 {
   StrDict dict;
   int values[NumberOfItems];
-  char const *const keys[NumberOfItems] = {"", "Aardvark", "bison", "Camel", "YAK", "zebra"};
+  char const *const keys[NumberOfItems] = {"",      "Aardvark", "bison",
+                                           "Camel", "YAK",      "zebra"};
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   strdict_init(&dict);
@@ -1633,7 +1672,8 @@ void strdict_tests(void)
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
-    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests), unit_tests[count].test_name);
+    printf("Test %zu/%zu : %s\n", 1 + count, ARRAY_SIZE(unit_tests),
+           unit_tests[count].test_name);
 
     unit_tests[count].test_func();
   }

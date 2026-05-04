@@ -76,21 +76,24 @@ void strdict_init(StrDict * /*dict*/);
  * Initialize a string dictionary.
  */
 
-typedef void StrDictDestructorFn(char const * /*key*/, _Optional void * /*value*/, void * /*arg*/);
+typedef void StrDictDestructorFn(char const * /*key*/,
+                                 _Optional void * /*value*/, void * /*arg*/);
 /*
  * Type of function called back to destroy each string dictionary item.
  * The value of 'arg' is that passed to the strdict_destroy function and
  * is expected to point to any additional parameters.
  */
 
-void strdict_destroy(StrDict * /*dict*/, _Optional StrDictDestructorFn * /*destructor*/,
+void strdict_destroy(StrDict * /*dict*/,
+                     _Optional StrDictDestructorFn * /*destructor*/,
                      void * /*arg*/);
 /*
  * Destroy a string dictionary, optionally calling a destructor function
  * (if the callback function pointer is not null).
  */
 
-bool strdict_find(StrDict * /*dict*/, char const * /*key*/, _Optional size_t * /*index*/);
+bool strdict_find(StrDict * /*dict*/, char const * /*key*/,
+                  _Optional size_t * /*index*/);
 /*
  * Search for the first item with a given key in a string dictionary.
  * Outputs the index of the item if the dictionary contains the key.
@@ -99,7 +102,8 @@ bool strdict_find(StrDict * /*dict*/, char const * /*key*/, _Optional size_t * /
  * Returns: true if the dictionary contains the key, otherwise false.
  */
 
-bool strdict_find_specific(StrDict * /*dict*/, char const * /*key*/, _Optional void * /*value*/,
+bool strdict_find_specific(StrDict * /*dict*/, char const * /*key*/,
+                           _Optional void * /*value*/,
                            _Optional size_t * /*index*/);
 /*
  * Search for the first item with a given key and value in a string
@@ -110,8 +114,8 @@ bool strdict_find_specific(StrDict * /*dict*/, char const * /*key*/, _Optional v
  *          otherwise false.
  */
 
-bool strdict_insert(StrDict * /*dict*/, char const * /*key*/, _Optional void * /*value*/,
-                    _Optional size_t * /*index*/);
+bool strdict_insert(StrDict * /*dict*/, char const * /*key*/,
+                    _Optional void * /*value*/, _Optional size_t * /*index*/);
 /*
  * Insert an item and value pair into a string dictionary. If the new
  * item's key is not unique then its position is indeterminate relative
@@ -131,7 +135,8 @@ static inline size_t strdict_count(StrDict const *const dict)
  * Returns: number of items.
  */
 
-static inline char const *strdict_get_key_at(StrDict const *const dict, size_t const index)
+static inline char const *strdict_get_key_at(StrDict const *const dict,
+                                             size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
@@ -143,7 +148,8 @@ static inline char const *strdict_get_key_at(StrDict const *const dict, size_t c
  * Returns: the key with the given index.
  */
 
-static inline _Optional void *strdict_get_value_at(StrDict const *const dict, size_t const index)
+static inline _Optional void *strdict_get_value_at(StrDict const *const dict,
+                                                   size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
@@ -189,7 +195,8 @@ size_t strdict_bisect_right(StrDict * /*dict*/, char const * /*key*/);
  *          keys can be found.
  */
 
-static inline _Optional void *strdict_find_value(StrDict *const dict, char const *const key,
+static inline _Optional void *strdict_find_value(StrDict *const dict,
+                                                 char const *const key,
                                                  _Optional size_t *const index)
 {
   size_t pos;
@@ -234,8 +241,9 @@ static inline bool strdict_remove(StrDict *const dict, char const *const key,
  * Returns: true if the dictionary contained the key, otherwise false.
  */
 
-static inline _Optional void *strdict_remove_value(StrDict *const dict, char const *const key,
-                                                   _Optional size_t *const index)
+static inline _Optional void *
+strdict_remove_value(StrDict *const dict, char const *const key,
+                     _Optional size_t *const index)
 {
   size_t pos;
   if (!strdict_find(dict, key, &pos))
@@ -256,7 +264,8 @@ static inline _Optional void *strdict_remove_value(StrDict *const dict, char con
  *          if the key was not found.
  */
 
-static inline bool strdict_remove_specific(StrDict *dict, char const *key, _Optional void *value,
+static inline bool strdict_remove_specific(StrDict *dict, char const *key,
+                                           _Optional void *value,
                                            _Optional size_t *index)
 {
   size_t pos;
@@ -278,8 +287,9 @@ static inline bool strdict_remove_specific(StrDict *dict, char const *key, _Opti
  *          otherwise false.
  */
 
-#define STRDICT_FOR_EACH(dict, index, tmp)                                                         \
-  for (size_t(index) = 0, (tmp) = strdict_count(dict); (index) < (tmp); ++(index))
+#define STRDICT_FOR_EACH(dict, index, tmp)                                     \
+  for (size_t(index) = 0, (tmp) = strdict_count(dict); (index) < (tmp);        \
+       ++(index))
 /*
  * Macro to be used for iterating over a string dictionary. The dictionary
  * must not be modified within the body of the loop. Indices are generated
@@ -287,9 +297,9 @@ static inline bool strdict_remove_specific(StrDict *dict, char const *key, _Opti
  * and points to the current item.
  */
 
-#define STRDICT_FOR_EACH_IN_RANGE(dict, min_key, max_key, index, tmp)                              \
-  for (size_t(index) = strdict_bisect_left((dict), (min_key)),                                     \
-      (tmp) = strdict_bisect_right((dict), (max_key));                                             \
+#define STRDICT_FOR_EACH_IN_RANGE(dict, min_key, max_key, index, tmp)          \
+  for (size_t(index) = strdict_bisect_left((dict), (min_key)),                 \
+      (tmp) = strdict_bisect_right((dict), (max_key));                         \
        (index) < (tmp); ++(index))
 /*
  * Macro to be used for iterating over a range of keys within a string
@@ -311,7 +321,8 @@ typedef struct
  */
 
 _Optional void *strdictviter_init(StrDictVIter * /*iter*/, StrDict * /*dict*/,
-                                  char const * /*min_key*/, char const * /*max_key*/);
+                                  char const * /*min_key*/,
+                                  char const * /*max_key*/);
 /*
  * Initialise an iterator object in preparation for iterating over the
  * values associated with a given range of keys in a string dictionary.
@@ -323,7 +334,8 @@ _Optional void *strdictviter_init(StrDictVIter * /*iter*/, StrDict * /*dict*/,
  *          given range, or NULL if the range is empty.
  */
 
-_Optional void *strdictviter_all_init(StrDictVIter * /*iter*/, StrDict * /*dict*/);
+_Optional void *strdictviter_all_init(StrDictVIter * /*iter*/,
+                                      StrDict * /*dict*/);
 /*
  * Initialise an iterator object in preparation for iterating over all the
  * values stored in a string dictionary. Modifying the dictionary (except

@@ -42,8 +42,8 @@
 #include "Internal/CBUtilMisc.h"
 #include "StrExtra.h"
 
-size_t strinflate(char *const s1, size_t const n, const char *s2, const char *const srch,
-                  const char *rplc[])
+size_t strinflate(char *const s1, size_t const n, const char *s2,
+                  const char *const srch, const char *rplc[])
 {
   assert(s2 != NULL);
   assert(s1 != NULL || n == 0);
@@ -74,7 +74,8 @@ size_t strinflate(char *const s1, size_t const n, const char *s2, const char *co
 
     if (count + len < n)
     {
-      DEBUGF("Copying %zu bytes from %p to %p\n", len, (void *)s2, (void *)(s1 + count));
+      DEBUGF("Copying %zu bytes from %p to %p\n", len, (void *)s2,
+             (void *)(s1 + count));
       strncpy(s1 + count, s2, len);
     }
     else

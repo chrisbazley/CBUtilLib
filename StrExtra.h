@@ -76,8 +76,8 @@ _Optional char *strdup(_Optional const char * /*s*/);
  *          the block when no longer required.
  */
 
-size_t strinflate(char * /*s1*/, size_t /*n*/, const char * /*s2*/, const char * /*srch*/,
-                  const char * /*rplc*/[]);
+size_t strinflate(char * /*s1*/, size_t /*n*/, const char * /*s2*/,
+                  const char * /*srch*/, const char * /*rplc*/[]);
 /*
  * Inflates the string pointed to by s2 whilst copying it into the array
  * pointed to by s1. Every character of s2 which matches a character in the

@@ -31,13 +31,15 @@
 #include "Internal/CBUtilMisc.h"
 #include "StringBuff.h"
 
-bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format, va_list args)
+bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format,
+                          va_list args)
 {
   bool success = true;
 
   assert(buffer != NULL);
   assert(format != NULL);
-  DEBUG_VERBOSEF("StringBuff: Appending string formatted according to '%s' to buffer %p ('%s')\n",
+  DEBUG_VERBOSEF("StringBuff: Appending string formatted according to '%s' to "
+                 "buffer %p ('%s')\n",
                  format, (void *)buffer, STRING_OR_NULL(buffer->buffer));
 
   /* If the string buffer contains the empty string "" then the length
@@ -61,7 +63,8 @@ bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format, 
   /* Allocate space for the number of characters to be appended and a
      null terminator. */
   size_t min_size = (unsigned)extra_chars + 1;
-  _Optional char *const free_ptr = stringbuffer_prepare_append(buffer, &min_size);
+  _Optional char *const free_ptr =
+    stringbuffer_prepare_append(buffer, &min_size);
   if (free_ptr != NULL)
   {
     assert(buffer->buffer != NULL);
