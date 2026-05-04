@@ -965,15 +965,15 @@ static void test28(void)
 
           if (min_index <= max_index)
           {
-            for (size_t j = 0; j < min_index; ++j)
+            for (size_t m = 0; m < min_index; ++m)
             {
-              IntDictKey key = intdict_get_key_at(&dict, j);
+              IntDictKey key = intdict_get_key_at(&dict, m);
               assert(key < min_key);
             }
 
-            for (size_t j = max_index + 1; j < intdict_count(&dict); ++j)
+            for (size_t m = max_index + 1; m < intdict_count(&dict); ++m)
             {
-              IntDictKey key = intdict_get_key_at(&dict, j);
+              IntDictKey key = intdict_get_key_at(&dict, m);
               assert(key > max_key);
             }
 
@@ -1231,11 +1231,13 @@ static void test38(void)
     intdict_insert(&dict, keys[i], &values[i], NULL);
   }
 
-  size_t i = 0;
-  for (_Optional void *value = intdictviter_all_init(&iter, &dict);
-       value != NULL; value = intdictviter_advance(&iter))
   {
-    assert(value == &values[i++]);
+    size_t i = 0;
+    for (_Optional void *value = intdictviter_all_init(&iter, &dict);
+         value != NULL; value = intdictviter_advance(&iter))
+    {
+      assert(value == &values[i++]);
+    }
   }
 
   callback_count = 0;
@@ -1306,9 +1308,9 @@ static void test39(void)
             assert(vcount == 0);
           }
 
-          for (size_t i = 0; i < vcount; ++i)
+          for (size_t m = 0; m < vcount; ++m)
           {
-            assert(&values[min_index + i] == got_values[i]);
+            assert(&values[min_index + m] == got_values[m]);
           }
         }
       }
