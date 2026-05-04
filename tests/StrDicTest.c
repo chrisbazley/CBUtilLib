@@ -1026,15 +1026,15 @@ static void test28(void)
 
           if (min_index <= max_index)
           {
-            for (size_t j = 0; j < min_index; ++j)
+            for (size_t m = 0; m < min_index; ++m)
             {
-              char const *const key = strdict_get_key_at(&dict, j);
+              char const *const key = strdict_get_key_at(&dict, m);
               assert(stricmp(key, min_key) < 0);
             }
 
-            for (size_t j = max_index + 1; j < strdict_count(&dict); ++j)
+            for (size_t m = max_index + 1; m < strdict_count(&dict); ++m)
             {
-              char const *const key = strdict_get_key_at(&dict, j);
+              char const *const key = strdict_get_key_at(&dict, m);
               assert(stricmp(key, max_key) > 0);
             }
 
@@ -1274,9 +1274,9 @@ static void test37(void)
     for (size_t index = 0; index < strdict_count(&dict); ++index)
     {
       assert(index < strdict_count(&dict));
-      for (size_t k = 0; k <= i; ++k)
+      for (size_t l = 0; l <= i; ++l)
       {
-        assert(strdict_get_value_at(&dict, index) != &values[k]);
+        assert(strdict_get_value_at(&dict, index) != &values[l]);
       }
     }
 
