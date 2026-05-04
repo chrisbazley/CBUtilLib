@@ -647,7 +647,7 @@ static void insert_null_common(insert_t *const insert_cb)
 static void try_insert(StrDict *const dict, char const *const key,
                        _Optional void *const value, size_t const pos)
 {
-  size_t ins_pos;
+  size_t ins_pos = 0;
   bool success = false;
   for (unsigned long limit = 0; limit < FortifyAllocationLimit && !success;
        ++limit)
