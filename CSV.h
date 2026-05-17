@@ -33,6 +33,7 @@ History:
                   Use strtol and strtod instead of atoi, atof and atod to
                   avoid undefined behaviour if the value is unrepresentable.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 17-May-26: Add support for outputting an array of type unsigned char.
 */
 
 #ifndef CSV_h
@@ -49,7 +50,8 @@ typedef enum
 {
   CSVOutputType_Int,
   CSVOutputType_Long,
-  CSVOutputType_Double
+  CSVOutputType_Double,
+  CSVOutputType_UChar,
 } CSVOutputType;
 
 size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
@@ -93,6 +95,14 @@ static inline size_t csv_parse_as_double(const char *const s,
                                          size_t const nmemb)
 {
   return csv_parse_string(s, endp, output, CSVOutputType_Double, nmemb);
+}
+
+static inline size_t csv_parse_as_uchar(const char *const s,
+                                        _Optional char *_Optional *const endp,
+                                        _Optional unsigned char *const output,
+                                        size_t const nmemb)
+{
+  return csv_parse_string(s, endp, output, CSVOutputType_UChar, nmemb);
 }
 
 /* Deprecated type and enumeration constant names */

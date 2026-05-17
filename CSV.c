@@ -35,6 +35,7 @@
                   'void *' but the argument has another type.
                   Treat the result of strchr as optional.
   CJB: 29-Apr-26: Stop dereferencing a pointer of type void *.
+  CJB: 17-May-26: Add support for outputting an array of type unsigned char.
 */
 
 /* ISO library headers */
@@ -127,6 +128,16 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
             long int const tmp = strtol(start_of_field, NULL, 0);
             output_i[field] = (int)LOWEST(INT_MAX, HIGHEST(INT_MIN, tmp));
             DEBUGF("CSV: Decoded field %zu as %i\n", field, output_i[field]);
+          }
+          break;
+
+          case CSVOutputType_UChar:
+          {
+            _Optional unsigned char *const output_uc = output;
+            long int const tmp = strtol(start_of_field, NULL, 0);
+            output_uc[field] =
+              (unsigned char)LOWEST((long int)UCHAR_MAX, HIGHEST(0, tmp));
+            DEBUGF("CSV: Decoded field %zu as %hhi\n", field, output_uc[field]);
           }
           break;
         }
