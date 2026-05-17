@@ -29,12 +29,15 @@
                   behaviour caused by unrepresentable results of
                   left-shifting a signed integer type.
   CJB: 11-Aug-22: Make sign conversion explicit in fread_int32le.
+  CJB: 17-May-26: Make conversions to unsigned char explicit.
+                  Use CHAR_BIT instead of magic numbers.
 */
 
 /* ISO library headers */
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <limits.h>
 
 /* Local headers */
 #include "FileRWInt.h"
@@ -61,9 +64,10 @@ bool fread_int32le(long int *num, FILE *in)
   {
     /* Assemble a 32 bit integer from 4 bytes, assuming
        little-endian order (least significant byte first) */
-    uint32_t const unum = bytes[0] | ((uint32_t)bytes[1] << 8) |
-                          ((uint32_t)bytes[2] << 16) |
-                          ((uint32_t)bytes[3] << 24);
+    uint32_t const unum = bytes[0] |
+                          ((uint32_t)bytes[1] << CHAR_BIT) |
+                          ((uint32_t)bytes[2] << (CHAR_BIT * 2)) |
+                          ((uint32_t)bytes[3] << (CHAR_BIT * 3));
 
     int32_t snum = 0;
 
@@ -106,10 +110,10 @@ bool fwrite_int32le(long int num, FILE *out)
      little-endian order (least significant byte first) */
   uint32_t const unum = (uint32_t)num;
   unsigned char bytes[4];
-  bytes[0] = unum;
-  bytes[1] = unum >> 8;
-  bytes[2] = unum >> 16;
-  bytes[3] = unum >> 24;
+  bytes[0] = (unsigned char)unum;
+  bytes[1] = (unsigned char)(unum >> CHAR_BIT);
+  bytes[2] = (unsigned char)(unum >> (CHAR_BIT * 2));
+  bytes[3] = (unsigned char)(unum >> (CHAR_BIT * 3));
 
   n = fwrite(bytes, sizeof(bytes), 1, out);
   if (n != 1)
