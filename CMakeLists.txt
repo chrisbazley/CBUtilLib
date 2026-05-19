@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 99)
 
 if(MSVC)
     # MSVC equivalent of -Wall -Wextra is /W4
-    add_compile_options(/W4 /wd4200 /wd4996)
+    add_compile_options(/W4 /wd4200 /wd4996 /wd4130)
 else()
     # For GCC and Clang
     add_compile_options(-Wall -Wextra -Wsign-conversion -pedantic)
