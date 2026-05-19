@@ -31,6 +31,7 @@
   CJB: 11-Aug-22: Make sign conversion explicit in fread_int32le.
   CJB: 17-May-26: Make conversions to unsigned char explicit.
                   Use CHAR_BIT instead of magic numbers.
+  CJB: 19-May-26: Stop using unary minus because MSVC warns.
 */
 
 /* ISO library headers */
@@ -78,7 +79,7 @@ bool fread_int32le(long int *num, FILE *in)
     else
     {
       /* Beware that -INT32_MIN may be unrepresentable as int32_t. */
-      uint32_t const neg = -unum;
+      uint32_t const neg = 0u - unum;
       if (neg <= INT32_MAX)
       {
         snum = -(int32_t)neg;
