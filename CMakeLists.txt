@@ -11,7 +11,31 @@ else()
     add_compile_options(-Wall -Wextra -Wsign-conversion -pedantic)
 endif()
 
-file(GLOB SOURCES "*.c")
+set(SOURCES
+    ArgUtils.c
+    CSV.c
+    FileRWInt.c
+    IntDict.c
+    IntDictVIt.c
+    LinkedList.c
+    StrDict.c
+    StrDictVIt.c
+    StrInflate.c
+    StrTail.c
+    StringBuf2.c
+    StringBuf3.c
+    StringBuff.c
+    TrigTable.c
+)
+
+if(NOT MSVC)
+    list(APPEND SOURCES
+        Strdup.c
+        Stricmp.c
+        Strnicmp.c
+    )
+endif()
+
 file(GLOB PUBLIC_HEADERS "*.h")
 
 add_library(CBUtil STATIC ${SOURCES} ${PUBLIC_HEADERS})
