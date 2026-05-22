@@ -25,6 +25,7 @@
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 22-May-26: strdup no longer accepts a null pointer.
  */
 
 /* ISO library headers */
@@ -38,18 +39,14 @@
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */
 
-_Optional char *strdup(_Optional const char *const string)
+_Optional char *strdup(const char *const string)
 {
-  if (!string)
-  {
-    return NULL;
-  }
-
-  size_t const len = strlen(&*string) + 1;
+  assert(string);
+  size_t const len = strlen(string) + 1;
   _Optional char *const newstr = malloc(len);
   if (newstr == NULL)
   {
     return NULL;
   }
-  return memcpy(&*newstr, &*string, len);
+  return memcpy(&*newstr, string, len);
 }
