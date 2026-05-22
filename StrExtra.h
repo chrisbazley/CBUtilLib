@@ -35,6 +35,8 @@ History:
   CJB: 11-Aug-22: Documented the behaviour of strdup when passed a null pointer.
                   Changed the return type of strinflate from int to size_t.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 22-May-26: Avoid declaring stricmp, strnicmp or strdup when using MSVC.
+                  strdup no longer accepts a null pointer.
  */
 
 #ifndef StrExtra_h
@@ -47,6 +49,12 @@ History:
 #define _Optional
 #endif
 
+#ifdef _MSC_VER
+#include <string.h>
+#define stricmp _stricmp
+#define strnicmp _strnicmp
+#define strdup _strdup
+#else
 int stricmp(const char * /*s1*/, const char * /*s2*/);
 /*
  * Compares the string pointed to by s1 to the string pointed to by s2.
@@ -66,15 +74,15 @@ int strnicmp(const char * /*s1*/, const char * /*s2*/, size_t /*n*/);
  *          or less than the string pointed to by s2.
  */
 
-_Optional char *strdup(_Optional const char * /*s*/);
+_Optional char *strdup(const char * /*s*/);
 /*
  * Duplicates the string pointed to by s by copying it into a malloc'd block
- * of appropriate size. If the input is a null pointer then the output will
- * also be a null pointer.
+ * of appropriate size.
  * Returns: a pointer to the new string, or a null pointer if memory
  *          allocation failed. It is the caller's responsibility to free
  *          the block when no longer required.
  */
+#endif
 
 size_t strinflate(char * /*s1*/, size_t /*n*/, const char * /*s2*/,
                   const char * /*srch*/, const char * /*rplc*/[]);
