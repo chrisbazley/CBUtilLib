@@ -37,8 +37,10 @@ if(NOT MSVC)
 endif()
 
 file(GLOB PUBLIC_HEADERS "*.h")
+file(GLOB PRIVATE_HEADERS "Internal/*.h")
 
-add_library(CBUtil STATIC ${SOURCES} ${PUBLIC_HEADERS})
+
+add_library(CBUtil STATIC ${SOURCES} ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
 
 set_target_properties(CBUtil PROPERTIES
     PUBLIC_HEADER "${PUBLIC_HEADERS}"
