@@ -841,6 +841,20 @@ static void test25(void)
   remove_middle_common(remove_index_and_get_value);
 }
 
+static char *alloc_amended_key(const char *const key, int const k)
+{
+  char *const new_key = test_strdup(key);
+  size_t const len = strlen(new_key);
+  if (len > 0)
+  {
+    int const new_char = new_key[len - 1] + k;
+    assert(new_char >= CHAR_MIN);
+    assert(new_char <= CHAR_MAX);
+    new_key[len - 1] = (char)new_char;
+  }
+  return new_key;
+}
+
 static void test26(void)
 {
   StrDict dict;
@@ -860,13 +874,7 @@ static void test26(void)
   {
     for (int k = -1; k < 1; ++k)
     {
-      char *const bisect_key = test_strdup(keys[i]);
-      size_t const len = strlen(bisect_key);
-      if (len > 0)
-      {
-        bisect_key[len - 1] += k;
-      }
-
+      char *const bisect_key = alloc_amended_key(keys[i], k);
       size_t const bisect_index = strdict_bisect_left(&dict, bisect_key);
       assert(bisect_index <= strdict_count(&dict));
 
@@ -918,13 +926,7 @@ static void test27(void)
   {
     for (int k = -1; k < 1; ++k)
     {
-      char *const bisect_key = test_strdup(keys[i]);
-      size_t const len = strlen(bisect_key);
-      if (len > 0)
-      {
-        bisect_key[len - 1] += k;
-      }
-
+      char *const bisect_key = alloc_amended_key(keys[i], k);
       size_t const bisect_index = strdict_bisect_right(&dict, bisect_key);
       assert(bisect_index <= strdict_count(&dict));
 
@@ -980,19 +982,8 @@ static void test28(void)
       {
         for (int l = -1; l <= 1; ++l)
         {
-          char *const min_key = test_strdup(keys[j]);
-          size_t const min_len = strlen(min_key);
-          if (min_len > 0)
-          {
-            min_key[min_len - 1] += k;
-          }
-
-          char *const max_key = test_strdup(keys[i]);
-          size_t const max_len = strlen(max_key);
-          if (max_len > 0)
-          {
-            max_key[max_len - 1] += l;
-          }
+          char *const min_key = alloc_amended_key(keys[j], k),
+               *const max_key = alloc_amended_key(keys[i], l);
 
           size_t min_index = SIZE_MAX, max_index = 0;
 
@@ -1355,19 +1346,8 @@ static void test39(void)
       {
         for (int l = -1; l <= 1; ++l)
         {
-          char *const min_key = test_strdup(keys[j]);
-          size_t const min_len = strlen(min_key);
-          if (min_len > 0)
-          {
-            min_key[min_len - 1] += k;
-          }
-
-          char *const max_key = test_strdup(keys[i]);
-          size_t const max_len = strlen(max_key);
-          if (max_len > 0)
-          {
-            max_key[max_len - 1] += l;
-          }
+          char *const min_key = alloc_amended_key(keys[j], k),
+               *const max_key = alloc_amended_key(keys[i], l);
 
           size_t vcount = 0;
           _Optional int *got_values[NumberOfItems];
