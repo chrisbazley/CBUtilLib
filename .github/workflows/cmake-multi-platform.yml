@@ -92,24 +92,23 @@ jobs:
       shell: bash
       run: echo "build-output-dir=${{ github.workspace }}/build-analysis" >> "$GITHUB_OUTPUT"
 
-    # Install the clang-tools utility package which contains scan-build
     - name: Install Static Analysis Tools
       run: sudo apt-get update && sudo apt-get install -y clang-tools
 
-    - name: Configure CMake
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_C_COMPILER=clang
-        -DCMAKE_CXX_COMPILER=clang++
-        -DCMAKE_BUILD_TYPE=ClangAnalysis
-        -S ${{ github.workspace }}
-
-    # Use scan-build to capture the analysis output into an HTML report directory
-    - name: Run Static Analysis
+    # Both configuring and building are run through scan-build
+    # This forces CMake to log scan-build's wrapper scripts as the compilers
+    - name: Run Static Analysis Suite
       run: |
-        scan-build -o html-report cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ClangAnalysis
+        scan-build -o html-report \
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
+          -DCMAKE_BUILD_TYPE=ClangAnalysis \
+          -S ${{ github.workspace }}
+          
+        scan-build -o html-report \
+          cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ClangAnalysis
 
-    # Upload the generated report directly to your GitHub Action run dashboard
     - name: Upload Analysis Report Artifact
       if: always()
       uses: actions/upload-artifact@v4
