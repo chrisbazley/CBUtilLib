@@ -45,7 +45,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
+#include <inttypes.h>
 
 #if !defined(USE_OPTIONAL) && !defined(_Optional)
 #define _Optional
