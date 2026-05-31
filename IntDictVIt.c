@@ -22,6 +22,7 @@
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 31-May-26: Use PRIIntDictKey instead of "ld" as format specifier.
  */
 
 /* Local headers */
@@ -35,7 +36,7 @@ _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
   assert(iter);
   assert(dict);
   DEBUGF("Start iterating over values in dictionary %p of %zu "
-         "within range (%ld,%ld)\n",
+         "within range (%" PRIIntDictKey ",%" PRIIntDictKey ")\n",
          (void *)dict, intdict_count(dict), min_key, max_key);
 
   *iter = (IntDictVIter){
