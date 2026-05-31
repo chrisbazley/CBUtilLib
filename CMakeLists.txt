@@ -49,7 +49,7 @@ set_target_properties(CBUtil PROPERTIES
 
 target_include_directories(CBUtil PUBLIC .)
 
-target_compile_definitions(CBUtil PRIVATE
+target_compile_definitions(CBUtil PUBLIC
     $<$<CONFIG:Debug>:DEBUG_OUTPUT>
 )
 
