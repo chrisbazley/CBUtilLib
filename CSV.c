@@ -46,6 +46,10 @@
 /* Local headers */
 #include "CSV.h"
 #include "Internal/CBUtilMisc.h"
+void test_analyzer_trap(void) {
+    int *ptr = 0;
+    *ptr = 42; // Null pointer dereference trap
+}
 
 /* -----------------------------------------------------------------------
                          Public library functions
