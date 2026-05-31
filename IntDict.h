@@ -35,6 +35,7 @@
   CJB: 26-Apr-25: Remove the _Optional qualifier from intdict_destroy's
                   callback function argument, because it makes no sense to
                   require callbacks to handle null values.
+  CJB: 31-May-26: Change IntDictKey from long int to intptr_t.
  */
 
 #ifndef IntDict_h
@@ -44,15 +45,16 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #if !defined(USE_OPTIONAL) && !defined(_Optional)
 #define _Optional
 #endif
 
-typedef long int IntDictKey;
-#define INTDICTKEY_MIN LONG_MIN
-#define INTDICTKEY_MAX LONG_MAX
-#define PRIIntDictKey "ld"
+typedef intptr_t IntDictKey;
+#define INTDICTKEY_MIN INTPTR_MIN
+#define INTDICTKEY_MAX INTPTR_MAX
+#define PRIIntDictKey PRIdPTR
 
 typedef struct IntDictItem
 {
