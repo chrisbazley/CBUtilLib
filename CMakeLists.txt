@@ -11,6 +11,22 @@ else()
     add_compile_options(-Wall -Wextra -Wsign-conversion -pedantic)
 endif()
 
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_C_FLAGS_CLANG                  "${CMAKE_C_FLAGS_DEBUG}")
+    set(CMAKE_C_FLAGS_CLANGANALYSIS          "${CMAKE_C_FLAGS_DEBUG}")
+    set(CMAKE_C_FLAGS_CLANGOPTIONAL          "${CMAKE_C_FLAGS_DEBUG}")
+    set(CMAKE_C_FLAGS_CLANGANALYSISOPTIONAL  "${CMAKE_C_FLAGS_DEBUG}")
+
+    add_compile_options(
+        $<$<OR:$<CONFIG:ClangAnalysis>,$<CONFIG:ClangAnalysisOptional>>:--analyze>
+    )
+
+    set(FORK_CHECKERS "-xanalyzer -analyzer-checker=optionality,nullability,core --analyzer-no-default-checks")
+    add_compile_options(
+        $<$<CONFIG:ClangAnalysisOptional>:${FORK_CHECKERS}>
+    )
+endif()
+
 set(SOURCES
     ArgUtils.c
     CSV.c
@@ -39,18 +55,22 @@ endif()
 file(GLOB PUBLIC_HEADERS "*.h")
 file(GLOB PRIVATE_HEADERS "Internal/*.h")
 
-
 add_library(CBUtil STATIC ${SOURCES} ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
 
-set_target_properties(CBUtil PROPERTIES
-    PUBLIC_HEADER "${PUBLIC_HEADERS}"
+set_target_properties(CBUtil PROPERTIES 
+    PUBLIC_HEADER "${PUBLIC_HEADERS}" 
     DEBUG_POSTFIX "dbg"
+    MAP_IMPORTED_CONFIG_CLANG                  DEBUG
+    MAP_IMPORTED_CONFIG_CLANGANALYSIS          DEBUG
+    MAP_IMPORTED_CONFIG_CLANGOPTIONAL          DEBUG
+    MAP_IMPORTED_CONFIG_CLANGANALYSISOPTIONAL  DEBUG
 )
 
 target_include_directories(CBUtil PUBLIC .)
 
-target_compile_definitions(CBUtil PRIVATE
-    $<$<CONFIG:Debug>:DEBUG_OUTPUT>
+target_compile_definitions(CBUtil PRIVATE 
+    $<$<OR:$<CONFIG:Debug>,$<CONFIG:Clang>,$<CONFIG:ClangAnalysis>,$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:DEBUG_OUTPUT>
+    $<$<OR:$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:USE_OPTIONAL>
 )
 
 install(TARGETS CBUtil
