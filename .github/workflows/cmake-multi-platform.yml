@@ -113,6 +113,6 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: trunk-clang-analysis-report
+        name: clang-analysis-report
         path: html-report/
         if-no-files-found: ignore
