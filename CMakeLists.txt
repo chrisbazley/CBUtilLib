@@ -11,8 +11,7 @@ else()
     add_compile_options(-Wall -Wextra -Wsign-conversion -pedantic)
 endif()
 
-if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_C_FLAGS_CLANG                  "${CMAKE_C_FLAGS_DEBUG}")
+if(CMAKE_C_COMPILER_ID STREQUAL "clang")
     set(CMAKE_C_FLAGS_CLANGANALYSIS          "${CMAKE_C_FLAGS_DEBUG}")
     set(CMAKE_C_FLAGS_CLANGOPTIONAL          "${CMAKE_C_FLAGS_DEBUG}")
     set(CMAKE_C_FLAGS_CLANGANALYSISOPTIONAL  "${CMAKE_C_FLAGS_DEBUG}")
@@ -69,7 +68,7 @@ set_target_properties(CBUtil PROPERTIES
 target_include_directories(CBUtil PUBLIC .)
 
 target_compile_definitions(CBUtil PRIVATE 
-    $<$<OR:$<CONFIG:Debug>,$<CONFIG:Clang>,$<CONFIG:ClangAnalysis>,$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:DEBUG_OUTPUT>
+    $<$<OR:$<CONFIG:Debug>,$<CONFIG:ClangAnalysis>,$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:DEBUG_OUTPUT>
     $<$<OR:$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:USE_OPTIONAL>
 )
 
