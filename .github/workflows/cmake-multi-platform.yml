@@ -81,3 +81,24 @@ jobs:
         name: ctest-logs-${{ runner.os }}-${{ matrix.build_type }}
         path: ${{ steps.strings.outputs.build-output-dir }}/Testing/Temporary/
         if-no-files-found: ignore # Prevents failure if the folder doesn't exist yet
+
+  clang-analysis:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: echo "build-output-dir=${{ github.workspace }}/build-analysis" >> "$GITHUB_OUTPUT"
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_C_COMPILER=clang
+        -DCMAKE_CXX_COMPILER=clang++
+        -DCMAKE_BUILD_TYPE=ClangAnalysis
+        -S ${{ github.workspace }}
+
+    - name: Run Static Analysis
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ClangAnalysis
