@@ -1287,7 +1287,7 @@ static void test39(void)
           size_t vcount = 0;
           _Optional int *got_values[NumberOfItems];
 
-          printf("min_key %ld, max_key %ld\n", min_key, max_key);
+          printf("min_key %" PRIIntDictKey ", max_key %" PRIIntDictKey "\n", min_key, max_key);
 
           for (_Optional void *value =
                  intdictviter_init(&iter, &dict, min_key, max_key);
