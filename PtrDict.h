@@ -99,8 +99,8 @@ static inline void ptrdict_destroy(PtrDict *const dict,
  * (if the callback function pointer is not null).
  */
 
-bool ptrdict_find(PtrDict *const dict, void *const key,
-                  _Optional size_t *const index)
+static inline bool ptrdict_find(PtrDict *const dict, void *const key,
+                                _Optional size_t *const index)
 {
   assert(dict);
   assert(key);
@@ -133,8 +133,8 @@ static inline bool ptrdict_find_specific(PtrDict *const dict, void *const key,
  *          otherwise false.
  */
 
-bool ptrdict_insert(PtrDict *const dict, void * const key,
-                    _Optional void * const value, _Optional size_t * const index)
+static inline bool ptrdict_insert(PtrDict *const dict, void * const key,
+                                  _Optional void * const value, _Optional size_t * const index)
 {
   assert(dict);
   assert(key);
@@ -335,10 +335,10 @@ typedef struct
  * iterate over the values that are stored in a dictionary.
  */
 
-_Optional void *ptrdictviter_init(PtrDictVIter * const iter,
-                                  PtrDict * const dict,
-                                  void * const min_key,
-                                  void * const max_key)
+static inline _Optional void *ptrdictviter_init(PtrDictVIter * const iter,
+                                                PtrDict * const dict,
+                                                void * const min_key,
+                                                void * const max_key)
 {
   assert(iter);
   assert(dict);
@@ -359,8 +359,8 @@ _Optional void *ptrdictviter_init(PtrDictVIter * const iter,
  *          given range, or NULL if the range is empty.
  */
 
-_Optional void *ptrdictviter_all_init(PtrDictVIter * const iter,
-                                      PtrDict * const dict)
+static inline _Optional void *ptrdictviter_all_init(PtrDictVIter * const iter,
+                                                    PtrDict * const dict)
 {
   assert(iter);
   assert(dict);
@@ -375,7 +375,7 @@ _Optional void *ptrdictviter_all_init(PtrDictVIter * const iter,
  *          the dictionary, or NULL if the dictionary is empty.
  */
 
-_Optional void *ptrdictviter_advance(PtrDictVIter * const iter)
+static inline _Optional void *ptrdictviter_advance(PtrDictVIter * const iter)
 {
   assert(iter);
   return intdictviter_advance(&iter->_private);
@@ -388,7 +388,7 @@ _Optional void *ptrdictviter_advance(PtrDictVIter * const iter)
  *          there are no more values.
  */
 
-size_t ptrdictviter_remove(PtrDictVIter * const iter)
+static inline size_t ptrdictviter_remove(PtrDictVIter * const iter)
 {
   assert(iter);
   return intdictviter_remove(&iter->_private);
