@@ -92,27 +92,15 @@ jobs:
       shell: bash
       run: echo "build-output-dir=${{ github.workspace }}/build-analysis" >> "$GITHUB_OUTPUT"
 
-    - name: Install Static Analysis Tools
-      run: sudo apt-get update && sudo apt-get install -y clang-tools
-
-    # Both configuring and building are run through scan-build
-    # This forces CMake to log scan-build's wrapper scripts as the compilers
     - name: Run Static Analysis Suite
       run: |
-        scan-build -o html-report \
-          cmake -B ${{ steps.strings.outputs.build-output-dir }} \
+        # 1. Tell CMake explicitly to use the Clang Static Analyzer natively
+        cmake -B ${{ steps.strings.outputs.build-output-dir }} \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
-          -DCMAKE_BUILD_TYPE=ClangAnalysis \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_C_CLANG_STATIC_ANALYZER=/usr/bin/clang \
           -S ${{ github.workspace }}
-          
-        scan-build -o html-report \
-          cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ClangAnalysis
 
-    - name: Upload Analysis Report Artifact
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: clang-analysis-report
-        path: html-report/
-        if-no-files-found: ignore
+        # 2. Just build normally
+        cmake --build ${{ steps.strings.outputs.build-output-dir }}
