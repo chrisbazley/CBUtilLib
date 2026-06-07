@@ -74,7 +74,7 @@ static bool realloc_buffer(StringBuffer *const buffer, size_t const new_size)
   }
   else
   {
-    DEBUGF("StringBuff: reallocating %p (%zu bytes)\n", (void *)buffer->buffer);
+    DEBUGF("StringBuff: reallocating %p\n", (void *)buffer->buffer);
     new_buffer = realloc(buffer->buffer, new_size);
     if (new_buffer != NULL)
     {
