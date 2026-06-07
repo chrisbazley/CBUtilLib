@@ -42,6 +42,8 @@
   CJB: 03-May-25: Fix pedantic warnings when the format specifies type
                   'void *' but the argument has another type.
                   No longer assume that vsnprintf will accept NULL.
+  CJB: 07-Jun-26: Placate clang-tidy by not printing pointer values
+                  after calling free or realloc.
 */
 
 /* ISO library headers */
@@ -60,24 +62,24 @@
 
 static bool realloc_buffer(StringBuffer *const buffer, size_t const new_size)
 {
-  _Optional char *new_buffer = NULL;
+  _Optional void *new_buffer = NULL;
   bool success = true;
 
   assert(buffer != NULL);
   if (new_size == 0)
   {
-    free(buffer->buffer);
-    DEBUGF("StringBuff: freed %p (%zu bytes)\n", (void *)buffer->buffer,
+    DEBUGF("StringBuff: freeing %p (%zu bytes)\n", (void *)buffer->buffer,
            buffer->buffer_size);
+    free(buffer->buffer);
   }
   else
   {
+    DEBUGF("StringBuff: reallocating %p (%zu bytes)\n", (void *)buffer->buffer);
     new_buffer = realloc(buffer->buffer, new_size);
     if (new_buffer != NULL)
     {
-      DEBUGF("StringBuff: reallocated %p (%zu bytes) at %p (%zu bytes)\n",
-             (void *)buffer->buffer, buffer->buffer_size, (void *)new_buffer,
-             new_size);
+      DEBUGF("StringBuff: reallocated at %p (%zu to %zu bytes)\n",
+             new_buffer, buffer->buffer_size, new_size);
     }
     else
     {
