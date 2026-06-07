@@ -20,6 +20,7 @@
 /* History:
   CJB: 24-Sep-23: New function to append a formatted string.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 07-Jun-26: Stop leaking a copy of the va_list if vsnprintf fails.
 */
 
 /* ISO library headers */
@@ -34,7 +35,7 @@
 bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format,
                           va_list args)
 {
-  bool success = true;
+  bool success = false;
 
   assert(buffer != NULL);
   assert(format != NULL);
@@ -54,19 +55,23 @@ bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format,
   va_list args_copy;
   va_copy(args_copy, args);
 
-  int const extra_chars = vsnprintf(&(char){'\0'}, 0, format, args);
-  if (extra_chars < 0)
-  {
-    return false;
-  }
+  do {
+    int const extra_chars = vsnprintf(&(char){'\0'}, 0, format, args);
+    if (extra_chars < 0)
+    {
+      break;
+    }
 
-  /* Allocate space for the number of characters to be appended and a
-     null terminator. */
-  size_t min_size = (unsigned)extra_chars + 1;
-  _Optional char *const free_ptr =
-    stringbuffer_prepare_append(buffer, &min_size);
-  if (free_ptr != NULL)
-  {
+    /* Allocate space for the number of characters to be appended and a
+       null terminator. */
+    size_t min_size = (unsigned)extra_chars + 1;
+    _Optional char *const free_ptr =
+      stringbuffer_prepare_append(buffer, &min_size);
+    if (free_ptr == NULL)
+    {
+      break;
+    }
+
     assert(buffer->buffer != NULL);
 
     /* Copy characters from the tail string to the end of the existing
@@ -77,11 +82,8 @@ bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format,
 
     /* Record the new string length and append a null terminator. */
     stringbuffer_finish_append(buffer, (unsigned)extra_chars);
-  }
-  else
-  {
-    success = false;
-  }
+    success = true;
+  } while (0);
 
   va_end(args_copy);
   return success;
