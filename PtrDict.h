@@ -168,7 +168,7 @@ static inline void *ptrdict_get_key_at(PtrDict const *const dict,
                                        size_t const index)
 {
   assert(dict);
-  return intdict_get_key_at(&dict->_private, index);
+  return (void *)intdict_get_key_at(&dict->_private, index);
 }
 /*
  * Get the key currently at a given index in a pointer dictionary.
