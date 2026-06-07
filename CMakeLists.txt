@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CBUtilLib C)
 
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_XCODE_ATTRIBUTE_RUN_CLANG_STATIC_ANALYZER "YES")
 
 if(MSVC)
     # MSVC equivalent of -Wall -Wextra is /W4
