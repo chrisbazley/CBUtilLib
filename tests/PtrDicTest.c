@@ -235,24 +235,23 @@ static void remove_singleton_common(remove_t *const remove_cb)
 {
   /* Remove singleton */
   PtrDict dict;
-  int value;
-  void *key = 66;
+  int key, value;
 
   memset(&dict, CHAR_MAX, sizeof(dict));
   ptrdict_init(&dict);
 
   size_t index = MagicValue;
-  assert(ptrdict_insert(&dict, key, &value, &index));
+  assert(ptrdict_insert(&dict, &key, &value, &index));
   assert(index == 0);
-  check_find(&dict, key, &value, 0);
+  check_find(&dict, &key, &value, 0);
   assert(ptrdict_count(&dict) == 1);
 
-  remove_cb(&dict, key, &value, 0);
-  check_not_found(&dict, key, &value);
+  remove_cb(&dict, &key, &value, 0);
+  check_not_found(&dict, &key, &value);
   assert(ptrdict_count(&dict) == 0);
 
-  remove_cb(&dict, key, &value, SIZE_MAX);
-  check_not_found(&dict, key, &value);
+  remove_cb(&dict, &key, &value, SIZE_MAX);
+  check_not_found(&dict, &key, &value);
   assert(ptrdict_count(&dict) == 0);
 
   ptrdict_destroy(&dict, never_call_me, &dict);

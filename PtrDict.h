@@ -316,8 +316,8 @@ static inline bool ptrdict_remove_specific(PtrDict *dict, void *key,
  */
 
 #define PTRDICT_FOR_EACH_IN_RANGE(dict, min_key, max_key, index, tmp)          \
-  for (size_t(index) = ptrdict_bisect_left((dict), (intptr_t)(min_key)),       \
-      (tmp) = ptrdict_bisect_right((dict), (intptr_t)(max_key));               \
+  for (size_t(index) = ptrdict_bisect_left((dict), (min_key)),                 \
+      (tmp) = ptrdict_bisect_right((dict), (max_key));                         \
        (index) < (tmp); ++(index))
 /*
  * Macro to be used for iterating over a range of keys within a pointer
