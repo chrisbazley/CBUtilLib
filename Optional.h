@@ -27,6 +27,7 @@ History:
   ACA: 09-Aug-25: Fix the calloc macro's parameter list.  Add fflush,
                   reallocarray, and freezero.
   ACA: 10-Aug-25: Add setlocale, time, and getgroups.
+  CJB: 07-Jun-26: Add strpbrk.
 */
 
 #ifndef Optional_h
@@ -137,6 +138,13 @@ static inline _Optional char *optional_strchr(const char *str, int ch)
 }
 #undef strchr
 #define strchr(str, ch) optional_strchr(str, ch)
+
+static inline _Optional char *optional_strpbrk(const char *str, const char *brk)
+{
+  return strpbrk(str, brk);
+}
+#undef strpbrk
+#define strpbrk(str, brk) optional_strpbrk(str, brk)
 
 static inline _Optional char *optional_setlocale(int cat,
                                                  _Optional const char *l)
