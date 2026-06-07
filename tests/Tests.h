@@ -72,5 +72,6 @@ void StringBuffer_tests(void);
 void FileRWInt_tests(void);
 void strdict_tests(void);
 void intdict_tests(void);
+void ptrdict_tests(void);
 
 #endif /* Tests_h */

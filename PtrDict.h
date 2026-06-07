@@ -19,16 +19,19 @@
 
 /* History:
   CJB: 31-May-26: First release of this header file.
+  CJB: 06-Jun-26: Many fixes as the code was previously untested.
  */
 
 #ifndef ptrdict_h
 #define ptrdict_h
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <inttypes.h>
+
+#include "IntDict.h"
 
 #if !defined(USE_OPTIONAL) && !defined(_Optional)
 #define _Optional
@@ -47,7 +50,7 @@ typedef struct
 static inline void ptrdict_init(PtrDict *const dict)
 {
   assert(dict);
-  return intdict_init(&dict->_private);
+  intdict_init(&dict->_private);
 }
 /*
  * Initialize a pointer dictionary.
@@ -61,8 +64,9 @@ typedef void PtrDictDestructorFn(void * /*key*/, _Optional void * /*value*/,
  * is expected to point to any additional parameters.
  */
 
-typedef struct {
-  _Optional PtrDictDestructorFn *destructor,
+typedef struct
+{
+  _Optional PtrDictDestructorFn *destructor;
   void *arg;
 } PtrDictPrivateDestructorArg;
 /*
@@ -84,15 +88,15 @@ static void ptrdict_private_destructor(intptr_t const key,
  * For internal use only.
  */
 
-static inline void ptrdict_destroy(PtrDict *const dict,
-                                   _Optional PtrDictDestructorFn *const destructor,
-                                   void *const arg)
+static inline void
+ptrdict_destroy(PtrDict *const dict,
+                _Optional PtrDictDestructorFn *const destructor,
+                void *const arg)
 {
   assert(dict);
-  PtrDictPrivateDestructorArg wrapper = { destructor, arg };
-  return intdict_destroy(&dict->_private,
-                         destructor ? ptrdict_private_destructor : NULL,
-                         &wrapper);
+  PtrDictPrivateDestructorArg wrapper = {destructor, arg};
+  intdict_destroy(&dict->_private,
+                  destructor ? ptrdict_private_destructor : NULL, &wrapper);
 }
 /*
  * Destroy a pointer dictionary, optionally calling a destructor function
@@ -116,8 +120,8 @@ static inline bool ptrdict_find(PtrDict *const dict, void *const key,
  */
 
 static inline bool ptrdict_find_specific(PtrDict *const dict, void *const key,
-                                         _Optional void * const value,
-                                         _Optional size_t * const index)
+                                         _Optional void *const value,
+                                         _Optional size_t *const index)
 {
   assert(dict);
   assert(key);
@@ -133,8 +137,9 @@ static inline bool ptrdict_find_specific(PtrDict *const dict, void *const key,
  *          otherwise false.
  */
 
-static inline bool ptrdict_insert(PtrDict *const dict, void * const key,
-                                  _Optional void * const value, _Optional size_t * const index)
+static inline bool ptrdict_insert(PtrDict *const dict, void *const key,
+                                  _Optional void *const value,
+                                  _Optional size_t *const index)
 {
   assert(dict);
   assert(key);
@@ -191,7 +196,7 @@ static inline void ptrdict_remove_at(PtrDict *const dict, size_t const index)
  * Remove the item currently at a given index from a pointer dictionary.
  */
 
-static inline _Optional void *ptrdict_remove_value_at(PtrDict * const dict,
+static inline _Optional void *ptrdict_remove_value_at(PtrDict *const dict,
                                                       size_t const index)
 {
   assert(dict);
@@ -204,8 +209,7 @@ static inline _Optional void *ptrdict_remove_value_at(PtrDict * const dict,
  * Returns: pointer to the removed value.
  */
 
-static inline size_t ptrdict_bisect_left(PtrDict *const dict,
-                                         void *const key)
+static inline size_t ptrdict_bisect_left(PtrDict *const dict, void *const key)
 {
   assert(dict);
   assert(key);
@@ -222,8 +226,7 @@ static inline size_t ptrdict_bisect_left(PtrDict *const dict,
  *          or higher keys can be found.
  */
 
-static inline size_t ptrdict_bisect_right(PtrDict *const dict,
-                                         void *const key)
+static inline size_t ptrdict_bisect_right(PtrDict *const dict, void *const key)
 {
   assert(dict);
   assert(key);
@@ -241,7 +244,7 @@ static inline size_t ptrdict_bisect_right(PtrDict *const dict,
  */
 
 static inline _Optional void *ptrdict_find_value(PtrDict *const dict,
-                                                 void * const key,
+                                                 void *const key,
                                                  _Optional size_t *const index)
 {
   assert(dict);
@@ -256,7 +259,7 @@ static inline _Optional void *ptrdict_find_value(PtrDict *const dict,
  *          if the key was not found.
  */
 
-static inline bool ptrdict_remove(PtrDict *const dict, void * const key,
+static inline bool ptrdict_remove(PtrDict *const dict, void *const key,
                                   _Optional size_t *const index)
 {
   assert(dict);
@@ -272,7 +275,7 @@ static inline bool ptrdict_remove(PtrDict *const dict, void * const key,
  */
 
 static inline _Optional void *
-ptrdict_remove_value(PtrDict *const dict, void * const key,
+ptrdict_remove_value(PtrDict *const dict, void *const key,
                      _Optional size_t *const index)
 {
   assert(dict);
@@ -287,14 +290,13 @@ ptrdict_remove_value(PtrDict *const dict, void * const key,
  *          if the key was not found.
  */
 
-static inline bool ptrdict_remove_specific(PtrDict *dict, void * key,
+static inline bool ptrdict_remove_specific(PtrDict *dict, void *key,
                                            _Optional void *value,
                                            _Optional size_t *index)
 {
   assert(dict);
   assert(key);
-  return intdict_remove_specific(&dict->_private, (intptr_t)key,
-                                 value, index);
+  return intdict_remove_specific(&dict->_private, (intptr_t)key, value, index);
 }
 /*
  * Remove an item with a given key and value from a pointer dictionary.
@@ -314,8 +316,8 @@ static inline bool ptrdict_remove_specific(PtrDict *dict, void * key,
  */
 
 #define PTRDICT_FOR_EACH_IN_RANGE(dict, min_key, max_key, index, tmp)          \
-  for (size_t(index) = ptrdict_bisect_left((dict), (min_key)),                 \
-      (tmp) = ptrdict_bisect_right((dict), (max_key));                         \
+  for (size_t(index) = ptrdict_bisect_left((dict), (intptr_t)(min_key)),       \
+      (tmp) = ptrdict_bisect_right((dict), (intptr_t)(max_key));               \
        (index) < (tmp); ++(index))
 /*
  * Macro to be used for iterating over a range of keys within a pointer
@@ -335,17 +337,17 @@ typedef struct
  * iterate over the values that are stored in a dictionary.
  */
 
-static inline _Optional void *ptrdictviter_init(PtrDictVIter * const iter,
-                                                PtrDict * const dict,
-                                                void * const min_key,
-                                                void * const max_key)
+static inline _Optional void *ptrdictviter_init(PtrDictVIter *const iter,
+                                                PtrDict *const dict,
+                                                void *const min_key,
+                                                void *const max_key)
 {
   assert(iter);
   assert(dict);
   assert(min_key);
   assert(max_key);
-  return intdictviter_init(&iter->_private, &dict->_private,
-                           min_key, max_key);
+  return intdictviter_init(&iter->_private, &dict->_private, (intptr_t)min_key,
+                           (intptr_t)max_key);
 }
 
 /*
@@ -359,12 +361,12 @@ static inline _Optional void *ptrdictviter_init(PtrDictVIter * const iter,
  *          given range, or NULL if the range is empty.
  */
 
-static inline _Optional void *ptrdictviter_all_init(PtrDictVIter * const iter,
-                                                    PtrDict * const dict)
+static inline _Optional void *ptrdictviter_all_init(PtrDictVIter *const iter,
+                                                    PtrDict *const dict)
 {
   assert(iter);
   assert(dict);
-  return intdictviter_init(&iter->_private, &dict->_private);
+  return intdictviter_all_init(&iter->_private, &dict->_private);
 }
 
 /*
@@ -375,7 +377,7 @@ static inline _Optional void *ptrdictviter_all_init(PtrDictVIter * const iter,
  *          the dictionary, or NULL if the dictionary is empty.
  */
 
-static inline _Optional void *ptrdictviter_advance(PtrDictVIter * const iter)
+static inline _Optional void *ptrdictviter_advance(PtrDictVIter *const iter)
 {
   assert(iter);
   return intdictviter_advance(&iter->_private);
@@ -388,7 +390,7 @@ static inline _Optional void *ptrdictviter_advance(PtrDictVIter * const iter)
  *          there are no more values.
  */
 
-static inline size_t ptrdictviter_remove(PtrDictVIter * const iter)
+static inline size_t ptrdictviter_remove(PtrDictVIter *const iter)
 {
   assert(iter);
   return intdictviter_remove(&iter->_private);

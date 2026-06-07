@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   } test_groups[] = {
     {"LinkedList", LinkedList_tests}, {"StringBuffer", StringBuffer_tests},
     {"FileRWInt", FileRWInt_tests},   {"IntDict", intdict_tests},
-    {"StrDict", strdict_tests},
+    {"StrDict", strdict_tests},       {"PtrDict", ptrdict_tests},
   };
 
   NOT_USED(argc);
