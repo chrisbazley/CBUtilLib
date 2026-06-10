@@ -32,9 +32,15 @@
   CJB: 03-May-25: Fix pedantic warnings when the format specifies type
                   'void *' but the argument has another type.
                   Treat the result of strchr as optional.
+  CJB: 10-Jun-26: Allow the array of pointers passed to strinflate to be const.
+                  Allow a null pointer to be passed to strinflate instead of
+                  the address of an output buffer.
+                  Ensure the output string is always truncated in the right
+                  place and always terminated if the output buffer is too small.
 */
 
 /* ISO library headers */
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -42,13 +48,18 @@
 #include "Internal/CBUtilMisc.h"
 #include "StrExtra.h"
 
-size_t strinflate(char *const s1, size_t const n, const char *s2,
-                  const char *const srch, const char *rplc[])
+size_t strinflate(_Optional char *const s1, size_t n, const char *s2,
+                  const char *const srch, const char *const rplc[])
 {
   assert(s2 != NULL);
-  assert(s1 != NULL || n == 0);
+  assert(rplc != NULL);
 
-  size_t count = 0;
+  if (s1 == NULL)
+  {
+    n = 0;
+  }
+
+  size_t count = 0, nout = 0;
   while (*s2 != '\0')
   {
     size_t len = 0;
@@ -72,17 +83,32 @@ size_t strinflate(char *const s1, size_t const n, const char *s2,
       DEBUGF("Found inflatable character 0x%x at offset %zu\n", *i, len);
     }
 
-    if (count + len < n)
-    {
-      DEBUGF("Copying %zu bytes from %p to %p\n", len, (void *)s2,
-             (void *)(s1 + count));
-      strncpy(s1 + count, s2, len);
-    }
-    else
-    {
-      DEBUGF("Insufficient space in the output buffer (1)\n");
-    }
     count += len;
+
+    assert(nout <= n);
+    size_t avail = n - nout;
+
+    if (avail > 0)
+    {
+      if (len >= avail)
+      {
+        DEBUGF(
+          "Insufficient space to append %zu at %zu in the output buffer of "
+          "size %zu (1)\n",
+          len, nout, n);
+        len = avail - 1; // truncate
+      }
+
+      DEBUGF("Copying %zu bytes from %p to %p\n", len, (void *)s2,
+             (void *)(s1 + nout));
+      memcpy(s1 + nout, s2, len);
+
+      assert(len <= SIZE_MAX - nout);
+      nout += len;
+
+      assert(avail >= len);
+      avail -= len;
+    }
 
     if (i == NULL)
       break;
@@ -96,25 +122,40 @@ size_t strinflate(char *const s1, size_t const n, const char *s2,
 
     /* Get a pointer to the corresponding replacement string */
     const char *const r = rplc[&*m - srch];
+    assert(r != NULL);
 
     len = strlen(r);
-    if (count + len < n)
-    {
-      DEBUGF("Appending sequence '%s'\n", r);
-      strcpy(s1 + count, r);
-    }
-    else
-    {
-      DEBUGF("Insufficient space in the output buffer (2)\n");
-    }
     count += len;
+
+    if (avail > 0)
+    {
+      if (len >= avail)
+      {
+        DEBUGF(
+          "Insufficient space to append %zu at %zu in the output buffer of "
+          "size %zu (2)\n",
+          len, nout, n);
+        len = avail - 1; // truncate
+      }
+
+      DEBUGF("Appending sequence '%s'\n", r);
+      memcpy(s1 + nout, r, len);
+
+      assert(len <= SIZE_MAX - nout);
+      nout += len;
+    }
+
     s2 = i + 1; /* skip the character that was inflated */
   }
 
-  if (count < n)
+  if (nout < n)
   {
-    s1[count] = '\0'; /* append a nul terminator */
+    s1[nout] = '\0'; /* append a nul terminator */
     DEBUGF("Inflated string is '%s'\n", s1);
+  }
+  else
+  {
+    assert(n == 0);
   }
 
   /* Return the number of characters that would have been written had a

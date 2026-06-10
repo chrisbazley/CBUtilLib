@@ -73,5 +73,6 @@ void FileRWInt_tests(void);
 void strdict_tests(void);
 void intdict_tests(void);
 void ptrdict_tests(void);
+void strinflate_tests(void);
 
 #endif /* Tests_h */

@@ -37,6 +37,9 @@ History:
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 22-May-26: Avoid declaring stricmp, strnicmp or strdup when using MSVC.
                   strdup no longer accepts a null pointer.
+  CJB: 10-Jun-26: Allow the array of pointers passed to strinflate to be const.
+                  Allow a null pointer to be passed to strinflate instead of
+                  the address of an output buffer.
  */
 
 #ifndef StrExtra_h
@@ -84,14 +87,14 @@ _Optional char *strdup(const char * /*s*/);
  */
 #endif
 
-size_t strinflate(char * /*s1*/, size_t /*n*/, const char * /*s2*/,
-                  const char * /*srch*/, const char * /*rplc*/[]);
+size_t strinflate(_Optional char * /*s1*/, size_t /*n*/, const char * /*s2*/,
+                  const char * /*srch*/, const char * const /*rplc*/[]);
 /*
  * Inflates the string pointed to by s2 whilst copying it into the array
  * pointed to by s1. Every character of s2 which matches a character in the
  * string pointed to by srch will be replaced by the string pointed to by
- * the corresponding element of the array pointed to by rplc. If n is zero,
- * nothing is written and s1 may be a null pointer. Otherwise, output
+ * the corresponding element of the array pointed to by rplc. If n is zero
+ * s1 is a null pointer then nothing is written. Otherwise, output
  * characters beyond the n-1st are discarded and a null character is written
  * at the end of the characters actually written into the array.
  * Returns: the number of characters that would have been written had n
