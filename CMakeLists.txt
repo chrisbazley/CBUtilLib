@@ -97,6 +97,10 @@ target_compile_definitions(CBUtil PRIVATE
     $<$<OR:$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:USE_OPTIONAL>
 )
 
+if(UNIX)
+    target_link_libraries(CBUtil PRIVATE m)
+endif()
+
 install(TARGETS CBUtil
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include
