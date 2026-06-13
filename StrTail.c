@@ -23,6 +23,8 @@
   CJB: 11-Dec-20: Removed redundant use of the 'extern' keyword.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 13-Jun-26: Fix the behaviour of strtail with n == 0, which was
+                  previously undefined.
 */
 
 /* ISO library headers */
@@ -33,11 +35,16 @@
 #include "Internal/CBUtilMisc.h"
 #include "StrExtra.h"
 
-char *strtail(const char *s, int c, size_t n)
+char *strtail(const char *const s, const int c, const size_t n)
 {
   assert(s != NULL);
 
   const char *ptr = s + strlen(s); /* terminator */
+  if (n == 0)
+  {
+    return (char *)ptr;
+  }
+
   size_t count = 0;
 
   while (ptr > s && count < n)

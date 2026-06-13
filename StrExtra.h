@@ -40,6 +40,7 @@ History:
   CJB: 10-Jun-26: Allow the array of pointers passed to strinflate to be const.
                   Allow a null pointer to be passed to strinflate instead of
                   the address of an output buffer.
+  CJB: 13-Jun-26: Document the newly defined behaviour of strtail with n == 0.
  */
 
 #ifndef StrExtra_h
@@ -107,9 +108,10 @@ char *strtail(const char * /*s*/, int /*c*/, size_t /*n*/);
  * Searches backwards through the string pointed to by s, stopping when
  * it has found n instances of character c (converted to unsigned char)
  * or else when it reaches the start of the string.
- * Returns: a pointer to the character following the last path separator
- *          found, or else the value of path if it was found to contain
- *          fewer than n elements.
+ * Returns: a pointer to the character following the n'th instance of c
+ *          found, or the value of s if the string was found to contain
+ *          fewer than n instances of c, or a pointer to the end of the
+ *          string if n was 0.
  */
 
 #endif

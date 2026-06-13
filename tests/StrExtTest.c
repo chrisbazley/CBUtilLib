@@ -214,6 +214,45 @@ static void test8(void)
   }
 }
 
+void test9(void)
+{
+  typedef const struct
+  {
+    const char *s; int c; size_t n;
+    const char *tail;
+  } TestCase;
+
+  static TestCase cases[] = {
+    {"ADFS::App1.$.!Paint",
+      '.', 0,
+      ""},
+    {"ADFS::App1.$.!Paint",
+      '.', 1,
+      "!Paint"},
+    {"ADFS::App1.$.!Paint",
+      '.', 2,
+      "$.!Paint"},
+    {"ADFS::App1.$.!Paint",
+      '.', 3,
+      "ADFS::App1.$.!Paint"},
+    {"ADFS::App1.$.!Paint",
+      '.', 4,
+      "ADFS::App1.$.!Paint"},
+    {"ADFS::App1.$.!Paint",
+      UCHAR_MAX + 1 + '.', 1,
+      "!Paint"},
+    {"ADFS::App1.$.!Paint",
+      '.' - UCHAR_MAX - 1, 1,
+      "!Paint"},
+  };
+
+  FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
+  {
+    char *const tail = strtail(cp->s, cp->c, cp->n);
+    assert(strcmp(tail, cp->tail) == 0);
+  }
+}
+
 void StrExtra_tests(void)
 {
   static const struct
@@ -229,6 +268,7 @@ void StrExtra_tests(void)
     {"Duplicate string fail", test6},
     {"Case-insensitive string comparison", test7},
     {"Case-insensitive substring comparison", test8},
+    {"String tail", test9},
   };
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
