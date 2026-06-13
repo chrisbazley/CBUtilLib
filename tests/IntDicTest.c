@@ -1234,9 +1234,9 @@ static void test38(void)
   {
     size_t i = 0;
     for (_Optional void *value = intdictviter_all_init(&iter, &dict);
-         value != NULL; value = intdictviter_advance(&iter))
+         value != NULL; value = intdictviter_advance(&iter), ++i)
     {
-      assert(value == &values[i++]);
+      assert(value == &values[i]);
     }
   }
 

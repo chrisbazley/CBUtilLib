@@ -1299,9 +1299,9 @@ static void test38(void)
   {
     size_t i = 0;
     for (_Optional void *value = strdictviter_all_init(&iter, &dict);
-         value != NULL; value = strdictviter_advance(&iter))
+         value != NULL; value = strdictviter_advance(&iter), ++i)
     {
-      assert(value == &values[i++]);
+      assert(value == &values[i]);
     }
   }
 

@@ -1240,9 +1240,9 @@ static void test38(void)
   {
     size_t i = 0;
     for (_Optional void *value = ptrdictviter_all_init(&iter, &dict);
-         value != NULL; value = ptrdictviter_advance(&iter))
+         value != NULL; value = ptrdictviter_advance(&iter), ++i)
     {
-      assert(value == &values[i++]);
+      assert(value == &values[i]);
     }
   }
 
