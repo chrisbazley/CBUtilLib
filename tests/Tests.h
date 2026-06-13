@@ -74,5 +74,6 @@ void strdict_tests(void);
 void intdict_tests(void);
 void ptrdict_tests(void);
 void strinflate_tests(void);
+void TrigTable_tests(void);
 
 #endif /* Tests_h */
