@@ -42,6 +42,8 @@ static void test1(void)
   unsigned int i;
   StringBuffer buffer[NumberOfBuffers];
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
+
   for (i = 0; i < ARRAY_SIZE(buffer); i++)
     stringbuffer_init(buffer + i);
 
@@ -69,6 +71,7 @@ static void test2(void)
     "from",    "'tail'", "at", "the\r", "end\n"};
   char expected_s[NumberOfAppends * 16] = "";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   for (i = 0; i < ARRAY_SIZE(tail); i++)
@@ -98,6 +101,7 @@ static void test3(void)
     "The boy stood on the burning deck whence all but he had fled";
   char expected_s[128] = "";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   for (i = 0; i < NumberOfAppends; i++)
@@ -124,6 +128,7 @@ static void test4(void)
   /* Append NULL */
   StringBuffer buffer;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   {
@@ -151,6 +156,7 @@ static void test5(void)
   char string[] =
     "The boy stood on the burning deck whence all but he had fled";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   /* Truncate empty */
@@ -190,6 +196,7 @@ static void test6(void)
     "from",    "'tail'", "at", "the\r", "end\n"};
   char expected_s[NumberOfAppends * 16] = "";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   for (i = 0; i < ARRAY_SIZE(tail); i++)
@@ -224,6 +231,7 @@ static void test7(void)
   char string[] =
     "The boy stood on the burning deck whence all but he had fled";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, string);
@@ -268,6 +276,7 @@ static void test8(void)
   size_t len;
   const char *s;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foo");
@@ -304,6 +313,7 @@ static void test9(void)
   const char *s, *string = "Man's life is as cheap as beast's";
   const size_t trunc_len = strlen(string) * 2 / 3;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, string);
@@ -343,6 +353,7 @@ static void test10(void)
                                               "walk",  "run",   "yawn",  "pop",
                                               "sleep", "stroll"};
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, stem);
@@ -374,6 +385,7 @@ static void test11(void)
   const char *string =
     "The boy stood on the burning deck whence all but he had fled";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, string);
@@ -408,6 +420,7 @@ static void test12(void)
   size_t len;
   const char *s;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foo");
@@ -435,6 +448,7 @@ static void test13(void)
   size_t len;
   const char *s;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foobar");
@@ -460,6 +474,7 @@ static void test14(void)
   StringBuffer buffer;
   unsigned int i;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foo");
@@ -492,6 +507,7 @@ static void test15(void)
   StringBuffer buffer;
   unsigned int i;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foobar");
@@ -525,6 +541,7 @@ static void test16(void)
   size_t len;
   const char *s;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foo");
@@ -552,6 +569,7 @@ static void test17(void)
   size_t len;
   const char *s;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_all(&buffer, "foobar");
@@ -583,6 +601,7 @@ static void test18(void)
   const char sep = '$';
   char expected_s[NumberOfAppends * 16] = "";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   for (i = 0; i < ARRAY_SIZE(tail); i++)
@@ -617,6 +636,7 @@ static void test19(void)
                                               "sleep", "stroll"};
   const char sep = ',';
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_separated(&buffer, sep, stem);
@@ -652,6 +672,7 @@ static void test20(void)
   const char sep = '\t';
   char expected_s[NumberOfAppends * 16] = "";
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   for (i = 0; i < ARRAY_SIZE(tail); i++)
@@ -688,6 +709,7 @@ static void test21(void)
   const char *s;
   const char sep = '.';
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_append_separated(&buffer, sep, "foo");
@@ -720,6 +742,7 @@ static void test22(void)
   /* Append formatted string */
   StringBuffer buffer;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   for (int c = 'a'; c <= 'z'; ++c)
@@ -752,6 +775,7 @@ static void test23(void)
   size_t len;
   const char *s;
 
+  memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
   success = stringbuffer_printf(&buffer, "%s", "foo");
