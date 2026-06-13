@@ -94,18 +94,15 @@ static void test3(void)
 #endif
 }
 
-#define FOR_EACH_T(T, E, A)                                                    \
-  for (T * (E) = &(A)[0]; (E) < &(A)[ARRAY_SIZE(A)]; ++(E))
-
 static void test4(void)
 {
   /* Sine */
-  FOR_EACH_T(const int, m, multipliers)
+  FOR_EACH_ELEM_PTR(const int *, m, multipliers)
   {
     double max_error = 0;
     const double allowed_error = MAX_ERROR / *m;
 
-    FOR_EACH_T(const int, q, quarter_turns)
+    FOR_EACH_ELEM_PTR(const int *, q, quarter_turns)
     {
       _Optional TrigTable *tt = TrigTable_make(*m, *q);
       assert(tt);
@@ -139,12 +136,12 @@ static void test4(void)
 static void test5(void)
 {
   /* Cosine */
-  FOR_EACH_T(const int, m, multipliers)
+  FOR_EACH_ELEM_PTR(const int *, m, multipliers)
   {
     double max_error = 0;
     const double allowed_error = MAX_ERROR / *m;
 
-    FOR_EACH_T(const int, q, quarter_turns)
+    FOR_EACH_ELEM_PTR(const int *, q, quarter_turns)
     {
       _Optional TrigTable *tt = TrigTable_make(*m, *q);
       assert(tt);

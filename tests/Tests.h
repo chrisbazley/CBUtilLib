@@ -67,13 +67,16 @@
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 
+#define FOR_EACH_ELEM_PTR(T, E, A)                                             \
+  for (T(E) = &(A)[0]; (E) < &(A)[ARRAY_SIZE(A)]; ++(E))
+
 void LinkedList_tests(void);
 void StringBuffer_tests(void);
 void FileRWInt_tests(void);
 void strdict_tests(void);
 void intdict_tests(void);
 void ptrdict_tests(void);
-void strinflate_tests(void);
+void StrExtra_tests(void);
 void TrigTable_tests(void);
 
 #endif /* Tests_h */

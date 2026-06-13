@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     {"LinkedList", LinkedList_tests}, {"StringBuffer", StringBuffer_tests},
     {"FileRWInt", FileRWInt_tests},   {"IntDict", intdict_tests},
     {"StrDict", strdict_tests},       {"PtrDict", ptrdict_tests},
-    {"strinflate", strinflate_tests}, {"TrigTable", TrigTable_tests},
+    {"StrExtra", StrExtra_tests},     {"TrigTable", TrigTable_tests},
   };
 
   NOT_USED(argc);
