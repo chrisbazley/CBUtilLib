@@ -36,6 +36,8 @@
                   Treat the result of strchr as optional.
   CJB: 29-Apr-26: Stop dereferencing a pointer of type void *.
   CJB: 17-May-26: Add support for outputting an array of type unsigned char.
+  CJB: 13-Jun-26: An outdated assertion previously prevented use of
+                  CSVOutputType_UChar.
 */
 
 /* ISO library headers */
@@ -61,7 +63,7 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
   DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n",
          (void *)s, nmemb, output);
   assert(type == CSVOutputType_Int || type == CSVOutputType_Long ||
-         type == CSVOutputType_Double);
+         type == CSVOutputType_Double || type == CSVOutputType_UChar);
   assert(s != NULL);
 
   /* Find the carriage return or linefeed at the end of this record */

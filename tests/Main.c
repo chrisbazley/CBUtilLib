@@ -32,10 +32,15 @@ int main(int argc, char *argv[])
     const char *test_name;
     void (*test_func)(void);
   } test_groups[] = {
-    {"LinkedList", LinkedList_tests}, {"StringBuffer", StringBuffer_tests},
-    {"FileRWInt", FileRWInt_tests},   {"IntDict", intdict_tests},
-    {"StrDict", strdict_tests},       {"PtrDict", ptrdict_tests},
-    {"StrExtra", StrExtra_tests},     {"TrigTable", TrigTable_tests},
+    {"LinkedList", LinkedList_tests},
+    {"StringBuffer", StringBuffer_tests},
+    {"FileRWInt", FileRWInt_tests},
+    {"IntDict", intdict_tests},
+    {"StrDict", strdict_tests},
+    {"PtrDict", ptrdict_tests},
+    {"StrExtra", StrExtra_tests},
+    {"TrigTable", TrigTable_tests},
+    {"CSV", CSV_tests},
   };
 
   NOT_USED(argc);
