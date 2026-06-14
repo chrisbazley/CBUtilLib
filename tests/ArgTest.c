@@ -47,32 +47,38 @@ static void test1(void)
 
   static TestCase cases[] = {
     // Argument selection
-    {0, LONG_MAX, 0, 1, {"23"}, true, 23},
-    {0, LONG_MAX, 1, 2, {"5", "10"}, true, 10},
-    {0, LONG_MAX, 4, 7, {"1", "67", "43", "2", "444", "65", "6"}, true, 444},
+    {LONG_MIN, LONG_MAX, 0, 1, {"23"}, true, 23},
+    {LONG_MIN, LONG_MAX, 1, 2, {"5", "10"}, true, 10},
+    {LONG_MIN,
+     LONG_MAX,
+     4,
+     7,
+     {"1", "67", "43", "2", "444", "65", "6"},
+     true,
+     444},
     // Invalid argument index (treated as missing argument)
-    {0, LONG_MAX, 1, 1, {"23"}, false, 0},
+    {LONG_MIN, LONG_MAX, 1, 1, {"23"}, false, 0},
     // Value out of range
     {1, 2, 0, 1, {"0"}, false, 0},
     {0, 1, 0, 1, {"2"}, false, 0},
     // Switch in place of expected numeric argument
-    {0, LONG_MAX, 0, 1, {"-foo"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"-1"}, false, 0}, // questionable
+    {LONG_MIN, LONG_MAX, 0, 1, {"-foo"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"- 1"}, false, 0},
     // Interesting number formats
-    {0, LONG_MAX, 0, 1, {"010"}, true, 8},
-    {0, LONG_MAX, 0, 1, {"0x10"}, true, 16},
-    {0, LONG_MAX, 0, 1, {" 13"}, true, 13},
+    {LONG_MIN, LONG_MAX, 0, 1, {"010"}, true, 8},
+    {LONG_MIN, LONG_MAX, 0, 1, {"0x10"}, true, 16},
+    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, true, 13},
     // Invalid number formats
-    {0, LONG_MAX, 0, 1, {"2.999"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"13E2"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"1300e-1"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"x13"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"13x"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"1+1"}, false, 0},
-    {0, LONG_MAX, 0, 1, {"13 "}, false, 0}, // questionable
+    {LONG_MIN, LONG_MAX, 0, 1, {"2.999"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13E2"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"1300e-1"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"x13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13x"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"1+1"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0}, // questionable
     // Extreme values
-    {0, LONG_MAX, 0, 1, {"0"}, true, 0},
-    {0, LONG_MAX, 0, 1, {"2147483647"}, true, 2147483647},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-2147483648"}, true, -2147483648},
+    {LONG_MIN, LONG_MAX, 0, 1, {"2147483647"}, true, 2147483647},
   };
 
   FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
@@ -110,32 +116,74 @@ static void test2(void)
 
   static TestCase cases[] = {
     // Argument selection
-    {0, DBL_MAX, 0, 1, {"23"}, true, 23},
-    {0, DBL_MAX, 1, 2, {"5", "10"}, true, 10},
-    {0, DBL_MAX, 4, 7, {"1", "67", "43", "2", "444", "65", "6"}, true, 444},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"23"}, true, 23},
+    {-DBL_MAX, DBL_MAX, 1, 2, {"5", "10"}, true, 10},
+    {-DBL_MAX,
+     DBL_MAX,
+     4,
+     7,
+     {"1", "67", "43", "2", "444", "65", "6"},
+     true,
+     444},
     // Invalid argument index (treated as missing argument)
-    {0, DBL_MAX, 1, 1, {"23"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 1, 1, {"23"}, false, 0},
     // Value out of range
     {1, 2, 0, 1, {"0"}, false, 0},
     {0, 1, 0, 1, {"2"}, false, 0},
     // Switch in place of expected numeric argument
-    {0, DBL_MAX, 0, 1, {"-foo"}, false, 0},
-    {0, DBL_MAX, 0, 1, {"-1"}, false, 0}, // questionable
+    {-DBL_MAX, DBL_MAX, 0, 1, {"-foo"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"- 1"}, false, 0},
     // Interesting number formats
-    {0, DBL_MAX, 0, 1, {"010"}, true, 8},
-    {0, DBL_MAX, 0, 1, {"0x10"}, true, 16},
-    {0, DBL_MAX, 0, 1, {" 13"}, true, 13},
-    {0, DBL_MAX, 0, 1, {"2.999"}, true, 2.999},
-    {0, DBL_MAX, 0, 1, {"13E2"}, true, 1300},
-    {0, DBL_MAX, 0, 1, {"1300e-1"}, true, 130},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"010"}, true, 8},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"0x10"}, true, 16},
+    {-DBL_MAX, DBL_MAX, 0, 1, {" 13"}, true, 13},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"2.999"}, true, 2.999},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13E2"}, true, 1300},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"1300e-1"}, true, 130},
     // Invalid number formats
-    {0, DBL_MAX, 0, 1, {"x13"}, false, 0},
-    {0, DBL_MAX, 0, 1, {"13x"}, false, 0},
-    {0, DBL_MAX, 0, 1, {"1+1"}, false, 0},
-    {0, DBL_MAX, 0, 1, {"13 "}, false, 0}, // questionable
+    {-DBL_MAX, DBL_MAX, 0, 1, {"x13"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13x"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"1+1"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13 "}, false, 0}, // questionable
     // Extreme values
-    {0, DBL_MAX, 0, 1, {"0"}, true, 0},
-    {0, DBL_MAX, 0, 1, {"1.79769e+308"}, true, 1.79769e+308},
+    {-DBL_MAX,
+     DBL_MAX,
+     0,
+     1,
+     {"-1797693134862315708145274237317043567"
+      "98070567525844996598917476803157260780"
+      "02853876058955863276687817154045895351"
+      "43824642343213268894641827684675467035"
+      "37516986049910576551282076245490090389"
+      "32894407586850845513394230458323690322"
+      "29481658085593321233482747978824"},
+     true,
+     -1797693134862315708145274237317043567\
+98070567525844996598917476803157260780\
+02853876058955863276687817154045895351\
+43824642343213268894641827684675467035\
+37516986049910576551282076245490090389\
+32894407586850845513394230458323690322\
+29481658085593321233482747978824.},
+    {-DBL_MAX,
+     DBL_MAX,
+     0,
+     1,
+     {"1797693134862315708145274237317043567"
+      "98070567525844996598917476803157260780"
+      "02853876058955863276687817154045895351"
+      "43824642343213268894641827684675467035"
+      "37516986049910576551282076245490090389"
+      "32894407586850845513394230458323690322"
+      "29481658085593321233482747978824"},
+     true,
+     1797693134862315708145274237317043567\
+98070567525844996598917476803157260780\
+02853876058955863276687817154045895351\
+43824642343213268894641827684675467035\
+37516986049910576551282076245490090389\
+32894407586850845513394230458323690322\
+29481658085593321233482747978824.},
   };
 
   FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
@@ -192,8 +240,9 @@ static void test3(void)
 
   FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
   {
-    printf("Expecting %s from argument %s matching at least %zu characters of %s\n",
-           cp->success ? "success" : "failure", cp->arg, cp->min, cp->name);
+    printf(
+      "Expecting %s from argument %s matching at least %zu characters of %s\n",
+      cp->success ? "success" : "failure", cp->arg, cp->min, cp->name);
 
     bool const success = is_switch(cp->arg, cp->name, cp->min);
     assert(success == cp->success);

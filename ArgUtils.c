@@ -21,6 +21,8 @@
   CJB: 07-Aug-18: Copied this source file from SF3KtoObj.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 14-Jun-26: Fixed get_long_arg and get_double_arg to accept
+                  negative numbers.
 */
 
 /* ISO library header files */
@@ -28,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /* My library files */
 #include "ArgUtils.h"
@@ -45,7 +48,7 @@ bool get_long_arg(const char *const name, long int *const value,
   assert(argv != NULL);
   assert(n >= 0);
 
-  if (n >= argc || argv[n][0] == '-')
+  if (n >= argc || (argv[n][0] == '-' && !isdigit(argv[n][1])))
   {
     fprintf(stderr, "Missing value for %s\n", name);
     return false;
@@ -80,7 +83,7 @@ bool get_double_arg(const char *const name, double *const value,
   assert(argv != NULL);
   assert(n >= 0);
 
-  if (n >= argc || argv[n][0] == '-')
+  if (n >= argc || (argv[n][0] == '-' && !isdigit(argv[n][1])))
   {
     fprintf(stderr, "Missing value for %s\n", name);
     return false;
