@@ -79,5 +79,6 @@ void ptrdict_tests(void);
 void StrExtra_tests(void);
 void TrigTable_tests(void);
 void CSV_tests(void);
+void ArgUtils_tests(void);
 
 #endif /* Tests_h */
