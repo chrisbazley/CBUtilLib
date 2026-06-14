@@ -44,6 +44,8 @@
                   No longer assume that vsnprintf will accept NULL.
   CJB: 07-Jun-26: Placate clang-tidy by not printing pointer values
                   after calling free or realloc.
+  CJB: 14-Jun-26: Assign a compound literal in stringbuffer_init to
+                  guarantee full initialisation of new instances.
 */
 
 /* ISO library headers */
@@ -135,10 +137,13 @@ void stringbuffer_init(StringBuffer *const buffer)
   assert(buffer != NULL);
   DEBUGF("StringBuff: Initializing buffer %p\n", (void *)buffer);
 
-  buffer->buffer_size = 0;
-  buffer->string_len = 0;
-  buffer->buffer = NULL;
-  buffer->undo_len = 0;
+  *buffer = (StringBuffer){
+    .buffer_size = 0,
+    .string_len = 0,
+    .buffer = NULL,
+    .undo_len = 0,
+    .undo_char = '\0',
+  };
 }
 
 _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
