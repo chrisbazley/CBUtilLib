@@ -57,7 +57,7 @@ static void test1(void)
 static void test2(void)
 {
   /* Get inflated string size with no buffer */
-  size_t count = strinflate(NULL, 0, input, srch, rplc);
+  size_t count = strinflate(NULL, 100, input, srch, rplc);
   assert(count == strlen(expected));
 }
 
