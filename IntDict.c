@@ -237,7 +237,7 @@ bool intdict_insert(IntDict *const dict, IntDictKey const key,
 
   if (nitems == dict->nalloc)
   {
-    if (dict->nalloc == SIZE_MAX)
+    if (dict->nalloc == SIZE_MAX/ sizeof(IntDictItem))
     {
       DEBUGF("Can't reallocate dictionary at max size\n");
       return false;

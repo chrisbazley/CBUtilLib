@@ -231,7 +231,7 @@ bool strdict_insert(StrDict *const dict, char const *const key,
 
   if (nitems == dict->nalloc)
   {
-    if (dict->nalloc == SIZE_MAX)
+    if (dict->nalloc == SIZE_MAX / sizeof(StrDictItem))
     {
       DEBUGF("Can't reallocate dictionary at max size\n");
       return false;
