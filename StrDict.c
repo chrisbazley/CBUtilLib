@@ -31,6 +31,8 @@
   CJB: 26-Apr-25: Remove the _Optional qualifier from strdict_destroy's
                   callback function argument, because it makes no sense to
                   require callbacks to handle null values.
+  CJB: 14-Jun-26: Guard against overflow of the realloc size argument, not
+                  only the number of array elements.
  */
 
 #include <stdbool.h>
@@ -238,13 +240,13 @@ bool strdict_insert(StrDict *const dict, char const *const key,
     size_t new_size = ArrayInitSize;
     if (dict->nalloc > 0)
     {
-      if (dict->nalloc < SIZE_MAX / ArrayGrowthFactor)
+      if (dict->nalloc < SIZE_MAX / sizeof(StrDictItem) / ArrayGrowthFactor)
       {
         new_size = dict->nalloc * ArrayGrowthFactor;
       }
       else
       {
-        new_size = SIZE_MAX;
+        new_size = SIZE_MAX / sizeof(StrDictItem);
       }
     }
 
