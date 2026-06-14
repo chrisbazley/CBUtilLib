@@ -147,10 +147,10 @@ static void test2(void)
     {-DBL_MAX, DBL_MAX, 0, 1, {"13x"}, false, 0},
     {-DBL_MAX, DBL_MAX, 0, 1, {"1+1"}, false, 0},
     // These should never happen unless argument parsing is broken
-    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {" -13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"-13 "}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {" 13"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {" -13"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13 "}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"-13 "}, false, 0},
     // Extreme values
     {-DBL_MAX, DBL_MAX, 0, 1, {"-1.79769e+308"}, true, -1.79769e+308},
     {-DBL_MAX, DBL_MAX, 0, 1, {"1.79769e+308"}, true, 1.79769e+308},
