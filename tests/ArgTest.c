@@ -67,7 +67,6 @@ static void test1(void)
     // Interesting number formats
     {LONG_MIN, LONG_MAX, 0, 1, {"010"}, true, 8},
     {LONG_MIN, LONG_MAX, 0, 1, {"0x10"}, true, 16},
-    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, true, 13},
     // Invalid number formats
     {LONG_MIN, LONG_MAX, 0, 1, {"2.999"}, false, 0},
     {LONG_MIN, LONG_MAX, 0, 1, {"13E2"}, false, 0},
@@ -75,7 +74,11 @@ static void test1(void)
     {LONG_MIN, LONG_MAX, 0, 1, {"x13"}, false, 0},
     {LONG_MIN, LONG_MAX, 0, 1, {"13x"}, false, 0},
     {LONG_MIN, LONG_MAX, 0, 1, {"1+1"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0}, // questionable
+    // These should never happen unless argument parsing is broken
+    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {" -13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-13 "}, false, 0},
     // Extreme values
     {LONG_MIN, LONG_MAX, 0, 1, {"-2147483648"}, true, -2147483648},
     {LONG_MIN, LONG_MAX, 0, 1, {"2147483647"}, true, 2147483647},
@@ -136,7 +139,6 @@ static void test2(void)
     // Interesting number formats
     {-DBL_MAX, DBL_MAX, 0, 1, {"010"}, true, 8},
     {-DBL_MAX, DBL_MAX, 0, 1, {"0x10"}, true, 16},
-    {-DBL_MAX, DBL_MAX, 0, 1, {" 13"}, true, 13},
     {-DBL_MAX, DBL_MAX, 0, 1, {"2.999"}, true, 2.999},
     {-DBL_MAX, DBL_MAX, 0, 1, {"13E2"}, true, 1300},
     {-DBL_MAX, DBL_MAX, 0, 1, {"1300e-1"}, true, 130},
@@ -144,7 +146,11 @@ static void test2(void)
     {-DBL_MAX, DBL_MAX, 0, 1, {"x13"}, false, 0},
     {-DBL_MAX, DBL_MAX, 0, 1, {"13x"}, false, 0},
     {-DBL_MAX, DBL_MAX, 0, 1, {"1+1"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"13 "}, false, 0}, // questionable
+    // These should never happen unless argument parsing is broken
+    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {" -13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-13 "}, false, 0},
     // Extreme values
     {-DBL_MAX,
      DBL_MAX,
@@ -233,9 +239,9 @@ static void test3(void)
     {"Tigress", "Tiger", 3, false},
     // When the abbreviated form is too long, it does not match
     {"Tiger", "Tiger", 6, false}, // questionable
-    // Invalid formats
-    {" tiger", "tiger", 3, false},
-    {"tiger ", "tiger", 5, false}, // questionable
+    // These should never happen unless argument parsing is broken
+    {" tiger", "tiger", 5, false},
+    {"tiger ", "tiger", 5, false},
   };
 
   FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
