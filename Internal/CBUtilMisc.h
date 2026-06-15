@@ -19,6 +19,7 @@
 
 /* History:
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 15-Jun-26: Send the debug log to stderr not stdout.
 */
 
 #ifndef CBUtilMisc_h
@@ -39,15 +40,15 @@
 #include <assert.h>
 
 #if defined(DEBUG_VERBOSE_OUTPUT) && defined (DEBUG_OUTPUT)
-#define DEBUG_VERBOSEF if (1) printf
+#define DEBUG_VERBOSEF(...) if (1) fprintf(stderr, __VA_ARGS__)
 #else
-#define DEBUG_VERBOSEF if (0) printf
+#define DEBUG_VERBOSEF(...) if (0) fprintf(stderr, __VA_ARGS__)
 #endif /* DEBUG_VERBOSE_OUTPUT && DEBUG_OUTPUT */
 
 #ifdef DEBUG_OUTPUT
-#define DEBUGF if (1) printf
+#define DEBUGF(...) if (1) fprintf(stderr, __VA_ARGS__)
 #else
-#define DEBUGF if (0) printf
+#define DEBUGF(...) if (0) fprintf(stderr, __VA_ARGS__)
 #endif /* DEBUG_OUTPUT */
 
 #endif /* USE_CBDEBUG */
