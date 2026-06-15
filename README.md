@@ -31,7 +31,7 @@ ARM Linker:     Fortify_free, referred to from C:debug.CBUtilLib(ReaderGKey).
 Rebuilding the library
 ----------------------
   If you have CMake, a build system generator, then you can use it to
-build the library with minimal manual intervention.
+build the library and its tests with minimal manual intervention.
 
 For example, use the following commands to build and test on Linux:
 ```
