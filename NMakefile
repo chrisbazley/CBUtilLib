@@ -6,7 +6,7 @@ CC = cc
 LibFile = libfile
 
 # Toolflags:
-CCCommonFlags =  -c -depend !Depend -IC: -throwback -fahi -apcs 3/32/fpe2/swst/fp/nofpr -memaccess -L22-S22-L41 -o $@
+CCCommonFlags =  -c -depend !Depend -IC: -throwback -fahi -DACORN_C -apcs 3/32/fpe2/swst/fp/nofpr -memaccess -L22-S22-L41 -o $@
 CCFlags = $(CCCommonFlags) -DNDEBUG -Otime
 CCDebugFlags = $(CCCommonFlags) -g -DUSE_CBDEBUG -DDEBUG_OUTPUT -DFORTIFY 
 CCModuleFlags = $(CCCommonFlags) -DNDEBUG -Ospace -zM -zps1 -ff
