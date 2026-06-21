@@ -114,9 +114,18 @@ static void test3(void)
 
     expected_len += i;
     assert(len == expected_len);
-
     assert(s != NULL);
+
+    // Truncation is intentional
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
     strncat(expected_s, tail, i);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
     assert(strcmp(s, expected_s) == 0);
   }
 
