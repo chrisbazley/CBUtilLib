@@ -143,7 +143,6 @@ static inline bool ptrdict_insert(PtrDict *const dict, void *const key,
   assert(key);
   return intdict_insert(&dict->_private, (intptr_t)key, value, index);
 }
-
 /*
  * Insert an item and value pair into a pointer dictionary. If the new
  * item's key is not unique then its position is indeterminate relative
