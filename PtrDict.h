@@ -343,7 +343,6 @@ static inline _Optional void *ptrdictviter_init(PtrDictVIter *const iter,
   return intdictviter_init(&iter->_private, &dict->_private, (intptr_t)min_key,
                            (intptr_t)max_key);
 }
-
 /*
  * Initialise an iterator object in preparation for iterating over the
  * values associated with a given range of keys in a pointer dictionary.
@@ -362,7 +361,6 @@ static inline _Optional void *ptrdictviter_all_init(PtrDictVIter *const iter,
   assert(dict);
   return intdictviter_all_init(&iter->_private, &dict->_private);
 }
-
 /*
  * Initialise an iterator object in preparation for iterating over all the
  * values stored in a pointer dictionary. Modifying the dictionary
@@ -376,7 +374,6 @@ static inline _Optional void *ptrdictviter_advance(PtrDictVIter *const iter)
   assert(iter);
   return intdictviter_advance(&iter->_private);
 }
-
 /*
  * Advance an iterator object to get the next value from its associated
  * pointer dictionary. Values are returned in sorted key order.
