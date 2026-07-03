@@ -110,7 +110,6 @@ static inline bool ptrdict_find(PtrDict *const dict, void *const key,
   assert(key);
   return intdict_find(&dict->_private, (intptr_t)key, index);
 }
-
 /*
  * Search for the first item with a given key in a pointer dictionary.
  * Outputs the index of the item if the dictionary contains the key.
@@ -127,7 +126,6 @@ static inline bool ptrdict_find_specific(PtrDict *const dict, void *const key,
   assert(key);
   return intdict_find_specific(&dict->_private, (intptr_t)key, value, index);
 }
-
 /*
  * Search for the first item with a given key and value in a pointer
  * dictionary. Outputs the index of the item if found.
@@ -191,7 +189,6 @@ static inline void ptrdict_remove_at(PtrDict *const dict, size_t const index)
   assert(dict);
   intdict_remove_at(&dict->_private, index);
 }
-
 /*
  * Remove the item currently at a given index from a pointer dictionary.
  */
@@ -202,7 +199,6 @@ static inline _Optional void *ptrdict_remove_value_at(PtrDict *const dict,
   assert(dict);
   return intdict_remove_value_at(&dict->_private, index);
 }
-
 /*
  * Remove the item currently at a given index from a pointer dictionary,
  * returning the associated value.
@@ -215,7 +211,6 @@ static inline size_t ptrdict_bisect_left(PtrDict *const dict, void *const key)
   assert(key);
   return intdict_bisect_left(&dict->_private, (intptr_t)key);
 }
-
 /*
  * Search in a pointer dictionary for the lowest key not less than a
  * specified key. If all the keys in the dictionary are less than the
@@ -232,7 +227,6 @@ static inline size_t ptrdict_bisect_right(PtrDict *const dict, void *const key)
   assert(key);
   return intdict_bisect_right(&dict->_private, (intptr_t)key);
 }
-
 /*
  * Search in a pointer dictionary for the lowest key greater than a
  * specified key. If all the keys in the dictionary are less than or
