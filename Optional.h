@@ -38,6 +38,7 @@ History:
                   unspecified _POSIX_VERSION.
                   Correct the type of the first parameter of getgroups
                   from size_t to int.
+                  Add strdup.
 */
 
 #ifndef Optional_h
@@ -53,6 +54,7 @@ History:
 #if __has_include(<unistd.h>)
 #include <unistd.h>
 #endif
+#include "StrExtra.h" // for strdup
 
 #undef NULL
 #define NULL ((_Optional void *)0)
@@ -155,6 +157,13 @@ static inline _Optional char *optional_strpbrk(const char *str, const char *brk)
 }
 #undef strpbrk
 #define strpbrk(str, brk) optional_strpbrk(str, brk)
+
+static inline _Optional char *optional_strdup(const char *str)
+{
+  return strdup(str);
+}
+#undef strdup
+#define strdup(str) optional_strdup(str)
 
 static inline _Optional char *optional_setlocale(int cat,
                                                  _Optional const char *l)

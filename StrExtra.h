@@ -41,6 +41,8 @@ History:
                   Allow a null pointer to be passed to strinflate instead of
                   the address of an output buffer.
   CJB: 13-Jun-26: Document the newly defined behaviour of strtail with n == 0.
+  CJB: 01-Aug-26: Make my declaration of strdup conditional on not-C23 and
+                  remove _Optional from the referenced type of the return type.
  */
 
 #ifndef StrExtra_h
@@ -78,7 +80,9 @@ int strnicmp(const char * /*s1*/, const char * /*s2*/, size_t /*n*/);
  *          or less than the string pointed to by s2.
  */
 
-_Optional char *strdup(const char * /*s*/);
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L) && \
+    (!defined(_POSIX_VERSION) || _POSIX_VERSION < 200112L)
+char *strdup(const char * /*s*/);
 /*
  * Duplicates the string pointed to by s by copying it into a malloc'd block
  * of appropriate size.
@@ -86,6 +90,10 @@ _Optional char *strdup(const char * /*s*/);
  *          allocation failed. It is the caller's responsibility to free
  *          the block when no longer required.
  */
+#else
+#include <string.h>
+#endif
+
 #endif
 
 size_t strinflate(_Optional char * /*s1*/, size_t /*n*/, const char * /*s2*/,

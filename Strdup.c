@@ -26,6 +26,9 @@
                   included header files redefine macros such as assert().
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 22-May-26: strdup no longer accepts a null pointer.
+  CJB: 01-Aug-26: Make my definition of strdup conditional on not-C23 and
+                  remove _Optional from the referenced type of the return type.
+
  */
 
 /* ISO library headers */
@@ -39,14 +42,19 @@
 /* ----------------------------------------------------------------------- */
 /*                         Public functions                                */
 
-_Optional char *strdup(const char *const string)
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L) && \
+    (!defined(_POSIX_VERSION) || _POSIX_VERSION < 200112L)
+char *strdup(const char *const string)
 {
   assert(string);
   size_t const len = strlen(string) + 1;
   _Optional char *const newstr = malloc(len);
   if (newstr == NULL)
   {
-    return NULL;
+    return (char *)NULL;
   }
   return memcpy(&*newstr, string, len);
 }
+#else
+int cbutils_dummy;
+#endif
