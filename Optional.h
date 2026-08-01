@@ -28,6 +28,16 @@ History:
                   reallocarray, and freezero.
   ACA: 10-Aug-25: Add setlocale, time, and getgroups.
   CJB: 07-Jun-26: Add strpbrk.
+  CJB: 01-Aug-26: Don't assume that freezero is available unless
+                  __OpenBSD__ is defined because
+                  __has_include(<readpassphrase.h>) was insufficient.
+                  Don't assume that reallocarray is available unless
+                  a suitable version of POSIX is available because
+                  __has_include(<unistd.h>) was insufficient.
+                  Similarly, guard the call to getgroups with an
+                  unspecified _POSIX_VERSION.
+                  Correct the type of the first parameter of getgroups
+                  from size_t to int.
 */
 
 #ifndef Optional_h
@@ -68,7 +78,7 @@ static inline void optional_free(_Optional void *x)
 #undef free
 #define free(x) optional_free(x)
 
-#if __has_include(<readpassphrase.h>) // If we're on a BSD system.
+#ifdef __OpenBSD__
 static inline void optional_freezero(_Optional void *p, size_t n)
 {
   freezero((void *)p, n);
@@ -98,7 +108,7 @@ static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 #undef realloc
 #define realloc(p, n) optional_realloc(p, n)
 
-#if __has_include(<unistd.h>) // If we're on a POSIX system.
+#if defined(_POSIX_VERSION) && _POSIX_VERSION >= 202405L
 static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
                                                     size_t sz)
 {
@@ -161,8 +171,8 @@ static inline time_t optional_time(_Optional time_t *tp)
 #undef time
 #define time(tp) optional_time(tp)
 
-#if __has_include(<unistd.h>)
-static inline int optional_getgroups(size_t n, _Optional gid_t gids[n])
+#ifdef _POSIX_VERSION
+static inline int optional_getgroups(int n, _Optional gid_t gids[n])
 {
   return getgroups(n, (gid_t *)gids);
 }
