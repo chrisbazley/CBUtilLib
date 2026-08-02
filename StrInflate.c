@@ -37,6 +37,7 @@
                   the address of an output buffer.
                   Ensure the output string is always truncated in the right
                   place and always terminated if the output buffer is too small.
+  CJB: 02-Aug-26: Deal with optional-qualified referenced type of strpbrk.
 */
 
 /* ISO library headers */
@@ -66,7 +67,7 @@ size_t strinflate(_Optional char *const s1, size_t n, const char *s2,
 
     /* Find the next character that needs to be inflated */
     DEBUGF("Searching for inflatable characters in '%s'\n", s2);
-    const char *const i = strpbrk(s2, srch);
+    _Optional const char *const i = strpbrk(s2, srch);
     if (i == NULL)
     {
       /* No more characters need to be inflated, so append the remainder

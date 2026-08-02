@@ -34,6 +34,8 @@
   CJB: 26-Apr-25: Remove the _Optional qualifier from strdict_destroy's
                   callback function argument, because it makes no sense to
                   require callbacks to handle null values.
+  CJB: 02-Aug-26: Qualify the return type of strdict_get_key_at because it
+                  can return null.
  */
 
 #ifndef StrDict_h
@@ -135,8 +137,8 @@ static inline size_t strdict_count(StrDict const *const dict)
  * Returns: number of items.
  */
 
-static inline char const *strdict_get_key_at(StrDict const *const dict,
-                                             size_t const index)
+static inline _Optional char const *strdict_get_key_at(StrDict const *const dict,
+                                                       size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
@@ -145,7 +147,7 @@ static inline char const *strdict_get_key_at(StrDict const *const dict,
 }
 /*
  * Get the key currently at a given index in a string dictionary.
- * Returns: the key with the given index.
+ * Returns: the key with the given index, or NULL if there is none.
  */
 
 static inline _Optional void *strdict_get_value_at(StrDict const *const dict,

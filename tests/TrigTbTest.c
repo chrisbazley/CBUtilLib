@@ -44,7 +44,7 @@ static void test1(void)
     _Optional TrigTable *table =
       TrigTable_make(multipliers[i % ARRAY_SIZE(multipliers)],
                      quarter_turns[i / ARRAY_SIZE(multipliers)]);
-    assert(tt);
+    assert(table);
     tt[i] = &*table;
 
     for (size_t j = 0; j < i; j++)

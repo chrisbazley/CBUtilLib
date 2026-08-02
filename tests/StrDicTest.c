@@ -880,14 +880,16 @@ static void test26(void)
 
       for (size_t j = 0; j < bisect_index; ++j)
       {
-        char const *const key = strdict_get_key_at(&dict, j);
-        assert(stricmp(key, bisect_key) < 0);
+        _Optional char const *const key = strdict_get_key_at(&dict, j);
+        assert(key);
+        assert(stricmp(&*key, bisect_key) < 0);
       }
 
       for (size_t j = bisect_index; j < strdict_count(&dict); ++j)
       {
-        char const *const key = strdict_get_key_at(&dict, j);
-        assert(stricmp(key, bisect_key) >= 0);
+        _Optional char const *const key = strdict_get_key_at(&dict, j);
+        assert(key);
+        assert(stricmp(&*key, bisect_key) >= 0);
       }
       free(bisect_key);
     }
@@ -932,14 +934,16 @@ static void test27(void)
 
       for (size_t j = 0; j < bisect_index; ++j)
       {
-        char const *const key = strdict_get_key_at(&dict, j);
-        assert(stricmp(key, bisect_key) <= 0);
+        _Optional char const *const key = strdict_get_key_at(&dict, j);
+        assert(key);
+        assert(stricmp(&*key, bisect_key) <= 0);
       }
 
       for (size_t j = bisect_index; j < strdict_count(&dict); ++j)
       {
-        char const *const key = strdict_get_key_at(&dict, j);
-        assert(stricmp(key, bisect_key) > 0);
+        _Optional char const *const key = strdict_get_key_at(&dict, j);
+        assert(key);
+        assert(stricmp(&*key, bisect_key) > 0);
       }
       free(bisect_key);
     }
@@ -1003,9 +1007,10 @@ static void test28(void)
               max_index = index;
             }
 
-            char const *const key = strdict_get_key_at(&dict, index);
-            assert(stricmp(min_key, key) <= 0);
-            assert(stricmp(key, max_key) <= 0);
+            _Optional char const *const key = strdict_get_key_at(&dict, index);
+            assert(key);
+            assert(stricmp(min_key, &*key) <= 0);
+            assert(stricmp(&*key, max_key) <= 0);
           }
 
           printf("min_index %zu, max_index %zu\n", min_index, max_index);
@@ -1019,14 +1024,16 @@ static void test28(void)
           {
             for (size_t m = 0; m < min_index; ++m)
             {
-              char const *const key = strdict_get_key_at(&dict, m);
-              assert(stricmp(key, min_key) < 0);
+              _Optional char const *const key = strdict_get_key_at(&dict, m);
+              assert(key);
+              assert(stricmp(&*key, min_key) < 0);
             }
 
             for (size_t m = max_index + 1; m < strdict_count(&dict); ++m)
             {
-              char const *const key = strdict_get_key_at(&dict, m);
-              assert(stricmp(key, max_key) > 0);
+              _Optional char const *const key = strdict_get_key_at(&dict, m);
+              assert(key);
+              assert(stricmp(&*key, max_key) > 0);
             }
 
             assert(min_index == strdict_bisect_left(&dict, min_key));
@@ -1107,7 +1114,9 @@ static void test35(void)
     assert(dup_key);
     size_t find_pos = MagicValue;
     assert(strdict_find(&dict, dup_key, &find_pos));
-    assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
+    _Optional const char *key = strdict_get_key_at(&dict, find_pos);
+    assert(key);
+    assert(stricmp(&*key, dup_key) == 0);
 
     find_pos = MagicValue;
     _Optional void *const value = strdict_find_value(&dict, dup_key, &find_pos);
@@ -1124,7 +1133,9 @@ static void test35(void)
       }
     }
     assert(found_value);
-    assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
+    key = strdict_get_key_at(&dict, find_pos);
+    assert(key);
+    assert(stricmp(&*key, dup_key) == 0);
 
     assert(strdict_count(&dict) == i + 1);
 
@@ -1132,8 +1143,9 @@ static void test35(void)
     {
       assert(index < strdict_count(&dict));
       assert(index <= i);
-      assert(stricmp(strdict_get_key_at(&dict, index), keys[index / (k + 1)]) ==
-             0);
+      _Optional const char *key = strdict_get_key_at(&dict, index);
+      assert(key);
+      assert(stricmp(&*key, keys[index / (k + 1)]) == 0);
     }
     free(dup_key);
   }
@@ -1192,7 +1204,9 @@ static void test36(void)
 
     size_t find_pos = MagicValue;
     assert(strdict_find(&dict, dup_key, &find_pos));
-    assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
+    _Optional const char *key = strdict_get_key_at(&dict, find_pos);
+    assert(key);
+    assert(stricmp(&*key, dup_key) == 0);
 
     assert(strdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i);
 
@@ -1209,7 +1223,9 @@ static void test36(void)
     else
     {
       assert(success);
-      assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
+      key = strdict_get_key_at(&dict, find_pos);
+      assert(key);
+      assert(stricmp(&*key, dup_key) == 0);
     }
 
     assert(strdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i - 1);
@@ -1242,7 +1258,9 @@ static void test37(void)
 
     size_t find_pos = MagicValue;
     assert(strdict_find(&dict, dup_key, &find_pos));
-    assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
+    _Optional const char *key = strdict_get_key_at(&dict, find_pos);
+    assert(key);
+    assert(stricmp(&*key, dup_key) == 0);
 
     assert(strdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i);
 
@@ -1257,7 +1275,9 @@ static void test37(void)
     else
     {
       assert(success);
-      assert(stricmp(strdict_get_key_at(&dict, find_pos), dup_key) == 0);
+      key = strdict_get_key_at(&dict, find_pos);
+      assert(key);
+      assert(stricmp(&*key, dup_key) == 0);
     }
 
     assert(strdict_count(&dict) == (NumberOfKeys * NumberOfDuplicates) - i - 1);
