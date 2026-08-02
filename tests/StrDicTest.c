@@ -1143,7 +1143,7 @@ static void test35(void)
     {
       assert(index < strdict_count(&dict));
       assert(index <= i);
-      _Optional const char *key = strdict_get_key_at(&dict, index);
+      key = strdict_get_key_at(&dict, index);
       assert(key);
       assert(stricmp(&*key, keys[index / (k + 1)]) == 0);
     }
