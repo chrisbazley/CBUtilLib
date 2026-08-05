@@ -39,6 +39,7 @@ History:
                   Correct the type of the first parameter of getgroups
                   from size_t to int.
                   Add strdup.
+ CJB: 05-Aug-26: Add strtoul and strtok.
 */
 
 #ifndef Optional_h
@@ -128,6 +129,14 @@ static inline long optional_strtol(const char *restrict str,
 #undef strtol
 #define strtol(str, str_end, base) optional_strtol(str, str_end, base)
 
+static inline unsigned long optional_strtoul(const char *restrict str,
+                                             char *_Optional *restrict str_end, int base)
+{
+  return strtoul(str, (char **)str_end, base);
+}
+#undef strtoul
+#define strtoul(str, str_end, base) optional_strtoul(str, str_end, base)
+
 static inline double optional_strtod(const char *restrict str,
                                      char *_Optional *restrict str_end)
 {
@@ -164,6 +173,13 @@ static inline _Optional char *optional_strdup(const char *str)
 }
 #undef strdup
 #define strdup(str) optional_strdup(str)
+
+static inline _Optional char *optional_strtok(_Optional char *str, const char *delimiters)
+{
+  return strtok((char *)str, delimiters);
+}
+#undef strtok
+#define strtok(str, delimiters) optional_strtok(str, delimiters)
 
 static inline _Optional char *optional_setlocale(int cat,
                                                  _Optional const char *l)
