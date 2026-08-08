@@ -33,6 +33,8 @@
                   require callbacks to handle null values.
   CJB: 14-Jun-26: Guard against overflow of the realloc size argument, not
                   only the number of array elements.
+  CJB: 08-Aug-26: Substitute (size_t)PTRDIFF_MAX for SIZE_MAX to try to
+                  avoid broken analysis by Clang's analyzer.
  */
 
 #include <stdbool.h>
@@ -237,7 +239,7 @@ bool intdict_insert(IntDict *const dict, IntDictKey const key,
 
   if (nitems == dict->nalloc)
   {
-    if (dict->nalloc == SIZE_MAX/ sizeof(IntDictItem))
+    if (dict->nalloc == (size_t)PTRDIFF_MAX / sizeof(IntDictItem))
     {
       DEBUGF("Can't reallocate dictionary at max size\n");
       return false;
@@ -246,13 +248,13 @@ bool intdict_insert(IntDict *const dict, IntDictKey const key,
     size_t new_size = ArrayInitSize;
     if (dict->nalloc > 0)
     {
-      if (dict->nalloc < SIZE_MAX / sizeof(IntDictItem) / ArrayGrowthFactor)
+      if (dict->nalloc < (size_t)PTRDIFF_MAX / sizeof(IntDictItem) / ArrayGrowthFactor)
       {
         new_size = dict->nalloc * ArrayGrowthFactor;
       }
       else
       {
-        new_size = SIZE_MAX / sizeof(IntDictItem);
+        new_size = (size_t)PTRDIFF_MAX / sizeof(IntDictItem);
       }
     }
 
