@@ -23,6 +23,7 @@
   CJB: 03-Oct-20: Added assertions to detect null pointer arguments.
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
+  CJB: 10-Aug-26: Pedantic use of toupper.
  */
 
 /* ISO library headers */
@@ -49,8 +50,8 @@ int strnicmp(const char *s1, const char *s2, size_t n)
   do
   {
     i = *s1++, j = *s2++;
-    i = toupper(i);
-    j = toupper(j);
+    i = toupper((unsigned char)(i));
+    j = toupper((unsigned char)(j));
   } while (i && i == j && --n);
 
   return (i - j);

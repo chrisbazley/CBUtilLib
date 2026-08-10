@@ -23,6 +23,7 @@
                   included header files redefine macros such as assert().
   CJB: 14-Jun-26: Fixed get_long_arg and get_double_arg to accept
                   negative numbers and reject leading whitespace.
+  CJB: 10-Aug-26: Pedantic use of isdigit.
 */
 
 /* ISO library header files */
@@ -48,8 +49,8 @@ bool get_long_arg(const char *const name, long int *const value,
   assert(argv != NULL);
   assert(n >= 0);
 
-  if (n >= argc || (argv[n][0] != '-' && !isdigit(argv[n][0])) ||
-      (argv[n][0] == '-' && !isdigit(argv[n][1])))
+  if (n >= argc || (argv[n][0] != '-' && !isdigit((unsigned char)(argv[n][0]))) ||
+      (argv[n][0] == '-' && !isdigit((unsigned char)(argv[n][1]))))
   {
     fprintf(stderr, "Missing value for %s\n", name);
     return false;
@@ -84,8 +85,8 @@ bool get_double_arg(const char *const name, double *const value,
   assert(argv != NULL);
   assert(n >= 0);
 
-  if (n >= argc || (argv[n][0] != '-' && !isdigit(argv[n][0])) ||
-      (argv[n][0] == '-' && !isdigit(argv[n][1])))
+  if (n >= argc || (argv[n][0] != '-' && !isdigit((unsigned char)(argv[n][0]))) ||
+      (argv[n][0] == '-' && !isdigit((unsigned char)(argv[n][1]))))
   {
     fprintf(stderr, "Missing value for %s\n", name);
     return false;
