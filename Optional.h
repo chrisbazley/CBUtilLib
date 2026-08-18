@@ -40,6 +40,7 @@ History:
                   from size_t to int.
                   Add strdup.
  CJB: 05-Aug-26: Add strtoul and strtok.
+ CJB: 18-Aug-26: Add tmpfile.
 */
 
 #ifndef Optional_h
@@ -66,6 +67,13 @@ static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 }
 #undef fopen
 #define fopen(p, n) optional_fopen(p, n)
+
+static inline _Optional FILE *optional_tmpfile(void)
+{
+  return tmpfile();
+}
+#undef tmpfile
+#define tmpfile() optional_tmpfile()
 
 static inline int optional_fflush(_Optional FILE *stream)
 {
