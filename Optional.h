@@ -41,7 +41,10 @@ History:
                   Add strdup.
  CJB: 05-Aug-26: Add strtoul and strtok.
  CJB: 18-Aug-26: Add tmpfile.
-*/
+ CJB: 19-Aug-26: Add interceptors for the remaining common ISO C pointer
+                 interfaces with optional arguments or results.
+                 Implement const-preservation for functions such as strstr.
+ */
 
 #ifndef Optional_h
 #define Optional_h
@@ -61,6 +64,17 @@ History:
 #undef NULL
 #define NULL ((_Optional void *)0)
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define OPTIONAL_QCHAR_RESULT(result, str) \
+_Generic(1 ? (str) : (char *)0, \
+const char *: (_Optional const char *)(result), \
+char *: (_Optional char *)(result))
+#define OPTIONAL_QVOID_RESULT(result, ptr) \
+_Generic(1 ? (ptr) : (void *)0, \
+const void *: (_Optional const void *)(result), \
+void *: (_Optional void *)(result))
+#endif
+
 static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 {
   return fopen(name, mode);
@@ -75,12 +89,44 @@ static inline _Optional FILE *optional_tmpfile(void)
 #undef tmpfile
 #define tmpfile() optional_tmpfile()
 
+static inline _Optional FILE *optional_freopen(const char *restrict name,
+                                               const char *restrict mode,
+                                               FILE *restrict stream)
+{
+  return freopen(name, mode, stream);
+}
+#undef freopen
+#define freopen(name, mode, stream) optional_freopen(name, mode, stream)
+
+static inline _Optional char *optional_fgets(char *restrict str, int n,
+                                             FILE *restrict stream)
+{
+  return fgets(str, n, stream);
+}
+#undef fgets
+#define fgets(str, n, stream) optional_fgets(str, n, stream)
+
+static inline _Optional char *optional_tmpnam(_Optional char *str)
+{
+  return tmpnam((char *)str);
+}
+#undef tmpnam
+#define tmpnam(str) optional_tmpnam(str)
+
 static inline int optional_fflush(_Optional FILE *stream)
 {
   return fflush((FILE *)stream);
 }
 #undef fflush
 #define fflush(stream) optional_fflush(stream)
+
+static inline void optional_setbuf(FILE *restrict stream,
+                                   _Optional char *restrict buf)
+{
+  setbuf(stream, (char *)buf);
+}
+#undef setbuf
+#define setbuf(stream, buf) optional_setbuf(stream, buf)
 
 static inline void optional_free(_Optional void *x)
 {
@@ -119,6 +165,29 @@ static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 #undef realloc
 #define realloc(p, n) optional_realloc(p, n)
 
+static inline _Optional void *optional_bsearch(const void *key, const void *base,
+                                               size_t n, size_t size,
+                                               int (*cmp)(const void *,
+                                                          const void *))
+{
+  return (bsearch)(key, base, n, size, cmp);
+}
+#undef bsearch
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define bsearch(key, base, n, size, cmp) \
+OPTIONAL_QVOID_RESULT(optional_bsearch(key, base, n, size, cmp), base)
+#else
+#define bsearch(key, base, n, size, cmp) \
+optional_bsearch(key, base, n, size, cmp)
+#endif
+
+static inline _Optional char *optional_getenv(const char *name)
+{
+  return getenv(name);
+}
+#undef getenv
+#define getenv(name) optional_getenv(name)
+
 #if defined(_POSIX_VERSION) && _POSIX_VERSION >= 202405L
 static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
                                                     size_t sz)
@@ -145,6 +214,23 @@ static inline unsigned long optional_strtoul(const char *restrict str,
 #undef strtoul
 #define strtoul(str, str_end, base) optional_strtoul(str, str_end, base)
 
+static inline long long optional_strtoll(const char *restrict str,
+                                         char *_Optional *restrict str_end,
+                                         int base)
+{
+  return strtoll(str, (char **)str_end, base);
+}
+#undef strtoll
+#define strtoll(str, str_end, base) optional_strtoll(str, str_end, base)
+
+static inline unsigned long long optional_strtoull(
+                                                   const char *restrict str, char *_Optional *restrict str_end, int base)
+{
+  return strtoull(str, (char **)str_end, base);
+}
+#undef strtoull
+#define strtoull(str, str_end, base) optional_strtoull(str, str_end, base)
+
 static inline double optional_strtod(const char *restrict str,
                                      char *_Optional *restrict str_end)
 {
@@ -153,27 +239,109 @@ static inline double optional_strtod(const char *restrict str,
 #undef strtod
 #define strtod(str, str_end) optional_strtod(str, str_end)
 
+static inline float optional_strtof(const char *restrict str,
+                                    char *_Optional *restrict str_end)
+{
+  return strtof(str, (char **)str_end);
+}
+#undef strtof
+#define strtof(str, str_end) optional_strtof(str, str_end)
+
+static inline long double optional_strtold(const char *restrict str,
+                                           char *_Optional *restrict str_end)
+{
+  return strtold(str, (char **)str_end);
+}
+#undef strtold
+#define strtold(str, str_end) optional_strtold(str, str_end)
+
+static inline int optional_system(_Optional const char *command)
+{
+  return system((const char *)command);
+}
+#undef system
+#define system(command) optional_system(command)
+
+static inline int optional_mblen(_Optional const char *str, size_t n)
+{
+  return mblen((const char *)str, n);
+}
+#undef mblen
+#define mblen(str, n) optional_mblen(str, n)
+
+static inline int optional_mbtowc(_Optional wchar_t *restrict wc,
+                                  _Optional const char *restrict str, size_t n)
+{
+  return mbtowc((wchar_t *)wc, (const char *)str, n);
+}
+#undef mbtowc
+#define mbtowc(wc, str, n) optional_mbtowc(wc, str, n)
+
+static inline int optional_wctomb(_Optional char *str, wchar_t wc)
+{
+  return wctomb((char *)str, wc);
+}
+#undef wctomb
+#define wctomb(str, wc) optional_wctomb(str, wc)
+
+static inline _Optional void *optional_memchr(const void *str, int ch, size_t n)
+{
+  return (memchr)(str, ch, n);
+}
+#undef memchr
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define memchr(str, ch, n) \
+OPTIONAL_QVOID_RESULT(optional_memchr(str, ch, n), str)
+#else
+#define memchr(str, ch, n) optional_memchr(str, ch, n)
+#endif
+
 static inline _Optional char *optional_strstr(const char *str,
                                               const char *substr)
 {
-  return strstr(str, substr);
+  return (strstr)(str, substr);
 }
 #undef strstr
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define strstr(str, substr) \
+OPTIONAL_QCHAR_RESULT(optional_strstr(str, substr), str)
+#else
 #define strstr(str, substr) optional_strstr(str, substr)
+#endif
 
 static inline _Optional char *optional_strchr(const char *str, int ch)
 {
-  return strchr(str, ch);
+  return (strchr)(str, ch);
 }
 #undef strchr
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define strchr(str, ch) OPTIONAL_QCHAR_RESULT(optional_strchr(str, ch), str)
+#else
 #define strchr(str, ch) optional_strchr(str, ch)
+#endif
+
+static inline _Optional char *optional_strrchr(const char *str, int ch)
+{
+  return (strrchr)(str, ch);
+}
+#undef strrchr
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define strrchr(str, ch) OPTIONAL_QCHAR_RESULT(optional_strrchr(str, ch), str)
+#else
+#define strrchr(str, ch) optional_strrchr(str, ch)
+#endif
 
 static inline _Optional char *optional_strpbrk(const char *str, const char *brk)
 {
-  return strpbrk(str, brk);
+  return (strpbrk)(str, brk);
 }
 #undef strpbrk
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define strpbrk(str, brk) \
+OPTIONAL_QCHAR_RESULT(optional_strpbrk(str, brk), str)
+#else
 #define strpbrk(str, brk) optional_strpbrk(str, brk)
+#endif
 
 static inline _Optional char *optional_strdup(const char *str)
 {
@@ -203,6 +371,20 @@ static inline time_t optional_time(_Optional time_t *tp)
 }
 #undef time
 #define time(tp) optional_time(tp)
+
+static inline _Optional struct tm *optional_gmtime(const time_t *timer)
+{
+  return gmtime(timer);
+}
+#undef gmtime
+#define gmtime(timer) optional_gmtime(timer)
+
+static inline _Optional struct tm *optional_localtime(const time_t *timer)
+{
+  return localtime(timer);
+}
+#undef localtime
+#define localtime(timer) optional_localtime(timer)
 
 #ifdef _POSIX_VERSION
 static inline int optional_getgroups(int n, _Optional gid_t gids[n])
