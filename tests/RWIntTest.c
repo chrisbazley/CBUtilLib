@@ -111,15 +111,15 @@ static void test3(void)
 {
 #ifdef FORTIFY
   /* Read fail */
-  FILE *f = fopen(file_name, "wb");
+  _Optional FILE *f = fopen(file_name, "wb");
   if (f == NULL)
     perror("Failed to open file");
   assert(f != NULL);
 
   static uint8_t const data[] = {1, 2, 3, 4};
-  assert(fwrite(data, sizeof(*data), ARRAY_SIZE(data), f));
+  assert(fwrite(data, sizeof(*data), ARRAY_SIZE(data), &*f));
 
-  assert(!fclose(f));
+  assert(!fclose(&*f));
   f = fopen(file_name, "rb");
   if (f == NULL)
     perror("Failed to open file");
@@ -128,15 +128,15 @@ static void test3(void)
   long int num = DUMMY;
 
   Fortify_SetNumAllocationsLimit(0);
-  assert(!fread_int32le(&num, f));
+  assert(!fread_int32le(&num, &*f));
   Fortify_SetNumAllocationsLimit(ULONG_MAX);
 
-  assert(ftell(f) == 0);
-  assert(ferror(f));
-  assert(!feof(f));
+  assert(ftell(&*f) == 0);
+  assert(ferror(&*f));
+  assert(!feof(&*f));
   assert(num == DUMMY);
 
-  assert(!fclose(f));
+  assert(!fclose(&*f));
   remove(file_name);
 #endif
 }
@@ -145,20 +145,20 @@ static void test4(void)
 {
 #ifdef FORTIFY
   /* Write fail */
-  FILE *f = fopen(file_name, "wb");
+  _Optional FILE *f = fopen(file_name, "wb");
   if (f == NULL)
     perror("Failed to open file");
   assert(f != NULL);
 
   Fortify_SetNumAllocationsLimit(0);
-  assert(!fwrite_int32le(TEST, f));
+  assert(!fwrite_int32le(TEST, &*f));
   Fortify_SetNumAllocationsLimit(ULONG_MAX);
 
-  assert(ftell(f) == 0);
-  assert(ferror(f));
-  assert(!feof(f));
+  assert(ftell(&*f) == 0);
+  assert(ferror(&*f));
+  assert(!feof(&*f));
 
-  if (fclose(f))
+  if (fclose(&*f))
   {
     perror("fclose failed");
   }
