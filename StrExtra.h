@@ -43,6 +43,7 @@ History:
   CJB: 13-Jun-26: Document the newly defined behaviour of strtail with n == 0.
   CJB: 01-Aug-26: Make my declaration of strdup conditional on not-C23 and
                   remove _Optional from the referenced type of the return type.
+  CJB: 26-Aug-26: Preserve Fortify's strdup interceptor when enabled.
  */
 
 #ifndef StrExtra_h
@@ -59,7 +60,9 @@ History:
 #include <string.h>
 #define stricmp _stricmp
 #define strnicmp _strnicmp
+#ifndef FORTIFY_INTERCEPTED_STRDUP
 #define strdup _strdup
+#endif
 #else
 int stricmp(const char * /*s1*/, const char * /*s2*/);
 /*
@@ -80,7 +83,8 @@ int strnicmp(const char * /*s1*/, const char * /*s2*/, size_t /*n*/);
  *          or less than the string pointed to by s2.
  */
 
-#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L) && \
+#if !defined(FORTIFY_INTERCEPTED_STRDUP) && \
+    (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L) && \
     (!defined(_POSIX_VERSION) || _POSIX_VERSION < 200112L)
 char *strdup(const char * /*s*/);
 /*

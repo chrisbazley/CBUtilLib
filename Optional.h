@@ -44,6 +44,7 @@ History:
  CJB: 19-Aug-26: Add interceptors for the remaining common ISO C pointer
                  interfaces with optional arguments or results.
                  Implement const-preservation for functions such as strstr.
+ CJB: 26-Aug-26: Preserve Fortify's strdup interceptor when enabled.
  */
 
 #ifndef Optional_h
@@ -343,12 +344,14 @@ OPTIONAL_QCHAR_RESULT(optional_strpbrk(str, brk), str)
 #define strpbrk(str, brk) optional_strpbrk(str, brk)
 #endif
 
+#ifndef FORTIFY_INTERCEPTED_STRDUP
 static inline _Optional char *optional_strdup(const char *str)
 {
   return strdup(str);
 }
 #undef strdup
 #define strdup(str) optional_strdup(str)
+#endif
 
 static inline _Optional char *optional_strtok(_Optional char *str, const char *delimiters)
 {
