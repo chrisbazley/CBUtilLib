@@ -28,6 +28,8 @@
   CJB: 22-May-26: strdup no longer accepts a null pointer.
   CJB: 01-Aug-26: Make my definition of strdup conditional on not-C23 and
                   remove _Optional from the referenced type of the return type.
+  CJB: 26-Aug-26: Suppress expansion of an intercepted strdup macro in the
+                  function definition.
 
  */
 
@@ -44,7 +46,7 @@
 
 #if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L) && \
     (!defined(_POSIX_VERSION) || _POSIX_VERSION < 200112L)
-char *strdup(const char *const string)
+char *(strdup)(const char *const string)
 {
   assert(string);
   size_t const len = strlen(string) + 1;
