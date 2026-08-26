@@ -87,7 +87,7 @@ static void test3(void)
 
   const int cos = TrigTable_look_up_cosine(&*tt, 0),
             sin = TrigTable_look_up_sine(&*tt, 0);
-  assert(cos == 1);
+  assert(cos == multipliers[0]);
   assert(sin == 0);
 
   TrigTable_destroy(tt);
