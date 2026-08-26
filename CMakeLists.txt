@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(CBUtilLib C)
 
 option(USE_OPTIONAL "Enable the _Optional qualifier" OFF)
+option(USE_FORTIFY "Enable Fortify memory-allocation checking" OFF)
 option(ENABLE_CLANG_TIDY "Run clang-tidy during compilation" OFF)
 
 if(USE_OPTIONAL)
@@ -17,6 +18,17 @@ if(USE_OPTIONAL)
         set(CMAKE_XCODE_ATTRIBUTE_CLANG_ANALYZER_OTHER_FLAGS
             "-analyzer-checker optionality,core -analyzer-max-loop 32")
     endif()
+endif()
+
+if(USE_FORTIFY)
+    include(FetchContent)
+
+    FetchContent_Declare(Fortify
+        GIT_REPOSITORY https://github.com/chrisbazley/Fortify.git
+        GIT_TAG main
+    )
+
+    FetchContent_MakeAvailable(Fortify)
 endif()
 
 set(CMAKE_C_STANDARD 99)
@@ -119,6 +131,10 @@ set_target_properties(CBUtil PROPERTIES
 
 target_include_directories(CBUtil PUBLIC .)
 
+if(USE_FORTIFY)
+    target_link_libraries(CBUtil PRIVATE Fortify)
+endif()
+
 target_compile_definitions(CBUtil PRIVATE 
     $<$<OR:$<CONFIG:Debug>,$<CONFIG:ClangAnalysis>,$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:DEBUG_OUTPUT>
     $<$<OR:$<CONFIG:ClangOptional>,$<CONFIG:ClangAnalysisOptional>>:USE_OPTIONAL>
@@ -136,5 +152,12 @@ install(TARGETS CBUtil
 include(CTest)
 
 if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-  add_subdirectory(tests)
+    add_subdirectory(tests)
+
+    # The tests call Fortify's fault-injection interface directly. Fortify is
+    # deliberately a private dependency of CBUtil, so link it separately here
+    # to provide the tests with its interface and FORTIFY definition.
+    if(USE_FORTIFY)
+        target_link_libraries(CBUtilTests PRIVATE Fortify)
+    endif()
 endif()
