@@ -45,6 +45,8 @@ History:
                  interfaces with optional arguments or results.
                  Implement const-preservation for functions such as strstr.
  CJB: 26-Aug-26: Preserve Fortify's strdup interceptor when enabled.
+ CJB: 26-Aug-26: Preserve the remaining qualified Fortify allocation
+                 interceptors and cover newer ISO C allocation interfaces.
  */
 
 #ifndef Optional_h
@@ -129,12 +131,36 @@ static inline void optional_setbuf(FILE *restrict stream,
 #undef setbuf
 #define setbuf(stream, buf) optional_setbuf(stream, buf)
 
+#ifndef FORTIFY_INTERCEPTED_FREE
 static inline void optional_free(_Optional void *x)
 {
   free((void *)x);
 }
 #undef free
 #define free(x) optional_free(x)
+#endif
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#ifndef FORTIFY_INTERCEPTED_FREE_SIZED
+static inline void optional_free_sized(_Optional void *p, size_t n)
+{
+  free_sized((void *)p, n);
+}
+#undef free_sized
+#define free_sized(p, n) optional_free_sized(p, n)
+#endif
+
+#ifndef FORTIFY_INTERCEPTED_FREE_ALIGNED_SIZED
+static inline void optional_free_aligned_sized(_Optional void *p,
+                                               size_t alignment, size_t n)
+{
+  free_aligned_sized((void *)p, alignment, n);
+}
+#undef free_aligned_sized
+#define free_aligned_sized(p, alignment, n) \
+optional_free_aligned_sized(p, alignment, n)
+#endif
+#endif
 
 #ifdef __OpenBSD__
 static inline void optional_freezero(_Optional void *p, size_t n)
@@ -145,26 +171,44 @@ static inline void optional_freezero(_Optional void *p, size_t n)
 #define freezero(p, n) optional_freezero(p, n)
 #endif
 
+#ifndef FORTIFY_INTERCEPTED_MALLOC
 static inline _Optional void *optional_malloc(size_t n)
 {
   return malloc(n);
 }
 #undef malloc
 #define malloc(n) optional_malloc(n)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_CALLOC
 static inline _Optional void *optional_calloc(size_t sz, size_t n)
 {
   return calloc(sz, n);
 }
 #undef calloc
 #define calloc(sz, n) optional_calloc(sz, n)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_REALLOC
 static inline _Optional void *optional_realloc(_Optional void *p, size_t n)
 {
   return realloc((void *)p, n);
 }
 #undef realloc
 #define realloc(p, n) optional_realloc(p, n)
+#endif
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#ifndef FORTIFY_INTERCEPTED_ALIGNED_ALLOC
+static inline _Optional void *optional_aligned_alloc(size_t alignment,
+                                                     size_t n)
+{
+  return aligned_alloc(alignment, n);
+}
+#undef aligned_alloc
+#define aligned_alloc(alignment, n) optional_aligned_alloc(alignment, n)
+#endif
+#endif
 
 static inline _Optional void *optional_bsearch(const void *key, const void *base,
                                                size_t n, size_t size,
@@ -190,6 +234,7 @@ static inline _Optional char *optional_getenv(const char *name)
 #define getenv(name) optional_getenv(name)
 
 #if defined(_POSIX_VERSION) && _POSIX_VERSION >= 202405L
+#ifndef FORTIFY_INTERCEPTED_REALLOCARRAY
 static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
                                                     size_t sz)
 {
@@ -197,6 +242,7 @@ static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
 }
 #undef reallocarray
 #define reallocarray(p, n, sz) optional_reallocarray(p, n, sz)
+#endif
 #endif
 
 static inline long optional_strtol(const char *restrict str,
@@ -351,6 +397,18 @@ static inline _Optional char *optional_strdup(const char *str)
 }
 #undef strdup
 #define strdup(str) optional_strdup(str)
+#endif
+
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) || \
+    (defined(_POSIX_VERSION) && _POSIX_VERSION >= 200809L)
+#ifndef FORTIFY_INTERCEPTED_STRNDUP
+static inline _Optional char *optional_strndup(const char *str, size_t n)
+{
+  return strndup(str, n);
+}
+#undef strndup
+#define strndup(str, n) optional_strndup(str, n)
+#endif
 #endif
 
 static inline _Optional char *optional_strtok(_Optional char *str, const char *delimiters)
