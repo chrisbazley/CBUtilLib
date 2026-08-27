@@ -35,6 +35,8 @@
   CJB: 26-Apr-25: Remove the _Optional qualifier from linkedlist_for_each's
                   callback function argument, because it makes no sense to
                   require callbacks to handle null values.
+  CJB: 27-Aug-26: Add a defensive null pointer check in linkedlist_insert
+                  because Clang's analyser makes a false inference.
 */
 
 /* ISO library headers */
@@ -72,6 +74,12 @@ void linkedlist_insert(LinkedList *const list,
   assert(item != NULL);
   DEBUGF("LinkedList: Inserting item %p into list %p after item %p\n",
          (void *)item, (void *)list, (void *)prev);
+
+  // Clang's analyser makes a fallacious inference due to the type of list->head
+  if (!item)
+  {
+    return;
+  }
 
   assert(!linkedlist_is_member(list, item));
   if (prev != NULL)
