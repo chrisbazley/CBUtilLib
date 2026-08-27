@@ -35,6 +35,8 @@
                   only the number of array elements.
   CJB: 08-Aug-26: Substitute (size_t)PTRDIFF_MAX for SIZE_MAX to try to
                   avoid broken analysis by Clang's analyzer.
+  CJB: 27-Aug-26: Add a defensive null pointer check in compare_key_n_item
+                  because Clang's analyser makes a false inference.
  */
 
 #include <stdbool.h>
@@ -90,6 +92,12 @@ static int compare_key_n_item(const void *const key, const void *const item)
   StrDict *const dict = (StrDict *)key;
   assert(dict->sought_key);
   StrDictItem const *const candidate = item;
+
+  // Clang's analyser makes a fallacious inference due to the type of dict->candidate
+  if (!candidate)
+  {
+    return 0;
+  }
 
   if (dict->array)
   {
