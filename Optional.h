@@ -67,6 +67,10 @@ History:
 #endif
 #include "StrExtra.h" // for strdup
 
+#ifdef FORTIFY
+#include "fortify.h"
+#endif
+
 #undef NULL
 #define NULL ((_Optional void *)0)
 
