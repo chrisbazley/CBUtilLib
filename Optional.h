@@ -47,6 +47,9 @@ History:
  CJB: 26-Aug-26: Preserve Fortify's strdup interceptor when enabled.
  CJB: 26-Aug-26: Preserve the remaining qualified Fortify allocation
                  interceptors and cover newer ISO C allocation interfaces.
+ CJB: 27-Aug-26: Use more FORTIFY_INTERCEPTED_... macros to prevent problems
+                 such as an unrecognized FILE * in Fortify because fopen was
+                 redefined by this header.
  */
 
 #ifndef Optional_h
@@ -78,20 +81,25 @@ const void *: (_Optional const void *)(result), \
 void *: (_Optional void *)(result))
 #endif
 
+#ifndef FORTIFY_INTERCEPTED_FOPEN
 static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 {
   return fopen(name, mode);
 }
 #undef fopen
 #define fopen(p, n) optional_fopen(p, n)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_TMPFILE
 static inline _Optional FILE *optional_tmpfile(void)
 {
   return tmpfile();
 }
 #undef tmpfile
 #define tmpfile() optional_tmpfile()
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_FREOPEN
 static inline _Optional FILE *optional_freopen(const char *restrict name,
                                                const char *restrict mode,
                                                FILE *restrict stream)
@@ -100,7 +108,9 @@ static inline _Optional FILE *optional_freopen(const char *restrict name,
 }
 #undef freopen
 #define freopen(name, mode, stream) optional_freopen(name, mode, stream)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_FGETS
 static inline _Optional char *optional_fgets(char *restrict str, int n,
                                              FILE *restrict stream)
 {
@@ -108,21 +118,27 @@ static inline _Optional char *optional_fgets(char *restrict str, int n,
 }
 #undef fgets
 #define fgets(str, n, stream) optional_fgets(str, n, stream)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_TMPNAM
 static inline _Optional char *optional_tmpnam(_Optional char *str)
 {
   return tmpnam((char *)str);
 }
 #undef tmpnam
 #define tmpnam(str) optional_tmpnam(str)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_FFLUSH
 static inline int optional_fflush(_Optional FILE *stream)
 {
   return fflush((FILE *)stream);
 }
 #undef fflush
 #define fflush(stream) optional_fflush(stream)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_SETBUF
 static inline void optional_setbuf(FILE *restrict stream,
                                    _Optional char *restrict buf)
 {
@@ -130,6 +146,7 @@ static inline void optional_setbuf(FILE *restrict stream,
 }
 #undef setbuf
 #define setbuf(stream, buf) optional_setbuf(stream, buf)
+#endif
 
 #ifndef FORTIFY_INTERCEPTED_FREE
 static inline void optional_free(_Optional void *x)
@@ -161,14 +178,17 @@ static inline void optional_free_aligned_sized(_Optional void *p,
 optional_free_aligned_sized(p, alignment, n)
 #endif
 #endif
+#endif
 
 #ifdef __OpenBSD__
+#ifndef FORTIFY_INTERCEPTED_FREEZERO
 static inline void optional_freezero(_Optional void *p, size_t n)
 {
   freezero((void *)p, n);
 }
 #undef freezero
 #define freezero(p, n) optional_freezero(p, n)
+#endif
 #endif
 
 #ifndef FORTIFY_INTERCEPTED_MALLOC
@@ -226,12 +246,14 @@ OPTIONAL_QVOID_RESULT(optional_bsearch(key, base, n, size, cmp), base)
 optional_bsearch(key, base, n, size, cmp)
 #endif
 
+#ifndef FORTIFY_INTERCEPTED_GETENV
 static inline _Optional char *optional_getenv(const char *name)
 {
   return getenv(name);
 }
 #undef getenv
 #define getenv(name) optional_getenv(name)
+#endif
 
 #if defined(_POSIX_VERSION) && _POSIX_VERSION >= 202405L
 #ifndef FORTIFY_INTERCEPTED_REALLOCARRAY
@@ -418,6 +440,7 @@ static inline _Optional char *optional_strtok(_Optional char *str, const char *d
 #undef strtok
 #define strtok(str, delimiters) optional_strtok(str, delimiters)
 
+#ifndef FORTIFY_INTERCEPTED_SETLOCALE
 static inline _Optional char *optional_setlocale(int cat,
                                                  _Optional const char *l)
 {
@@ -425,6 +448,7 @@ static inline _Optional char *optional_setlocale(int cat,
 }
 #undef setlocale
 #define setlocale(cat, l) optional_setlocale(cat, l)
+#endif
 
 static inline time_t optional_time(_Optional time_t *tp)
 {
@@ -433,19 +457,23 @@ static inline time_t optional_time(_Optional time_t *tp)
 #undef time
 #define time(tp) optional_time(tp)
 
+#ifndef FORTIFY_INTERCEPTED_GMTIME
 static inline _Optional struct tm *optional_gmtime(const time_t *timer)
 {
   return gmtime(timer);
 }
 #undef gmtime
 #define gmtime(timer) optional_gmtime(timer)
+#endif
 
+#ifndef FORTIFY_INTERCEPTED_LOCALTIME
 static inline _Optional struct tm *optional_localtime(const time_t *timer)
 {
   return localtime(timer);
 }
 #undef localtime
 #define localtime(timer) optional_localtime(timer)
+#endif
 
 #ifdef _POSIX_VERSION
 static inline int optional_getgroups(int n, _Optional gid_t gids[n])
