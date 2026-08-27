@@ -178,7 +178,6 @@ static inline void optional_free_aligned_sized(_Optional void *p,
 optional_free_aligned_sized(p, alignment, n)
 #endif
 #endif
-#endif
 
 #ifdef __OpenBSD__
 #ifndef FORTIFY_INTERCEPTED_FREEZERO
