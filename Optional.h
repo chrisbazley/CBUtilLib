@@ -65,7 +65,7 @@ History:
 #if __has_include(<unistd.h>)
 #include <unistd.h>
 #endif
-#include "StrExtra.h" // for strdup\
+#include "StrExtra.h" // for strdup
 
 #ifdef FORTIFY
 #include "fortify.h"
