@@ -25,6 +25,23 @@
 /* Local headers */
 #include "Tests.h"
 
+#ifdef FORTIFY
+static int fortify_detected;
+
+static void fortify_check(void)
+{
+  Fortify_CheckAllMemory();
+  assert(!fortify_detected);
+}
+
+static void fortify_output(const char *text)
+{
+  fputs(text, stdout);
+  if (strstr(text, "detected"))
+    fortify_detected = 1;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
   static const struct
@@ -48,6 +65,11 @@ int main(int argc, char *argv[])
   NOT_USED(argv);
 
   DEBUG_SET_OUTPUT(DebugOutput_StdOut, "");
+
+#ifdef FORTIFY
+  Fortify_SetOutputFunc(fortify_output);
+  atexit(fortify_check);
+#endif
 
   for (size_t count = 0; count < ARRAY_SIZE(test_groups); count++)
   {
