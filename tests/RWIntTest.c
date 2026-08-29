@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* CBUtilLib headers */
@@ -204,7 +205,11 @@ void FileRWInt_tests(void)
     {"Write fail", test4}, {"Round trip", test5},
   };
 
-  tmpnam(file_name);
+  if (tmpnam(file_name) == NULL)
+  {
+    fputs("Failed to generate temporary filename\n", stderr);
+    abort();
+  }
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)
   {
