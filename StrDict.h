@@ -36,6 +36,8 @@
                   require callbacks to handle null values.
   CJB: 02-Aug-26: Qualify the return type of strdict_get_key_at because it
                   can return null.
+  CJB: 31-Aug-26: Add the strdict_init_compare function to allow alternative
+                  string comparison functions to be used.
  */
 
 #ifndef StrDict_h
@@ -57,10 +59,16 @@ typedef struct StrDictItem
   _Optional void *value;
 } StrDictItem;
 
+typedef int StrDictCompareFn(char const * /*key1*/, char const * /*key2*/);
+/*
+ * Type of function used to compare dictionary keys. The return value has
+ * the same interpretation as strcmp.
+ */
+
 typedef struct
 {
-  size_t nalloc;
-  size_t nitems;
+  StrDictCompareFn *compare;
+  size_t nalloc, nitems;
   StringBuffer buffer;
   _Optional char const *sought_key;
   _Optional StrDictItem *array;
@@ -70,12 +78,19 @@ typedef struct
  * A string dictionary type that associates every item in an ordered
  * list of strings (keys) with a pointer to a value. Duplicate keys are
  * allowed unless the client explicitly takes steps to prevent them.
- * Upper and lower case characters are considered equivalent in keys.
+ * Keys are stored exactly as supplied by the client; the comparison
+ * function affects only their ordering and equivalence.
  */
 
 void strdict_init(StrDict * /*dict*/);
 /*
- * Initialize a string dictionary.
+ * Initialize a string dictionary using case-insensitive comparison.
+ */
+
+void strdict_init_compare(StrDict * /*dict*/, StrDictCompareFn * /*compare*/);
+/*
+ * Initialize a string dictionary using the specified key comparison
+ * function.
  */
 
 typedef void StrDictDestructorFn(char const * /*key*/,

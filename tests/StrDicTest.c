@@ -1603,6 +1603,72 @@ static void test60(void)
   remove_null_common(remove_key_only_no_pos);
 }
 
+static void test61(void)
+{
+  StrDict dict;
+  int value;
+  char const *const key = "MiXeD";
+
+  memset(&dict, CHAR_MAX, sizeof(dict));
+  strdict_init(&dict);
+  assert(strdict_insert(&dict, key, &value, NULL));
+
+  size_t index = MagicValue;
+  assert(strdict_find(&dict, "mixed", &index));
+  assert(index == 0);
+  assert(strdict_get_key_at(&dict, index) == key);
+  assert(strcmp(strdict_get_key_at(&dict, index), "MiXeD") == 0);
+
+  strdict_destroy(&dict, NULL, NULL);
+}
+
+static void test62(void)
+{
+  StrDict dict;
+  int value;
+  char const *const key = "MiXeD";
+
+  memset(&dict, CHAR_MAX, sizeof(dict));
+  strdict_init_compare(&dict, strcmp);
+  assert(strdict_insert(&dict, key, &value, NULL));
+
+  assert(!strdict_find(&dict, "mixed", NULL));
+
+  size_t index = MagicValue;
+  assert(strdict_find(&dict, "MiXeD", &index));
+  assert(index == 0);
+  assert(strdict_get_key_at(&dict, index) == key);
+  assert(strcmp(strdict_get_key_at(&dict, index), "MiXeD") == 0);
+
+  strdict_destroy(&dict, NULL, NULL);
+}
+
+static int compare_length(char const *const a, char const *const b)
+{
+  size_t const a_len = strlen(a), b_len = strlen(b);
+  return (a_len > b_len) - (a_len < b_len);
+}
+
+static void test63(void)
+{
+  StrDict dict;
+  int value;
+  char const *const key = "Original";
+
+  memset(&dict, CHAR_MAX, sizeof(dict));
+  strdict_init_compare(&dict, compare_length);
+  assert(strdict_insert(&dict, key, &value, NULL));
+
+  size_t index = MagicValue;
+  assert(strdict_find(&dict, "12345678", &index));
+  assert(index == 0);
+  assert(strdict_get_key_at(&dict, index) == key);
+  assert(strcmp(strdict_get_key_at(&dict, index), "Original") == 0);
+  assert(strdict_find_value(&dict, "12345678", NULL) == &value);
+
+  strdict_destroy(&dict, NULL, NULL);
+}
+
 void strdict_tests(void)
 {
   static const struct
@@ -1670,6 +1736,9 @@ void strdict_tests(void)
     {"Remove key from tail without position", test58},
     {"Remove key from middle without position", test59},
     {"Remove key with null value without position", test60},
+    {"Default comparison preserves original key", test61},
+    {"Case-sensitive comparison preserves original key", test62},
+    {"Equivalent lookup preserves original key", test63},
   };
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)

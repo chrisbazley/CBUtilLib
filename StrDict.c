@@ -37,6 +37,8 @@
                   avoid broken analysis by Clang's analyzer.
   CJB: 27-Aug-26: Add a defensive null pointer check in compare_key_n_item
                   because Clang's analyser makes a false inference.
+  CJB: 31-Aug-26: Add the strdict_init_compare function to allow alternative
+                  string comparison functions to be used.
  */
 
 #include <stdbool.h>
@@ -55,9 +57,16 @@ enum
 
 void strdict_init(StrDict *const dict)
 {
+  strdict_init_compare(dict, stricmp);
+}
+
+void strdict_init_compare(StrDict *const dict,
+                          StrDictCompareFn *const compare)
+{
   DEBUGF("Initializing string dictionary %p\n", (void *)dict);
   assert(dict);
-  *dict = (StrDict){0};
+  assert(compare);
+  *dict = (StrDict){.compare = compare};
   stringbuffer_init(&dict->buffer);
 }
 
@@ -106,7 +115,7 @@ static int compare_key_n_item(const void *const key, const void *const item)
   }
 
   dict->candidate = candidate;
-  return stricmp(STRING_OR_NULL(dict->sought_key), candidate->key);
+  return dict->compare(STRING_OR_NULL(dict->sought_key), candidate->key);
 }
 
 void strdict_remove_at(StrDict *const dict, size_t const index)
@@ -146,7 +155,7 @@ void strdict_remove_at(StrDict *const dict, size_t const index)
       assert(i + 1 < dict->nalloc);
       DEBUGF("%zu: Key %p:'%s', value %p\n", i, (void *)array[i].key,
              array[i].key, array[i].value);
-      assert(stricmp(array[i].key, array[i + 1].key) <= 0);
+      assert(dict->compare(array[i].key, array[i + 1].key) <= 0);
     }
     DEBUGF("%zu: key %p:'%s', value %p\n", dict->nitems - 1,
            (void *)array[dict->nitems - 1].key, array[dict->nitems - 1].key,
@@ -170,7 +179,7 @@ bool strdict_find(StrDict *const dict, char const *const key,
 {
   size_t const index = strdict_bisect_left(dict, key);
   if (!dict->array || index >= dict->nitems ||
-      stricmp(dict->array[index].key, key) != 0)
+      dict->compare(dict->array[index].key, key) != 0)
   {
     DEBUGF("Can't find key '%s'\n", key);
     return false;
@@ -201,7 +210,7 @@ bool strdict_find_specific(StrDict *const dict, char const *const key,
     return false;
   }
 
-  int diff = stricmp(array[index].key, key);
+  int diff = dict->compare(array[index].key, key);
 
   if (diff != 0)
   {
@@ -213,7 +222,7 @@ bool strdict_find_specific(StrDict *const dict, char const *const key,
   {
     ++index;
     assert(index < dict->nitems);
-    diff = stricmp(array[index].key, key);
+    diff = dict->compare(array[index].key, key);
   }
 
   if (diff != 0 || array[index].value != value)
@@ -302,7 +311,7 @@ bool strdict_insert(StrDict *const dict, char const *const key,
     assert(i + 1 < dict->nalloc);
     DEBUGF("%zu: Key %p:'%s', value %p\n", i, (void *)array[i].key,
            array[i].key, array[i].value);
-    assert(stricmp(array[i].key, array[i + 1].key) <= 0);
+    assert(dict->compare(array[i].key, array[i + 1].key) <= 0);
   }
   DEBUGF("%zu: key %p:'%s', value %p\n", dict->nitems - 1,
          (void *)array[dict->nitems - 1].key, array[dict->nitems - 1].key,
@@ -340,7 +349,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
       /* Can't just do a pointer comparison here because there could be a
          different string at a recycled address. Not sure how worthwhile
          this optimization is. */
-      if (stricmp(STRING_OR_NULL(dict->sought_key), key) == 0)
+      if (dict->compare(STRING_OR_NULL(dict->sought_key), key) == 0)
       {
         DEBUGF("Reuse last result of search for key '%s'\n", dict->sought_key);
       }
@@ -373,13 +382,13 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
     if (dict->candidate)
     {
       assert(dict->sought_key);
-      assert(stricmp(STRING_OR_NULL(dict->sought_key), key) == 0);
+      assert(dict->compare(STRING_OR_NULL(dict->sought_key), key) == 0);
       assert(dict->candidate >= array);
       assert(dict->candidate < array + dict->nitems);
 
       index = (size_t)(dict->candidate - array);
       assert(index < dict->nitems);
-      if (stricmp(array[index].key, key) < 0)
+      if (dict->compare(array[index].key, key) < 0)
       {
         DEBUGF(
           "Candidate %p at index %zu with value %p was too low: '%s' < '%s'\n",
@@ -391,7 +400,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
         do
         {
           ++index;
-        } while (index < dict->nitems && stricmp(array[index].key, key) < 0);
+        } while (index < dict->nitems && dict->compare(array[index].key, key) < 0);
       }
       else
       {
@@ -402,7 +411,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
 
         /* Search backward for the lowest key greater than or equal to
            the sought key */
-        while (index > 0 && stricmp(array[index - 1].key, key) >= 0)
+        while (index > 0 && dict->compare(array[index - 1].key, key) >= 0)
         {
           --index;
         }
@@ -411,7 +420,7 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
       if (index > 0)
       {
         assert(index - 1 < dict->nitems);
-        assert(stricmp(array[index - 1].key, key) < 0);
+        assert(dict->compare(array[index - 1].key, key) < 0);
       }
     }
     else
@@ -445,7 +454,7 @@ size_t strdict_bisect_right(StrDict *const dict, char const *const key)
 
   DEBUGF("Searching for lowest key > '%s' in dictionary of size %zu\n", key,
          dict->nitems);
-  while (index < dict->nitems && stricmp(array[index].key, key) <= 0)
+  while (index < dict->nitems && dict->compare(array[index].key, key) <= 0)
   {
     ++index;
   }
