@@ -38,6 +38,8 @@
                   can return null.
   CJB: 31-Aug-26: Add the strdict_init_compare function to allow alternative
                   string comparison functions to be used.
+  CJB: 01-Sep-26: Unqualify the return type of strdict_get_key_at because it
+                  cannot return null unless an invariant is violated.
  */
 
 #ifndef StrDict_h
@@ -152,13 +154,17 @@ static inline size_t strdict_count(StrDict const *const dict)
  * Returns: number of items.
  */
 
-static inline _Optional char const *strdict_get_key_at(StrDict const *const dict,
-                                                       size_t const index)
+static inline char const *strdict_get_key_at(StrDict const *const dict,
+                                             size_t const index)
 {
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
-  return dict->array ? dict->array[index].key : NULL;
+  if (!dict->array)
+  {
+    abort();
+  }
+  return dict->array[index].key;
 }
 /*
  * Get the key currently at a given index in a string dictionary.
