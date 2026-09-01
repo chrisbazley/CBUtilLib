@@ -1619,7 +1619,7 @@ static void test61(void)
   assert(strdict_get_key_at(&dict, index) == key);
   assert(strcmp(strdict_get_key_at(&dict, index), "MiXeD") == 0);
 
-  strdict_destroy(&dict, NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, &dict);
 }
 
 static void test62(void)
@@ -1640,7 +1640,7 @@ static void test62(void)
   assert(strdict_get_key_at(&dict, index) == key);
   assert(strcmp(strdict_get_key_at(&dict, index), "MiXeD") == 0);
 
-  strdict_destroy(&dict, NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, &dict);
 }
 
 static int compare_length(char const *const a, char const *const b)
@@ -1666,7 +1666,7 @@ static void test63(void)
   assert(strcmp(strdict_get_key_at(&dict, index), "Original") == 0);
   assert(strdict_find_value(&dict, "12345678", NULL) == &value);
 
-  strdict_destroy(&dict, NULL, NULL);
+  strdict_destroy(&dict, (StrDictDestructorFn *)NULL, &dict);
 }
 
 void strdict_tests(void)
