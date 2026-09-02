@@ -40,6 +40,7 @@
                   string comparison functions to be used.
   CJB: 01-Sep-26: Unqualify the return type of strdict_get_key_at because it
                   cannot return null unless an invariant is violated.
+  CJB: 02-Sep-26: Conditionally abort in strdict_get_value_at too.
  */
 
 #ifndef StrDict_h
@@ -178,7 +179,11 @@ static inline _Optional void *strdict_get_value_at(StrDict const *const dict,
   assert(dict);
   assert(dict->nitems <= dict->nalloc);
   assert(index < dict->nitems);
-  return dict->array ? dict->array[index].value : NULL;
+  if (!dict->array)
+  {
+    abort();
+  }
+  return dict->array[index].value;
 }
 /*
  * Get the value currently at a given index in a string dictionary.
