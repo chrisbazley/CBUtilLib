@@ -32,6 +32,7 @@
   CJB: 17-May-26: Make conversions to unsigned char explicit.
                   Use CHAR_BIT instead of magic numbers.
   CJB: 19-May-26: Stop using unary minus because MSVC warns.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 /* ISO library headers */
@@ -51,12 +52,11 @@ bool fread_int32le(long int *num, FILE *in)
 {
   unsigned char bytes[4];
   bool success = false;
-  size_t n;
 
   assert(num != NULL);
   assert(in != NULL);
 
-  n = fread(bytes, sizeof(bytes), 1, in);
+  size_t n = fread(bytes, sizeof(bytes), 1, in);
   if (n != 1)
   {
     DEBUGF("FileRWInt: fread from %p failed (%zu)\n", (void *)in, n);
@@ -103,7 +103,6 @@ bool fread_int32le(long int *num, FILE *in)
 bool fwrite_int32le(long int num, FILE *out)
 {
   bool success = false;
-  size_t n;
 
   assert(out != NULL);
 
@@ -116,7 +115,7 @@ bool fwrite_int32le(long int num, FILE *out)
   bytes[2] = (unsigned char)(unum >> (CHAR_BIT * 2));
   bytes[3] = (unsigned char)(unum >> (CHAR_BIT * 3));
 
-  n = fwrite(bytes, sizeof(bytes), 1, out);
+  size_t n = fwrite(bytes, sizeof(bytes), 1, out);
   if (n != 1)
   {
     DEBUGF("FileRWInt: fwrite to %p failed (%zu)\n", (void *)out, n);

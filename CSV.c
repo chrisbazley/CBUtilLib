@@ -38,6 +38,7 @@
   CJB: 17-May-26: Add support for outputting an array of type unsigned char.
   CJB: 13-Jun-26: An outdated assertion previously prevented use of
                   CSVOutputType_UChar.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 /* ISO library headers */
@@ -57,7 +58,7 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
                         _Optional void *output, CSVOutputType type,
                         size_t nmemb)
 {
-  _Optional const char *end_of_record, *cr, *lf;
+  _Optional const char *end_of_record;
   size_t field = 0;
 
   DEBUGF("CSV: Will parse string from %p, filling %zu members of array %p\n",
@@ -67,8 +68,8 @@ size_t csv_parse_string(const char *s, _Optional char *_Optional *endp,
   assert(s != NULL);
 
   /* Find the carriage return or linefeed at the end of this record */
-  lf = strchr(s, '\n');
-  cr = strchr(s, '\r');
+  _Optional const char *lf = strchr(s, '\n');
+  _Optional const char *cr = strchr(s, '\r');
   if (lf != NULL && (cr == NULL || lf < cr))
     end_of_record = lf;
   else

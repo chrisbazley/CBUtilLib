@@ -46,6 +46,7 @@
                   after calling free or realloc.
   CJB: 14-Jun-26: Assign a compound literal in stringbuffer_init to
                   guarantee full initialisation of new instances.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 /* ISO library headers */
@@ -150,7 +151,6 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
                                             size_t *const min_size)
 {
   _Optional char *free_ptr = NULL;
-  size_t size;
 
   assert(buffer != NULL);
   assert(min_size != NULL);
@@ -168,7 +168,7 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
 
   /* Ensure the string buffer is big enough for the existing string and
      the number of bytes to be appended. */
-  size = *min_size ? *min_size : 1; /* can't return null and succeed */
+  size_t size = *min_size ? *min_size : 1; /* can't return null and succeed */
   if (ensure_size(buffer, buffer->string_len + size) && buffer->buffer)
   {
     free_ptr = &*buffer->buffer + buffer->string_len;
@@ -217,7 +217,7 @@ bool stringbuffer_append_separated(StringBuffer *const buffer, const char sep,
 bool stringbuffer_append(StringBuffer *const buffer,
                          _Optional const char *const tail, size_t const n)
 {
-  size_t tail_len, extra_chars;
+  size_t tail_len;
   bool success = true;
 
   assert(buffer != NULL);
@@ -246,7 +246,7 @@ bool stringbuffer_append(StringBuffer *const buffer,
 
   /* Calculate the number of characters to append (can't be more than
      than the tail string length). */
-  extra_chars = LOWEST(tail_len, n);
+  size_t extra_chars = LOWEST(tail_len, n);
   if (extra_chars > 0)
   {
     /* Allocate space for the number of characters to be appended and a

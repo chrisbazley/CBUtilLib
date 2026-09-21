@@ -160,8 +160,6 @@ static void test5(void)
 {
   /* Truncate */
   StringBuffer buffer;
-  bool success;
-  size_t i;
   char string[] =
     "The boy stood on the burning deck whence all but he had fled";
 
@@ -171,21 +169,19 @@ static void test5(void)
   /* Truncate empty */
   stringbuffer_truncate(&buffer, 0);
 
-  success = stringbuffer_append_all(&buffer, string);
+  bool success = stringbuffer_append_all(&buffer, string);
   assert(success);
 
-  i = NumberOfAppends;
+  size_t i = NumberOfAppends;
   while (i-- > 0)
   {
-    size_t len;
-    const char *s;
 
     stringbuffer_truncate(&buffer, i);
 
-    len = stringbuffer_get_length(&buffer);
+    size_t len = stringbuffer_get_length(&buffer);
     assert(len == i);
 
-    s = stringbuffer_get_pointer(&buffer);
+    const char *s = stringbuffer_get_pointer(&buffer);
     assert(s != NULL);
     string[i] = '\0';
     assert(strcmp(s, string) == 0);
@@ -211,17 +207,15 @@ static void test6(void)
   for (i = 0; i < ARRAY_SIZE(tail); i++)
   {
     const bool success = stringbuffer_append_all(&buffer, tail[i]);
-    size_t len;
-    const char *s;
 
     assert(success);
     stringbuffer_minimize(&buffer);
 
-    len = stringbuffer_get_length(&buffer);
+    size_t len = stringbuffer_get_length(&buffer);
     expected_len += strlen(tail[i]);
     assert(len == expected_len);
 
-    s = stringbuffer_get_pointer(&buffer);
+    const char *s = stringbuffer_get_pointer(&buffer);
     assert(s != NULL);
     strcat(expected_s, tail[i]);
     assert(strcmp(s, expected_s) == 0);
@@ -234,8 +228,7 @@ static void test7(void)
 {
   /* Minimize after truncate */
   StringBuffer buffer;
-  bool success;
-  size_t i, len;
+  size_t len;
   const char *s;
   char string[] =
     "The boy stood on the burning deck whence all but he had fled";
@@ -243,10 +236,10 @@ static void test7(void)
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, string);
+  bool success = stringbuffer_append_all(&buffer, string);
   assert(success);
 
-  i = NumberOfAppends;
+  size_t i = NumberOfAppends;
   while (i-- > 0)
   {
 
@@ -281,14 +274,11 @@ static void test8(void)
 #ifdef FORTIFY
   /* Append fail recovery */
   StringBuffer buffer;
-  bool success;
-  size_t len;
-  const char *s;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foo");
+  bool success = stringbuffer_append_all(&buffer, "foo");
   assert(success);
 
   Fortify_SetAllocationLimit(0);
@@ -296,9 +286,9 @@ static void test8(void)
   Fortify_SetAllocationLimit(ULONG_MAX);
   assert(!success);
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == 3);
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
   success = stringbuffer_append_all(&buffer, "bar");
@@ -317,15 +307,13 @@ static void test9(void)
 {
   /* Minimize fail recovery */
   StringBuffer buffer;
-  bool success;
-  size_t len;
   const char *s, *string = "Man's life is as cheap as beast's";
   const size_t trunc_len = strlen(string) * 2 / 3;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, string);
+  bool success = stringbuffer_append_all(&buffer, string);
   assert(success);
 
   stringbuffer_truncate(&buffer, trunc_len);
@@ -334,7 +322,7 @@ static void test9(void)
   stringbuffer_minimize(&buffer);
   Fortify_SetAllocationLimit(ULONG_MAX);
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == trunc_len);
   s = stringbuffer_get_pointer(&buffer);
   assert(strncmp(s, string, trunc_len) == 0);
@@ -356,7 +344,6 @@ static void test10(void)
   /* Undo append */
   StringBuffer buffer;
   unsigned int i;
-  bool success;
   const char *stem = "Podd can ";
   static const char *tail[NumberOfAppends] = {"eat",   "dance", "snore", "swim",
                                               "walk",  "run",   "yawn",  "pop",
@@ -365,7 +352,7 @@ static void test10(void)
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, stem);
+  bool success = stringbuffer_append_all(&buffer, stem);
   assert(success);
 
   for (i = 0; i < ARRAY_SIZE(tail); i++)
@@ -389,27 +376,23 @@ static void test11(void)
 {
   /* Undo truncate */
   StringBuffer buffer;
-  bool success;
-  size_t i;
   const char *string =
     "The boy stood on the burning deck whence all but he had fled";
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, string);
+  bool success = stringbuffer_append_all(&buffer, string);
   assert(success);
 
-  i = NumberOfAppends;
+  size_t i = NumberOfAppends;
   while (i-- > 0)
   {
-    size_t len;
-    const char *s;
 
-    len = stringbuffer_get_length(&buffer);
+    size_t len = stringbuffer_get_length(&buffer);
     assert(len == strlen(string));
 
-    s = stringbuffer_get_pointer(&buffer);
+    const char *s = stringbuffer_get_pointer(&buffer);
     assert(s != NULL);
     assert(strcmp(s, string) == 0);
 
@@ -424,15 +407,12 @@ static void test11(void)
 static void test12(void)
 {
   /* Undo append after minimize */
-  bool success;
   StringBuffer buffer;
-  size_t len;
-  const char *s;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foo");
+  bool success = stringbuffer_append_all(&buffer, "foo");
   assert(success);
 
   success = stringbuffer_append_all(&buffer, "bar");
@@ -441,9 +421,9 @@ static void test12(void)
   stringbuffer_minimize(&buffer);
   stringbuffer_undo(&buffer); /* no effect */
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == strlen("foobar"));
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foobar") == 0);
 
   stringbuffer_destroy(&buffer);
@@ -452,15 +432,12 @@ static void test12(void)
 static void test13(void)
 {
   /* Undo truncate after minimize */
-  bool success;
   StringBuffer buffer;
-  size_t len;
-  const char *s;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foobar");
+  bool success = stringbuffer_append_all(&buffer, "foobar");
   assert(success);
 
   stringbuffer_truncate(&buffer, strlen("foo"));
@@ -468,9 +445,9 @@ static void test13(void)
   stringbuffer_minimize(&buffer);
   stringbuffer_undo(&buffer); /* no effect */
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == strlen("foo"));
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
   stringbuffer_destroy(&buffer);
@@ -479,14 +456,13 @@ static void test13(void)
 static void test14(void)
 {
   /* Undo append twice */
-  bool success;
   StringBuffer buffer;
   unsigned int i;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foo");
+  bool success = stringbuffer_append_all(&buffer, "foo");
   assert(success);
 
   success = stringbuffer_append_all(&buffer, "bar");
@@ -494,15 +470,13 @@ static void test14(void)
 
   for (i = 0; i < 2; ++i)
   {
-    size_t len;
-    const char *s;
 
     stringbuffer_undo(&buffer);
 
-    len = stringbuffer_get_length(&buffer);
+    size_t len = stringbuffer_get_length(&buffer);
     assert(len == strlen("foo"));
 
-    s = stringbuffer_get_pointer(&buffer);
+    const char *s = stringbuffer_get_pointer(&buffer);
     assert(strcmp(s, "foo") == 0);
   }
 
@@ -512,14 +486,13 @@ static void test14(void)
 static void test15(void)
 {
   /* Undo truncate twice */
-  bool success;
   StringBuffer buffer;
   unsigned int i;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foobar");
+  bool success = stringbuffer_append_all(&buffer, "foobar");
   assert(success);
 
   stringbuffer_truncate(&buffer, strlen("foo"));
@@ -527,15 +500,13 @@ static void test15(void)
 
   for (i = 0; i < 2; ++i)
   {
-    size_t len;
-    const char *s;
 
     stringbuffer_undo(&buffer);
 
-    len = stringbuffer_get_length(&buffer);
+    size_t len = stringbuffer_get_length(&buffer);
     assert(len == strlen("foo"));
 
-    s = stringbuffer_get_pointer(&buffer);
+    const char *s = stringbuffer_get_pointer(&buffer);
     assert(strcmp(s, "foo") == 0);
   }
 
@@ -545,15 +516,12 @@ static void test15(void)
 static void test16(void)
 {
   /* Undo append no chars */
-  bool success;
   StringBuffer buffer;
-  size_t len;
-  const char *s;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foo");
+  bool success = stringbuffer_append_all(&buffer, "foo");
   assert(success);
 
   success = stringbuffer_append_all(&buffer, "");
@@ -561,10 +529,10 @@ static void test16(void)
 
   stringbuffer_undo(&buffer); /* should have no effect */
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == strlen("foo"));
 
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
   stringbuffer_destroy(&buffer);
@@ -573,15 +541,12 @@ static void test16(void)
 static void test17(void)
 {
   /* Undo truncate no chars */
-  bool success;
   StringBuffer buffer;
-  size_t len;
-  const char *s;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_all(&buffer, "foobar");
+  bool success = stringbuffer_append_all(&buffer, "foobar");
   assert(success);
 
   stringbuffer_truncate(&buffer, strlen("foo"));
@@ -589,10 +554,10 @@ static void test17(void)
 
   stringbuffer_undo(&buffer); /* should have no effect */
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == strlen("foo"));
 
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
   stringbuffer_destroy(&buffer);
@@ -638,7 +603,6 @@ static void test19(void)
   /* Undo append separated */
   StringBuffer buffer;
   unsigned int i;
-  bool success;
   const char *stem = "Podd can ";
   static const char *tail[NumberOfAppends] = {"eat",   "dance", "snore", "swim",
                                               "walk",  "run",   "yawn",  "pop",
@@ -648,7 +612,7 @@ static void test19(void)
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_separated(&buffer, sep, stem);
+  bool success = stringbuffer_append_separated(&buffer, sep, stem);
   assert(success);
 
   for (i = 0; i < ARRAY_SIZE(tail); i++)
@@ -687,17 +651,15 @@ static void test20(void)
   for (i = 0; i < ARRAY_SIZE(tail); i++)
   {
     const bool success = stringbuffer_append_separated(&buffer, sep, tail[i]);
-    size_t len;
-    const char *s;
 
     assert(success);
     stringbuffer_minimize(&buffer);
 
-    len = stringbuffer_get_length(&buffer);
+    size_t len = stringbuffer_get_length(&buffer);
     expected_len += 1 + strlen(tail[i]);
     assert(len == expected_len);
 
-    s = stringbuffer_get_pointer(&buffer);
+    const char *s = stringbuffer_get_pointer(&buffer);
     assert(s != NULL);
     char ssep[] = {sep, '\0'};
     strcat(expected_s, ssep);
@@ -713,15 +675,12 @@ static void test21(void)
 #ifdef FORTIFY
   /* Append separated fail recovery */
   StringBuffer buffer;
-  bool success;
-  size_t len;
-  const char *s;
   const char sep = '.';
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_append_separated(&buffer, sep, "foo");
+  bool success = stringbuffer_append_separated(&buffer, sep, "foo");
   assert(success);
 
   Fortify_SetAllocationLimit(0);
@@ -729,9 +688,9 @@ static void test21(void)
   Fortify_SetAllocationLimit(ULONG_MAX);
   assert(!success);
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == 4);
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, ".foo") == 0);
 
   success = stringbuffer_append_separated(&buffer, sep, "bar");
@@ -780,14 +739,11 @@ static void test23(void)
 #ifdef FORTIFY
   /* Append fail recovery */
   StringBuffer buffer;
-  bool success;
-  size_t len;
-  const char *s;
 
   memset(&buffer, CHAR_MAX, sizeof(buffer));
   stringbuffer_init(&buffer);
 
-  success = stringbuffer_printf(&buffer, "%s", "foo");
+  bool success = stringbuffer_printf(&buffer, "%s", "foo");
   assert(success);
 
   Fortify_SetAllocationLimit(0);
@@ -795,9 +751,9 @@ static void test23(void)
   Fortify_SetAllocationLimit(ULONG_MAX);
   assert(!success);
 
-  len = stringbuffer_get_length(&buffer);
+  size_t len = stringbuffer_get_length(&buffer);
   assert(len == 3);
-  s = stringbuffer_get_pointer(&buffer);
+  const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
   success = stringbuffer_printf(&buffer, "%s", "bar");
