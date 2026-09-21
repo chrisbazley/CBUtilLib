@@ -20,6 +20,7 @@
 /* History:
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 15-Jun-26: Send the debug log to stderr not stdout.
+  CJB: 21-Sep-26: Use the public generic macro definitions.
 */
 
 #ifndef CBUtilMisc_h
@@ -54,15 +55,6 @@
 #endif /* USE_CBDEBUG */
 
 #include "Optional.h"
-
-#define PI (3.1415926535897896)
-
-#define NOT_USED(x) ((void)(x))
-
-#define LOWEST(a, b) ((a) < (b) ? (a) : (b))
-
-#define HIGHEST(a, b) ((a) > (b) ? (a) : (b))
-
-#define STRING_OR_NULL(s) ((s) == NULL ? "" : &*(s))
+#include "MacroUtils.h"
 
 #endif /* CBUtilMisc_h */

@@ -63,9 +63,7 @@
 #define _Optional
 #endif
 
-#define NOT_USED(x) ((void)(x))
-
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+#include "MacroUtils.h"
 
 #define FOR_EACH_ELEM_PTR(T, E, A)                                             \
   for (T(E) = &(A)[0]; (E) < &(A)[ARRAY_SIZE(A)]; ++(E))
@@ -80,5 +78,6 @@ void StrExtra_tests(void);
 void TrigTable_tests(void);
 void CSV_tests(void);
 void ArgUtils_tests(void);
+void MacroUtils_tests(void);
 
 #endif /* Tests_h */

@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
     {"TrigTable", TrigTable_tests},
     {"CSV", CSV_tests},
     {"ArgUtils", ArgUtils_tests},
+    {"MacroUtils", MacroUtils_tests},
   };
 
   NOT_USED(argc);
