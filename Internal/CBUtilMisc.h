@@ -21,6 +21,8 @@
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 15-Jun-26: Send the debug log to stderr not stdout.
   CJB: 21-Sep-26: Use the public generic macro definitions.
+  CJB: 22-Sep-26: Remove a redundant include of PseudoIO.h because fortify.h
+                  already enables standard I/O interception.
 */
 
 #ifndef CBUtilMisc_h
@@ -33,7 +35,6 @@
 #ifdef USE_CBDEBUG
 
 #include "Debug.h"
-#include "PseudoIO.h"
 
 #else /* USE_CBDEBUG */
 
