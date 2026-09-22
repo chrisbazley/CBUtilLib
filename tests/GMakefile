@@ -9,7 +9,7 @@ Delete = delete
 
 # Toolflags:
 CCFlags = -c -IC: -mlibscl -mthrowback -Wall -Wextra -Wsign-conversion -pedantic -std=c99 -g -DUSE_CBDEBUG -DDEBUG_OUTPUT -DDEBUG_DUMP -DFORTIFY -MMD -MP -o $@
-LinkFlags = -L../debug -LC: -mlibscl -lCBDebug -lCBUtildbg -lFortify -o $@
+LinkFlags = -L../debug -LC: -mlibscl -lCBPseudo -lCBDebug -lCBUtildbg -lFortify -o $@
 
 include MakeCommon
 
