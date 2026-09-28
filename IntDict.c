@@ -37,6 +37,7 @@
                   avoid broken analysis by Clang's analyzer.
   CJB: 27-Aug-26: Add a defensive null pointer check in compare_key_n_item
                   because Clang's analyser makes a false inference.
+  CJB: 28-Sep-26: Use the bsearch result when it finds a matching item.
  */
 
 #include <stdbool.h>
@@ -356,8 +357,11 @@ size_t intdict_bisect_left(IntDict *const dict, IntDictKey const key)
     if (!dict->candidate)
     {
       dict->sought_key = key;
-      (void)bsearch(dict, array, dict->nitems, sizeof(array[0]),
-                    compare_key_n_item);
+      _Optional IntDictItem const *const match =
+        bsearch(dict, array, dict->nitems, sizeof(array[0]),
+                compare_key_n_item);
+      if (match)
+        dict->candidate = match;
     }
 
     if (dict->candidate)
