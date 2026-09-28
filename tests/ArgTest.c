@@ -80,7 +80,7 @@ static void test1(void)
     {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0},
     {LONG_MIN, LONG_MAX, 0, 1, {"-13 "}, false, 0},
     // Extreme values
-    {LONG_MIN, LONG_MAX, 0, 1, {"-2147483648"}, true, -2147483648},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-2147483648"}, true, -2147483647L - 1},
     {LONG_MIN, LONG_MAX, 0, 1, {"2147483647"}, true, 2147483647},
   };
 

@@ -40,10 +40,20 @@ static void test_values(void)
   assert(LOWEST(2, 3) == 2);
   assert(HIGHEST(2, 3) == 3);
   assert(CLAMP(5, 1, 4) == 4);
+  int const neg_one = -1;
+#ifdef _MSC_VER
+  /* Both branches of the shift macros are parsed by MSVC, including the
+     deliberately unselected negative-shift branch. */
+#pragma warning(push)
+#pragma warning(disable:4293)
+#endif
   assert(SIGNED_R_SHIFT(8, 1) == 4);
-  assert(SIGNED_R_SHIFT(4, -1) == 8);
+  assert(SIGNED_R_SHIFT(4, neg_one) == 8);
   assert(SIGNED_L_SHIFT(4, 1) == 8);
-  assert(SIGNED_L_SHIFT(8, -1) == 4);
+  assert(SIGNED_L_SHIFT(8, neg_one) == 4);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
   assert(strcmp(STRINGIFY(test), "test") == 0);
 
   int a = 1;

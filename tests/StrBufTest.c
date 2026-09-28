@@ -117,12 +117,12 @@ static void test3(void)
     assert(s != NULL);
 
     // Truncation is intentional
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
 #endif
     strncat(expected_s, tail, i);
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 

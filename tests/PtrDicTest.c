@@ -627,9 +627,10 @@ static size_t adjust_index(size_t index, size_t size, int const offset)
 
   if (offset < 0)
   {
-    if (index >= -(size_t)offset)
+    size_t const magnitude = (size_t)(-(offset + 1)) + 1;
+    if (index >= magnitude)
     {
-      index -= -(size_t)offset;
+      index -= magnitude;
     }
     else
     {

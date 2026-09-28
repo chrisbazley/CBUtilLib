@@ -39,6 +39,7 @@
                   because Clang's analyser makes a false inference.
   CJB: 31-Aug-26: Add the strdict_init_compare function to allow alternative
                   string comparison functions to be used.
+  CJB: 28-Sep-26: Use the bsearch result when it finds a matching item.
  */
 
 #include <stdbool.h>
@@ -374,8 +375,11 @@ size_t strdict_bisect_left(StrDict *const dict, char const *const key)
       }
       if (array)
       {
-        (void)bsearch(dict, array, dict->nitems, sizeof(array[0]),
-                      compare_key_n_item);
+        _Optional StrDictItem const *const match =
+          bsearch(dict, array, dict->nitems, sizeof(array[0]),
+                  compare_key_n_item);
+        if (match)
+          dict->candidate = match;
       }
     }
 
