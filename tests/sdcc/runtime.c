@@ -8,7 +8,7 @@
 unsigned char __at (0xe000) __sdcc_heap[0x1000];
 unsigned char __at (0xf000) __sdcc_heap_end;
 
-/* uCsim interface configured by run.sh. */
+/* uCsim interface configured by the CTest runner. */
 volatile unsigned char __at (0xdf00) simif;
 
 int putchar(int c)

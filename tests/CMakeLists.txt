@@ -1,3 +1,8 @@
+if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
+    add_subdirectory(sdcc)
+    return()
+endif()
+
 file(GLOB SOURCES "*.c")
 file(GLOB PRIVATE_HEADERS "*.h")
 

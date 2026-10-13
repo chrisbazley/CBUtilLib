@@ -59,7 +59,7 @@ History:
 
 #include <stdlib.h>
 #include <string.h>
-#ifndef CBUTIL_FREESTANDING
+#ifndef CBUTIL_SDCC
 #include <locale.h>
 #include <stdio.h>
 #include <time.h>
@@ -91,8 +91,8 @@ const void *: (_Optional const void *)(result), \
 void *: (_Optional void *)(result))
 #endif
 
-/* Omit hosted interfaces unavailable in the freestanding build. */
-#ifndef CBUTIL_FREESTANDING
+/* Omit hosted interfaces unavailable in the SDCC build. */
+#ifndef CBUTIL_SDCC
 #ifndef FORTIFY_INTERCEPTED_FOPEN
 static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 {
@@ -160,7 +160,7 @@ static inline void optional_setbuf(FILE *restrict stream,
 #define setbuf(stream, buf) optional_setbuf(stream, buf)
 #endif
 
-#endif /* !CBUTIL_FREESTANDING */
+#endif /* !CBUTIL_SDCC */
 
 #ifndef FORTIFY_INTERCEPTED_FREE
 static inline void optional_free(_Optional void *x)
@@ -259,7 +259,7 @@ OPTIONAL_QVOID_RESULT(optional_bsearch(key, base, n, size, cmp), base)
 optional_bsearch(key, base, n, size, cmp)
 #endif
 
-#ifndef CBUTIL_FREESTANDING
+#ifndef CBUTIL_SDCC
 #ifndef FORTIFY_INTERCEPTED_GETENV
 static inline _Optional char *optional_getenv(const char *name)
 {
@@ -269,7 +269,7 @@ static inline _Optional char *optional_getenv(const char *name)
 #define getenv(name) optional_getenv(name)
 #endif
 
-#endif /* !CBUTIL_FREESTANDING */
+#endif /* !CBUTIL_SDCC */
 
 #if defined(_POSIX_VERSION) && _POSIX_VERSION >= 202405L
 #ifndef FORTIFY_INTERCEPTED_REALLOCARRAY
@@ -284,7 +284,7 @@ static inline _Optional void *optional_reallocarray(_Optional void *p, size_t n,
 #endif
 
 /* Numeric conversion wrappers are not needed by the portable test subset. */
-#ifndef CBUTIL_FREESTANDING
+#ifndef CBUTIL_SDCC
 static inline long optional_strtol(const char *restrict str,
                                    char *_Optional *restrict str_end, int base)
 {
@@ -371,7 +371,7 @@ static inline int optional_wctomb(_Optional char *str, wchar_t wc)
 #undef wctomb
 #define wctomb(str, wc) optional_wctomb(str, wc)
 
-#endif /* !CBUTIL_FREESTANDING */
+#endif /* !CBUTIL_SDCC */
 
 static inline _Optional void *optional_memchr(const void *str, int ch, size_t n)
 {
@@ -460,7 +460,7 @@ static inline _Optional char *optional_strtok(_Optional char *str, const char *d
 #undef strtok
 #define strtok(str, delimiters) optional_strtok(str, delimiters)
 
-#ifndef CBUTIL_FREESTANDING
+#ifndef CBUTIL_SDCC
 #ifndef FORTIFY_INTERCEPTED_SETLOCALE
 static inline _Optional char *optional_setlocale(int cat,
                                                  _Optional const char *l)
@@ -505,7 +505,7 @@ static inline int optional_getgroups(int n, _Optional gid_t gids[n])
 #define getgroups(n, gids) optional_getgroups(n, gids)
 #endif
 
-#endif /* !CBUTIL_FREESTANDING */
+#endif /* !CBUTIL_SDCC */
 
 #else
 #define _Optional

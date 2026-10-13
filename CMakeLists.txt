@@ -7,9 +7,9 @@ option(ENABLE_CLANG_TIDY "Run clang-tidy during compilation" OFF)
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
 if(USE_OPTIONAL)
-    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang|AppleClang")
+    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang|AppleClang|SDCC")
         message(FATAL_ERROR
-            "USE_OPTIONAL requires Christopher Bazley's Clang fork")
+            "USE_OPTIONAL requires SDCC or Christopher Bazley's Clang fork")
     endif()
 
     add_compile_definitions(USE_OPTIONAL)
@@ -32,13 +32,30 @@ if(USE_FORTIFY)
     FetchContent_MakeAvailable(Fortify)
 endif()
 
+include(CTest)
+
+if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
+    add_compile_options(--std-c99 --max-allocs-per-node 100
+        "SHELL:--disable-warning 110" "SHELL:--disable-warning 126")
+    # Keep _Optional type checking while exempting inference limitations.
+    if(USE_OPTIONAL)
+        add_compile_options("SHELL:--disable-warning 355"
+            "SHELL:--disable-warning 358" "SHELL:--disable-warning 359")
+    endif()
+    if(BUILD_TESTING)
+        # Keep test assertions active without filling the Z80 address space
+        # with expression strings. runtime.c supplies the failure handler.
+        add_compile_options("-Wp-include,${PROJECT_SOURCE_DIR}/tests/sdcc/compat.h")
+    endif()
+endif()
+
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_XCODE_ATTRIBUTE_RUN_CLANG_STATIC_ANALYZER "YES")
 
 if(MSVC)
     # MSVC equivalent of -Wall -Wextra is /W4
     add_compile_options(/W4 /wd4200 /wd4996 /wd4130)
-else()
+elseif(NOT CMAKE_C_COMPILER_ID STREQUAL "SDCC")
     # For GCC and Clang
     add_compile_options(-Wall -Wextra -Wsign-compare -pedantic)
 endif()
@@ -46,6 +63,8 @@ endif()
 if(WARNINGS_AS_ERRORS AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     if(MSVC)
         add_compile_options(/WX)
+    elseif(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
+        add_compile_options(--Werror)
     else()
         add_compile_options(-Werror)
     endif()
@@ -79,7 +98,7 @@ endif()
 if(MSVC)
     # MSVC equivalent of -Wall -Wextra is /W4
     add_compile_options(/W4 /wd4200 /wd4996 /wd4130)
-else()
+elseif(NOT CMAKE_C_COMPILER_ID STREQUAL "SDCC")
     # For GCC and Clang
     add_compile_options(-Wall -Wextra -Wsign-conversion -pedantic)
 endif()
@@ -100,9 +119,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "clang")
 endif()
 
 set(SOURCES
-    ArgUtils.c
-    CSV.c
-    FileRWInt.c
     IntDict.c
     IntDictVIt.c
     LinkedList.c
@@ -111,17 +127,18 @@ set(SOURCES
     StrInflate.c
     StrTail.c
     StringBuf2.c
-    StringBuf3.c
     StringBuff.c
-    TrigTable.c
 )
 
+if(NOT CMAKE_C_COMPILER_ID STREQUAL "SDCC")
+    list(APPEND SOURCES ArgUtils.c CSV.c FileRWInt.c StringBuf3.c TrigTable.c)
+    if(NOT MSVC)
+        list(APPEND SOURCES Strdup.c)
+    endif()
+endif()
+
 if(NOT MSVC)
-    list(APPEND SOURCES
-        Strdup.c
-        Stricmp.c
-        Strnicmp.c
-    )
+    list(APPEND SOURCES Stricmp.c Strnicmp.c)
 endif()
 
 file(GLOB PUBLIC_HEADERS "*.h")
@@ -139,6 +156,15 @@ set_target_properties(CBUtil PROPERTIES
 )
 
 target_include_directories(CBUtil PUBLIC .)
+
+if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
+    # SDCC's library lacks FILE streams and formatted buffer append.
+    target_compile_definitions(CBUtil PUBLIC CBUTIL_SDCC)
+    if(BUILD_TESTING)
+        set_source_files_properties(${SOURCES} PROPERTIES
+            OBJECT_DEPENDS "${PROJECT_SOURCE_DIR}/tests/sdcc/compat.h")
+    endif()
+endif()
 
 if(USE_FORTIFY)
     target_link_libraries(CBUtil PRIVATE Fortify)
@@ -158,9 +184,7 @@ install(TARGETS CBUtil
     PUBLIC_HEADER DESTINATION include
 )
 
-include(CTest)
-
-if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+if(BUILD_TESTING AND IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
     add_subdirectory(tests)
 
     # The tests call Fortify's fault-injection interface directly. Fortify is

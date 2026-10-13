@@ -106,22 +106,27 @@ no longer predefined.
 
 Building with SDCC
 ------------------
-  The SDCC build uses a separate script rather than CMake. It builds and
-runs tests for a Z80 subset: linked lists, dictionaries, string utilities,
-macros and string buffers without formatted append, with _Optional enabled.
-
-  Use SDCC trunk r16999 with sdcc, sdar and ucsim_z80 on PATH. The script
-also requires Bash, Python 3 and GNU timeout. From the checkout, run:
+  CMake's SDCC Z80 toolchain builds a subset: linked lists, dictionaries,
+string utilities, macros and string buffers without formatted append.
+Use SDCC trunk r16999 with sdcc and sdar on PATH. Running tests also
+requires ucsim_z80 and Python 3.8 or later. From the checkout, run:
 
 ```sh
-  bash tests/sdcc/run.sh
+  cmake -S . -B build-sdcc -DCMAKE_TOOLCHAIN_FILE=cmake/sdcc-z80.cmake \
+    -DUSE_OPTIONAL=ON -DWARNINGS_AS_ERRORS=ON
+  cmake --build build-sdcc
+  ctest --test-dir build-sdcc --output-on-failure
 ```
 
-  To build and run one test group, append its name, for example:
+  To run one test group, select it with CTest, for example:
 
 ```sh
-  bash tests/sdcc/run.sh IntDict
+  ctest --test-dir build-sdcc -R '^IntDict$' --output-on-failure
 ```
+
+  To build only the library without simulator dependencies, configure with
+-DBUILD_TESTING=OFF. Applications using string dictionaries must provide abort,
+which SDCC's Z80 library omits; the test runtime supplies its own definition.
 
 Licence and disclaimer
 ----------------------

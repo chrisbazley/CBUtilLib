@@ -41,7 +41,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#ifdef CBUTIL_FREESTANDING
+#ifdef CBUTIL_SDCC
 /* SDCC's Z80 library provides printf, but no FILE streams. */
 #ifdef DEBUG_OUTPUT
 #define DEBUGF(...) printf(__VA_ARGS__)
@@ -54,7 +54,7 @@
 #define DEBUGF(...) ((void)0)
 #define DEBUG_VERBOSEF(...) ((void)0)
 #endif
-#else /* CBUTIL_FREESTANDING */
+#else /* CBUTIL_SDCC */
 
 #if defined(DEBUG_VERBOSE_OUTPUT) && defined (DEBUG_OUTPUT)
 #define DEBUG_VERBOSEF(...) if (1) fprintf(stderr, __VA_ARGS__)
@@ -68,7 +68,7 @@
 #define DEBUGF(...) if (0) fprintf(stderr, __VA_ARGS__)
 #endif /* DEBUG_OUTPUT */
 
-#endif /* CBUTIL_FREESTANDING */
+#endif /* CBUTIL_SDCC */
 
 #endif /* USE_CBDEBUG */
 

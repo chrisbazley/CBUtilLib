@@ -31,7 +31,10 @@ jobs:
       - name: Compile, link and run portable tests
         run: |
           sdcc --version
-          bash tests/sdcc/run.sh
+          cmake -S . -B build-sdcc -DCMAKE_TOOLCHAIN_FILE=cmake/sdcc-z80.cmake \
+            -DUSE_OPTIONAL=ON -DWARNINGS_AS_ERRORS=ON
+          cmake --build build-sdcc --parallel 2
+          ctest --test-dir build-sdcc --output-on-failure
 
       - name: Upload simulator logs
         if: always()
@@ -39,7 +42,7 @@ jobs:
         with:
           name: sdcc-z80
           path: |
-            build-sdcc/*-output.log
-            build-sdcc/*-simulator.log
-            build-sdcc/*.map
+            build-sdcc/tests/sdcc/*-output.log
+            build-sdcc/tests/sdcc/*-simulator.log
+            build-sdcc/tests/sdcc/*.map
           if-no-files-found: ignore
