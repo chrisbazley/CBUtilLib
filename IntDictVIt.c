@@ -39,21 +39,12 @@ _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
          "within range (%" PRIIntDictKey ",%" PRIIntDictKey ")\n",
          (void *)dict, intdict_count(dict), min_key, max_key);
 
-#ifdef __SDCC
-  /* Avoid SDCC's internal error on this compound literal assignment. */
   IntDictVIter const initial = {
     .dict = dict,
     .next_index = intdict_bisect_left(dict, min_key),
     .end = intdict_bisect_right(dict, max_key),
   };
   *iter = initial;
-#else
-  *iter = (IntDictVIter){
-    .dict = dict,
-    .next_index = intdict_bisect_left(dict, min_key),
-    .end = intdict_bisect_right(dict, max_key),
-  };
-#endif
 
   return intdictviter_advance(iter);
 }
@@ -66,21 +57,12 @@ _Optional void *intdictviter_all_init(IntDictVIter *const iter,
   DEBUGF("Start iterating over values in dictionary %p of %zu\n", (void *)dict,
          intdict_count(dict));
 
-#ifdef __SDCC
-  /* Avoid SDCC's internal error on this compound literal assignment. */
   IntDictVIter const initial = {
     .dict = dict,
     .next_index = 0,
     .end = intdict_count(dict),
   };
   *iter = initial;
-#else
-  *iter = (IntDictVIter){
-    .dict = dict,
-    .next_index = 0,
-    .end = intdict_count(dict),
-  };
-#endif
 
   return intdictviter_advance(iter);
 }

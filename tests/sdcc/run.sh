@@ -27,8 +27,9 @@ Path(sys.argv[1]).unlink(missing_ok=True)
 PY_CLEAN
 sdar -rc "$build_dir/CBUtil.lib" "${objects[@]}"
 # Separate programs keep each test group small and identify failures.
-groups=(List:LinkedList IntDic:intdict StrDic:strdict PtrDic:ptrdict
-        StrBuf:StringBuffer StrExt:StrExtra Macro:MacroUtils)
+groups=(List:List:LinkedList IntDict:IntDic:intdict StrDic:StrDic:strdict
+        PtrDic:PtrDic:ptrdict StrBuf:StrBuf:StringBuffer StrExt:StrExt:StrExtra
+        Macro:Macro:MacroUtils)
 if [[ "${1:-all}" != all ]]; then
   selected=()
   for group in "${groups[@]}"; do
@@ -43,9 +44,9 @@ if [[ "${1:-all}" != all ]]; then
   groups=("${selected[@]}")
 fi
 for group in "${groups[@]}"; do
-  name="${group%%:*}"
-  function="${group#*:}_tests"
-  sdcc "${flags[@]}" -c "tests/${name}Test.c" -o "$build_dir/$name.rel"
+  IFS=: read -r name source function <<< "$group"
+  function+="_tests"
+  sdcc "${flags[@]}" -c "tests/${source}Test.c" -o "$build_dir/$name.rel"
   sdcc "${flags[@]}" -DTEST_FUNCTION="$function" -c tests/sdcc/runtime.c \
     -o "$build_dir/$name-runtime.rel"
   sdcc -mz80 --data-loc 0xf000 "$build_dir/$name-runtime.rel" \

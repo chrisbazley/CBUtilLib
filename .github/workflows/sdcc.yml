@@ -11,13 +11,9 @@ permissions:
 
 jobs:
   z80:
-    name: Z80 ${{ matrix.group }} runtime tests
+    name: Z80 runtime tests
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        group: [List, IntDic, StrDic, PtrDic, StrBuf, StrExt, Macro]
     steps:
       - uses: actions/checkout@v4
 
@@ -35,13 +31,13 @@ jobs:
       - name: Compile, link and run portable tests
         run: |
           sdcc --version
-          bash tests/sdcc/run.sh "${{ matrix.group }}"
+          bash tests/sdcc/run.sh
 
       - name: Upload simulator logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sdcc-z80-${{ matrix.group }}
+          name: sdcc-z80
           path: |
             build-sdcc/*-output.log
             build-sdcc/*-simulator.log

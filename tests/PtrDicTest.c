@@ -57,14 +57,8 @@ static void record_callbacks(void *key, _Optional void *value, void *arg)
   assert(callback_count < ARRAY_SIZE(callbacks));
   DEBUGF("Callback %zu: key %p, value %p, arg %p\n", callback_count, key, value,
          arg);
-#ifdef __SDCC
-  /* Avoid the same pointer-initializer ICE as in the library iterators. */
   struct CBInfo const info = {.key = key, .value = value, .arg = arg};
   callbacks[callback_count++] = info;
-#else
-  callbacks[callback_count++] =
-    (struct CBInfo){.key = key, .value = value, .arg = arg};
-#endif
 }
 
 static void never_call_me(void *key, _Optional void *value, void *arg)

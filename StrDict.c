@@ -67,13 +67,8 @@ void strdict_init_compare(StrDict *const dict,
   DEBUGF("Initializing string dictionary %p\n", (void *)dict);
   assert(dict);
   assert(compare);
-#ifdef __SDCC
-  /* SDCC cannot compile this compound literal with a pointer initializer. */
   StrDict const initial = {.compare = compare};
   *dict = initial;
-#else
-  *dict = (StrDict){.compare = compare};
-#endif
   stringbuffer_init(&dict->buffer);
 }
 
@@ -307,12 +302,8 @@ bool strdict_insert(StrDict *const dict, char const *const key,
   }
 
   assert(ins_index < dict->nalloc);
-#ifdef __SDCC
-  array[ins_index].key = key;
-  array[ins_index].value = value;
-#else
-  array[ins_index] = (StrDictItem){.key = key, .value = value};
-#endif
+  StrDictItem const item = {.key = key, .value = value};
+  array[ins_index] = item;
 
   assert(dict->nitems < dict->nalloc);
   dict->nitems++;

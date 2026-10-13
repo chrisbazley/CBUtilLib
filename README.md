@@ -120,7 +120,7 @@ also requires Bash, Python 3 and GNU timeout. From the checkout, run:
   To build and run one test group, append its name, for example:
 
 ```sh
-  bash tests/sdcc/run.sh IntDic
+  bash tests/sdcc/run.sh IntDict
 ```
 
 Licence and disclaimer
