@@ -104,6 +104,36 @@ the required header files. The dependency on CBDebugLib isn't very strong: it
 can be eliminated by modifying the make file so that the macro USE_CBDEBUG is
 no longer predefined.
 
+SDCC continuous integration
+---------------------------
+The SDCC job compiles a portable subset with SDCC trunk r16999 for Z80 and runs
+existing tests in uCsim. Each group is linked separately to fit in the
+16-bit address space. The script checks the linked memory regions against
+the reserved simulator, heap and stack areas. Both library and test
+assertions remain enabled,
+and an explicit completion marker is required for success.
+
+Coverage includes linked lists, integer/string/pointer dictionaries,
+string buffers (except formatted append), string utilities, and macros.
+File I/O, argument parsing, CSV parsing, trigonometry, formatted append,
+and Fortify fault injection are outside this job. SDCC's Z80 library
+omits the hosted interfaces required by these components. The strdup
+fallback is also excluded because SDCC already supplies that function.
+
+USE_OPTIONAL remains enabled. The freestanding build includes the allocation
+and string wrappers, but omits hosted and numeric conversion wrappers not
+needed by this subset. Warnings are errors except for SDCC optimizer messages
+110/126 and null-pointer inference warnings 355/358/359. The latter still
+occur on guarded structure members and after assertions in this trunk
+snapshot; this job checks runtime behaviour and qualifier type checking,
+but does not enforce those three null-pointer inference diagnostics.
+
+With SDCC and ucsim_z80 on PATH, run `bash tests/sdcc/run.sh` from the
+checkout, optionally adding a group name (for example, `IntDic`). CI runs
+the seven groups as separate matrix jobs. CBUTIL_FREESTANDING selects debug output without FILE streams
+and excludes the two formatted-append tests. It does not make every
+CBUtilLib module available in a freestanding environment.
+
 Licence and disclaimer
 ----------------------
   This library is free software; you can redistribute it and/or modify it

@@ -47,10 +47,18 @@ static void test_values(void)
 #pragma warning(push)
 #pragma warning(disable:4293)
 #endif
+#ifdef __SDCC
+  /* Like MSVC, SDCC diagnoses shifts in the unselected branch. */
+#pragma save
+#pragma disable_warning 116
+#endif
   assert(SIGNED_R_SHIFT(8, 1) == 4);
   assert(SIGNED_R_SHIFT(4, neg_one) == 8);
   assert(SIGNED_L_SHIFT(4, 1) == 8);
   assert(SIGNED_L_SHIFT(8, neg_one) == 4);
+#ifdef __SDCC
+#pragma restore
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
