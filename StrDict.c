@@ -67,7 +67,8 @@ void strdict_init_compare(StrDict *const dict,
   DEBUGF("Initializing string dictionary %p\n", (void *)dict);
   assert(dict);
   assert(compare);
-  *dict = (StrDict){.compare = compare};
+  StrDict const initial = {.compare = compare};
+  *dict = initial;
   stringbuffer_init(&dict->buffer);
 }
 
@@ -301,7 +302,8 @@ bool strdict_insert(StrDict *const dict, char const *const key,
   }
 
   assert(ins_index < dict->nalloc);
-  array[ins_index] = (StrDictItem){.key = key, .value = value};
+  StrDictItem const item = {.key = key, .value = value};
+  array[ins_index] = item;
 
   assert(dict->nitems < dict->nalloc);
   dict->nitems++;

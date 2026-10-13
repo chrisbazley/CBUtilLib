@@ -1,0 +1,48 @@
+name: SDCC
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  z80:
+    name: Z80 runtime tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download SDCC trunk r16999
+        shell: bash
+        run: |
+          archive="$RUNNER_TEMP/sdcc.tar.bz2"
+          curl --fail --location --retry 3 --max-time 180 \
+            https://downloads.sourceforge.net/project/sdcc/snapshot_builds/amd64-unknown-linux2.5/sdcc-snapshot-amd64-unknown-linux2.5-20261013-16999-cf-x86.tar.bz2 \
+            --output "$archive"
+          echo "272e6e72ab490c9508865c49f9e9bf70594995b8b34319506c8c78d3d65b58e0  $archive" | sha256sum --check
+          tar --no-same-owner -xjf "$archive" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/sdcc/bin" >> "$GITHUB_PATH"
+
+      - name: Compile, link and run portable tests
+        run: |
+          sdcc --version
+          cmake -S . -B build-sdcc -DCMAKE_TOOLCHAIN_FILE=cmake/sdcc-z80.cmake \
+            -DUSE_OPTIONAL=ON -DWARNINGS_AS_ERRORS=ON
+          cmake --build build-sdcc --parallel 2
+          ctest --test-dir build-sdcc --output-on-failure
+
+      - name: Upload simulator logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdcc-z80
+          path: |
+            build-sdcc/tests/sdcc/*-output.log
+            build-sdcc/tests/sdcc/*-simulator.log
+            build-sdcc/tests/sdcc/*.map
+          if-no-files-found: ignore

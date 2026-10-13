@@ -53,6 +53,11 @@
 
 #include "StringBuff.h"
 
+#ifdef CBUTIL_SDCC
+/* SDCC's Z80 stdlib omits abort; applications must supply its definition. */
+void abort(void);
+#endif
+
 #if !defined(USE_OPTIONAL) && !defined(_Optional)
 #define _Optional
 #endif

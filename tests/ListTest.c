@@ -441,7 +441,9 @@ static void test13(void)
   }
 
   size_t j = 0;
-  for (_Optional LinkedListItem *p = linkedlist_get_tail(&list); p != NULL;
+  /* SDCC loses the for-scope declaration when inlining the step expression. */
+  _Optional LinkedListItem *p;
+  for (p = linkedlist_get_tail(&list); p != NULL;
        p = linkedlist_get_prev(&*p), ++j)
   {
     assert(j < ARRAY_SIZE(items));
@@ -467,7 +469,9 @@ static void test14(void)
   }
 
   size_t j = 0;
-  for (_Optional LinkedListItem *p = linkedlist_get_head(&list); p != NULL;
+  /* SDCC loses the for-scope declaration when inlining the step expression. */
+  _Optional LinkedListItem *p;
+  for (p = linkedlist_get_head(&list); p != NULL;
        p = linkedlist_get_next(&*p), ++j)
   {
     assert(j < ARRAY_SIZE(items));

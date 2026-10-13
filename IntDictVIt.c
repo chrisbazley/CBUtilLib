@@ -39,11 +39,12 @@ _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
          "within range (%" PRIIntDictKey ",%" PRIIntDictKey ")\n",
          (void *)dict, intdict_count(dict), min_key, max_key);
 
-  *iter = (IntDictVIter){
+  IntDictVIter const initial = {
     .dict = dict,
     .next_index = intdict_bisect_left(dict, min_key),
     .end = intdict_bisect_right(dict, max_key),
   };
+  *iter = initial;
 
   return intdictviter_advance(iter);
 }
@@ -56,11 +57,12 @@ _Optional void *intdictviter_all_init(IntDictVIter *const iter,
   DEBUGF("Start iterating over values in dictionary %p of %zu\n", (void *)dict,
          intdict_count(dict));
 
-  *iter = (IntDictVIter){
+  IntDictVIter const initial = {
     .dict = dict,
     .next_index = 0,
     .end = intdict_count(dict),
   };
+  *iter = initial;
 
   return intdictviter_advance(iter);
 }

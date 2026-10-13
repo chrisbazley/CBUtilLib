@@ -133,6 +133,8 @@ bool stringbuffer_append_separated(StringBuffer * /*buffer*/,
  *          but could not be allocated.
  */
 
+#ifndef CBUTIL_SDCC
+/* Formatted append requires a hosted vsnprintf implementation. */
 bool stringbuffer_vprintf(StringBuffer * /*buffer*/, const char * /*format*/,
                           va_list /*args*/);
 /*
@@ -161,6 +163,8 @@ static inline bool stringbuffer_printf(StringBuffer *const buffer,
  * Returns: true if successful, or false if additional space was required
  *          but could not be allocated.
  */
+
+#endif /* !CBUTIL_SDCC */
 
 void stringbuffer_truncate(StringBuffer * /*buffer*/, size_t /*len*/);
 /*

@@ -57,8 +57,8 @@ static void record_callbacks(void *key, _Optional void *value, void *arg)
   assert(callback_count < ARRAY_SIZE(callbacks));
   DEBUGF("Callback %zu: key %p, value %p, arg %p\n", callback_count, key, value,
          arg);
-  callbacks[callback_count++] =
-    (struct CBInfo){.key = key, .value = value, .arg = arg};
+  struct CBInfo const info = {.key = key, .value = value, .arg = arg};
+  callbacks[callback_count++] = info;
 }
 
 static void never_call_me(void *key, _Optional void *value, void *arg)

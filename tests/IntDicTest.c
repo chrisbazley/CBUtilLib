@@ -1032,7 +1032,7 @@ static void test34(void)
 static void test35(void)
 {
   IntDict dict;
-  IntDictKey const keys[NumberOfKeys] = {81220, 161083};
+  IntDictKey const keys[NumberOfKeys] = {8122, 16108};
   int values[NumberOfKeys * NumberOfDuplicates];
 
   memset(&dict, CHAR_MAX, sizeof(dict));
@@ -1113,7 +1113,7 @@ static void test35(void)
 static void test36(void)
 {
   IntDict dict;
-  IntDictKey const keys[NumberOfKeys] = {81220, 161083};
+  IntDictKey const keys[NumberOfKeys] = {8122, 16108};
   int values[NumberOfKeys * NumberOfDuplicates];
 
   memset(&dict, CHAR_MAX, sizeof(dict));
@@ -1160,7 +1160,7 @@ static void test36(void)
 static void test37(void)
 {
   IntDict dict;
-  IntDictKey const keys[NumberOfKeys] = {81220, 161083};
+  IntDictKey const keys[NumberOfKeys] = {8122, 16108};
   int values[NumberOfKeys * NumberOfDuplicates];
 
   memset(&dict, CHAR_MAX, sizeof(dict));

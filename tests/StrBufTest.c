@@ -705,6 +705,8 @@ static void test21(void)
 #endif
 }
 
+#ifndef CBUTIL_SDCC
+/* These tests require vsnprintf, which the SDCC Z80 library omits. */
 static void test22(void)
 {
   /* Append formatted string */
@@ -768,6 +770,8 @@ static void test23(void)
 #endif
 }
 
+#endif /* !CBUTIL_SDCC */
+
 void StringBuffer_tests(void)
 {
   static const struct
@@ -796,8 +800,10 @@ void StringBuffer_tests(void)
     {"Undo append separated", test19},
     {"Minimize after append separated", test20},
     {"Append separated fail recovery", test21},
+#ifndef CBUTIL_SDCC
     {"Append formatted", test22},
     {"Append formatted fail recovery", test23},
+#endif
   };
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)

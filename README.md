@@ -104,6 +104,30 @@ the required header files. The dependency on CBDebugLib isn't very strong: it
 can be eliminated by modifying the make file so that the macro USE_CBDEBUG is
 no longer predefined.
 
+Building with SDCC
+------------------
+  CMake's SDCC Z80 toolchain builds a subset: linked lists, dictionaries,
+string utilities, macros and string buffers without formatted append.
+Use SDCC trunk r16999 with sdcc and sdar on PATH. Running tests also
+requires ucsim_z80 and Python 3.8 or later. From the checkout, run:
+
+```sh
+  cmake -S . -B build-sdcc -DCMAKE_TOOLCHAIN_FILE=cmake/sdcc-z80.cmake \
+    -DUSE_OPTIONAL=ON -DWARNINGS_AS_ERRORS=ON
+  cmake --build build-sdcc
+  ctest --test-dir build-sdcc --output-on-failure
+```
+
+  To run one test group, select it with CTest, for example:
+
+```sh
+  ctest --test-dir build-sdcc -R '^IntDict$' --output-on-failure
+```
+
+  To build only the library without simulator dependencies, configure with
+-DBUILD_TESTING=OFF. Applications using string dictionaries must provide abort,
+which SDCC's Z80 library omits; the test runtime supplies its own definition.
+
 Licence and disclaimer
 ----------------------
   This library is free software; you can redistribute it and/or modify it
