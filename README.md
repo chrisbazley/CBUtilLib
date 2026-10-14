@@ -109,7 +109,8 @@ Building with SDCC
   CMake's SDCC Z80 toolchain builds a subset: linked lists, dictionaries,
 string utilities, macros and string buffers without formatted append.
 Use SDCC trunk r16999 with sdcc and sdar on PATH. Running tests also
-requires ucsim_z80 and Python 3.8 or later. From the checkout, run:
+requires ucsim_z80. Enforcing other compiler warnings as errors also requires
+Python 3.8 or later. From the checkout, run:
 
 ```sh
   cmake -S . -B build-sdcc -DCMAKE_TOOLCHAIN_FILE=cmake/sdcc-z80.cmake \
@@ -123,6 +124,10 @@ requires ucsim_z80 and Python 3.8 or later. From the checkout, run:
 ```sh
   ctest --test-dir build-sdcc -R '^IntDict$' --output-on-failure
 ```
+
+  All _Optional warnings are displayed. Warnings 355, 358 and 359 remain
+non-fatal because of SDCC analysis limitations; WARNINGS_AS_ERRORS still
+rejects other warnings.
 
   To build only the library without simulator dependencies, configure with
 -DBUILD_TESTING=OFF. Applications using string dictionaries must provide abort,

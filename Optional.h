@@ -50,6 +50,8 @@ History:
  CJB: 27-Aug-26: Use more FORTIFY_INTERCEPTED_... macros to prevent problems
                  such as an unrecognized FILE * in Fortify because fopen was
                  redefined by this header.
+  CJB: 14-Oct-26: Omit interfaces unavailable in the SDCC library when
+                  CBUTIL_SDCC is set.
  */
 
 #ifndef Optional_h

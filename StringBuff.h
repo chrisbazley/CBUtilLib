@@ -33,6 +33,8 @@ History:
   CJB: 10-Aug-22: Converted the most trivial functions into inline functions.
   CJB: 24-Sep-23: Added functions to append a formatted string.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 14-Oct-26: Omit formatted append declarations when building the
+                  SDCC subset.
  */
 
 #ifndef StringBuff_h

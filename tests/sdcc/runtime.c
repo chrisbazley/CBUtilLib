@@ -18,20 +18,20 @@ int putchar(int c)
   return (unsigned char)c;
 }
 
-static void stop(void)
+_Noreturn static void stop(void)
 {
   simif = 's';
   for (;;) {}
 }
 
-void abort(void)
+_Noreturn void abort(void)
 {
   puts("CBUTIL TEST ABORT");
   stop();
 }
 
 /* Stop immediately on failure; a simulator exit alone is not a test pass. */
-void cbutil_sdcc_assert(unsigned int line)
+_Noreturn void cbutil_sdcc_assert(unsigned int line)
 {
   printf("ASSERT FAIL at line %u\n", line);
   stop();

@@ -20,6 +20,8 @@
 /* History:
   CJB: 21-Sep-26: Move the generic macro tests from CBLibrary and extend them
                   to cover the definitions now exported by CBUtilLib.
+  CJB: 14-Oct-26: Suppress SDCC warnings about shifts in deliberately
+                  unselected branches.
 */
 
 #include <stdlib.h>

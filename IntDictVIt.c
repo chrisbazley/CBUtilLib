@@ -23,6 +23,8 @@
                   included header files redefine macros such as assert().
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 31-May-26: Use PRIIntDictKey instead of "ld" as format specifier.
+  CJB: 14-Oct-26: Use named initializers to avoid an SDCC compound
+                  literal failure.
  */
 
 /* Local headers */

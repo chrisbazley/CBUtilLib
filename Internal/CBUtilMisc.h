@@ -23,6 +23,8 @@
   CJB: 21-Sep-26: Use the public generic macro definitions.
   CJB: 22-Sep-26: Remove a redundant include of PseudoIO.h because fortify.h
                   already enables standard I/O interception.
+  CJB: 14-Oct-26: Use printf for SDCC debug output because FILE streams
+                  are unavailable.
 */
 
 #ifndef CBUtilMisc_h
