@@ -2,6 +2,7 @@
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 
 NON_FATAL = {355, 358, 359}
@@ -28,8 +29,12 @@ def main():
     sys.stderr.write(result.stderr)
     if result.returncode:
         return result.returncode
-    fatal = fatal_warnings(result.stderr)
+    fatal = fatal_warnings(result.stderr + "\n" + result.stdout)
     if fatal:
+        # A produced object must not let a later incremental build skip
+        # the compilation that failed our warning policy.
+        if "-o" in command:
+            Path(command[command.index("-o") + 1]).unlink(missing_ok=True)
         sys.stderr.write("SDCC emitted fatal warnings:\n" + "\n".join(fatal) + "\n")
         return 1
     return 0

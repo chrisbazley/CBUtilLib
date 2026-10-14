@@ -64,8 +64,7 @@ if(WARNINGS_AS_ERRORS AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
             find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
             set(CMAKE_C_COMPILER_LAUNCHER
                 "${Python3_EXECUTABLE}"
-                "${PROJECT_SOURCE_DIR}/cmake/sdcc-diagnostics.py"
-                )
+                "${PROJECT_SOURCE_DIR}/cmake/sdcc-diagnostics.py")
         endif()
     else()
         add_compile_options(-Werror)

@@ -108,9 +108,9 @@ Building with SDCC
 ------------------
   CMake's SDCC Z80 toolchain builds a subset: linked lists, dictionaries,
 string utilities, macros and string buffers without formatted append.
-Use SDCC trunk r16999 with sdcc and sdar on PATH. Running tests also
-requires ucsim_z80. Enforcing other compiler warnings as errors also requires
-Python 3.8 or later. From the checkout, run:
+Use SDCC trunk r16999 with sdcc and sdar on PATH. Tests and _Optional
+warning handling require Python 3.8 or later; tests also require ucsim_z80.
+From the checkout, run:
 
 ```sh
   cmake -S . -B build-sdcc -DCMAKE_TOOLCHAIN_FILE=cmake/sdcc-z80.cmake \
