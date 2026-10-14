@@ -41,6 +41,8 @@
   CJB: 01-Sep-26: Unqualify the return type of strdict_get_key_at because it
                   cannot return null unless an invariant is violated.
   CJB: 02-Sep-26: Conditionally abort in strdict_get_value_at too.
+  CJB: 14-Oct-26: Declare abort for SDCC Z80 applications that supply
+                  its definition.
  */
 
 #ifndef StrDict_h
@@ -55,7 +57,7 @@
 
 #ifdef CBUTIL_SDCC
 /* SDCC's Z80 stdlib omits abort; applications must supply its definition. */
-void abort(void);
+_Noreturn void abort(void);
 #endif
 
 #if !defined(USE_OPTIONAL) && !defined(_Optional)

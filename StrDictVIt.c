@@ -22,6 +22,8 @@
   CJB: 17-Jun-23: Include "CBUtilMisc.h" last in case any of the other
                   included header files redefine macros such as assert().
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 14-Oct-26: Use a temporary object to avoid SDCC's failure on
+                  compound literal assignments.
  */
 
 /* Local headers */

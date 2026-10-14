@@ -37,11 +37,6 @@ include(CTest)
 if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
     add_compile_options(--std-c99 --max-allocs-per-node 100
         "SHELL:--disable-warning 110" "SHELL:--disable-warning 126")
-    # Keep _Optional type checking while exempting inference limitations.
-    if(USE_OPTIONAL)
-        add_compile_options("SHELL:--disable-warning 355"
-            "SHELL:--disable-warning 358" "SHELL:--disable-warning 359")
-    endif()
     if(BUILD_TESTING)
         # Keep test assertions active without filling the Z80 address space
         # with expression strings. runtime.c supplies the failure handler.
@@ -65,6 +60,12 @@ if(WARNINGS_AS_ERRORS AND CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         add_compile_options(/WX)
     elseif(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
         add_compile_options(--Werror)
+        if(USE_OPTIONAL)
+            find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
+            set(CMAKE_C_COMPILER_LAUNCHER
+                "${Python3_EXECUTABLE}"
+                "${PROJECT_SOURCE_DIR}/cmake/sdcc-diagnostics.py")
+        endif()
     else()
         add_compile_options(-Werror)
     endif()

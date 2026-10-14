@@ -40,6 +40,8 @@
   CJB: 31-Aug-26: Add the strdict_init_compare function to allow alternative
                   string comparison functions to be used.
   CJB: 28-Sep-26: Use the bsearch result when it finds a matching item.
+  CJB: 14-Oct-26: Use a temporary object to avoid SDCC's failure on
+                  compound literal assignments.
  */
 
 #include <stdbool.h>
