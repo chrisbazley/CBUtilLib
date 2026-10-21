@@ -17,14 +17,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download SDCC trunk r16999
+      - name: Download SDCC trunk r17038
         shell: bash
         run: |
           archive="$RUNNER_TEMP/sdcc.tar.bz2"
           curl --fail --location --retry 3 --max-time 180 \
-            https://downloads.sourceforge.net/project/sdcc/snapshot_builds/amd64-unknown-linux2.5/sdcc-snapshot-amd64-unknown-linux2.5-20261013-16999-cf-x86.tar.bz2 \
+            https://downloads.sourceforge.net/project/sdcc/snapshot_builds/amd64-unknown-linux2.5/sdcc-snapshot-amd64-unknown-linux2.5-20261020-17038-cf-x86.tar.bz2 \
             --output "$archive"
-          echo "272e6e72ab490c9508865c49f9e9bf70594995b8b34319506c8c78d3d65b58e0  $archive" | sha256sum --check
+          echo "3ab6d3c55ff119aefdd44a624c52566bda2fb0e789c41ec88c7ade233a1fccb2  $archive" | sha256sum --check
           tar --no-same-owner -xjf "$archive" -C "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/sdcc/bin" >> "$GITHUB_PATH"
 
