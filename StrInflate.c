@@ -38,6 +38,8 @@
                   Ensure the output string is always truncated in the right
                   place and always terminated if the output buffer is too small.
   CJB: 02-Aug-26: Deal with optional-qualified referenced type of strpbrk.
+  CJB: 21-Oct-26: Use a null output pointer when the buffer size is zero,
+                  and guard output operations directly with that pointer.
 */
 
 /* ISO library headers */
@@ -49,15 +51,15 @@
 #include "Internal/CBUtilMisc.h"
 #include "StrExtra.h"
 
-size_t strinflate(_Optional char *const s1, size_t n, const char *s2,
+size_t strinflate(_Optional char *s1, size_t const n, const char *s2,
                   const char *const srch, const char *const rplc[])
 {
   assert(s2 != NULL);
   assert(rplc != NULL);
 
-  if (s1 == NULL)
+  if (n == 0)
   {
-    n = 0;
+    s1 = NULL;
   }
 
   size_t count = 0, nout = 0;
@@ -89,7 +91,7 @@ size_t strinflate(_Optional char *const s1, size_t n, const char *s2,
     assert(nout <= n);
     size_t avail = n - nout;
 
-    if (avail > 0)
+    if (s1)
     {
       if (len >= avail)
       {
@@ -128,7 +130,7 @@ size_t strinflate(_Optional char *const s1, size_t n, const char *s2,
     len = strlen(r);
     count += len;
 
-    if (avail > 0)
+    if (s1)
     {
       if (len >= avail)
       {
@@ -149,14 +151,11 @@ size_t strinflate(_Optional char *const s1, size_t n, const char *s2,
     s2 = i + 1; /* skip the character that was inflated */
   }
 
-  if (nout < n)
+  if (s1)
   {
+    assert(nout < n);
     s1[nout] = '\0'; /* append a nul terminator */
     DEBUGF("Inflated string is '%s'\n", s1);
-  }
-  else
-  {
-    assert(n == 0);
   }
 
   /* Return the number of characters that would have been written had a
