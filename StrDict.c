@@ -42,6 +42,8 @@
   CJB: 28-Sep-26: Use the bsearch result when it finds a matching item.
   CJB: 14-Oct-26: Use a temporary object to avoid SDCC's failure on
                   compound literal assignments.
+  CJB: 22-Oct-26: Restore compound literal assignments now SDCC bug #4151
+                  is fixed in the CI compiler.
  */
 
 #include <stdbool.h>
@@ -69,8 +71,7 @@ void strdict_init_compare(StrDict *const dict,
   DEBUGF("Initializing string dictionary %p\n", (void *)dict);
   assert(dict);
   assert(compare);
-  StrDict const initial = {.compare = compare};
-  *dict = initial;
+  *dict = (StrDict){.compare = compare};
   stringbuffer_init(&dict->buffer);
 }
 
@@ -304,8 +305,7 @@ bool strdict_insert(StrDict *const dict, char const *const key,
   }
 
   assert(ins_index < dict->nalloc);
-  StrDictItem const item = {.key = key, .value = value};
-  array[ins_index] = item;
+  array[ins_index] = (StrDictItem){.key = key, .value = value};
 
   assert(dict->nitems < dict->nalloc);
   dict->nitems++;

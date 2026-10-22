@@ -24,6 +24,8 @@
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 14-Oct-26: Use a temporary object to avoid SDCC's failure on
                   compound literal assignments.
+  CJB: 22-Oct-26: Restore compound literal assignments now SDCC bug #4151
+                  is fixed in the CI compiler.
  */
 
 /* Local headers */
@@ -42,12 +44,11 @@ _Optional void *strdictviter_init(StrDictVIter *const iter, StrDict *const dict,
          "within range (%s,%s)\n",
          (void *)dict, dict->nitems, min_key, max_key);
 
-  StrDictVIter const initial = {
+  *iter = (StrDictVIter){
     .dict = dict,
     .next_index = strdict_bisect_left(dict, min_key),
     .end = strdict_bisect_right(dict, max_key),
   };
-  *iter = initial;
 
   return strdictviter_advance(iter);
 }
@@ -60,12 +61,11 @@ _Optional void *strdictviter_all_init(StrDictVIter *const iter,
   DEBUGF("Start iterating over values in dictionary %p of %zu\n", (void *)dict,
          strdict_count(dict));
 
-  StrDictVIter const initial = {
+  *iter = (StrDictVIter){
     .dict = dict,
     .next_index = 0,
     .end = strdict_count(dict),
   };
-  *iter = initial;
 
   return strdictviter_advance(iter);
 }

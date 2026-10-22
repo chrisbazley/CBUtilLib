@@ -25,6 +25,8 @@
   CJB: 31-May-26: Use PRIIntDictKey instead of "ld" as format specifier.
   CJB: 14-Oct-26: Use a temporary object to avoid SDCC's failure on
                   compound literal assignments.
+  CJB: 22-Oct-26: Restore compound literal assignments now SDCC bug #4151
+                  is fixed in the CI compiler.
  */
 
 /* Local headers */
@@ -41,12 +43,11 @@ _Optional void *intdictviter_init(IntDictVIter *const iter, IntDict *const dict,
          "within range (%" PRIIntDictKey ",%" PRIIntDictKey ")\n",
          (void *)dict, intdict_count(dict), min_key, max_key);
 
-  IntDictVIter const initial = {
+  *iter = (IntDictVIter){
     .dict = dict,
     .next_index = intdict_bisect_left(dict, min_key),
     .end = intdict_bisect_right(dict, max_key),
   };
-  *iter = initial;
 
   return intdictviter_advance(iter);
 }
@@ -59,12 +60,11 @@ _Optional void *intdictviter_all_init(IntDictVIter *const iter,
   DEBUGF("Start iterating over values in dictionary %p of %zu\n", (void *)dict,
          intdict_count(dict));
 
-  IntDictVIter const initial = {
+  *iter = (IntDictVIter){
     .dict = dict,
     .next_index = 0,
     .end = intdict_count(dict),
   };
-  *iter = initial;
 
   return intdictviter_advance(iter);
 }
