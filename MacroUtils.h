@@ -40,6 +40,8 @@ History:
   CJB: 21-Sep-26: Move generally useful definitions from CBLibrary. Harden
                   CONTAINER_OF with a debug null check and, in C23, exact
                   member pointer type checking including qualifiers.
+  CJB: 25-Oct-26: Make the definition of PI conditional because it is also
+                  defined by SDCC's <math.h>.
 */
 
 #ifndef MacroUtils_h
@@ -90,7 +92,10 @@ History:
 #define ABSDIFF(lvalue, x, y) \
   (lvalue) = (((x) > (y)) ? (x) - (y) : (y) - (x))
 
+#ifndef PI
 #define PI (3.1415926535897896)
+#endif
+
 #define STRING_OR_NULL(s) ((s) == NULL ? "" : &*(s))
 
 #define TEST_BITS(value, bits) (((value) & (bits)) != 0)
