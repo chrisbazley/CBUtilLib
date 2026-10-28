@@ -39,9 +39,9 @@ enum
 
 static struct
 {
-  _Optional LinkedList *list;
-  _Optional LinkedListItem *item;
-  _Optional void *arg;
+  LinkedList *list;
+  LinkedListItem *item;
+  void *arg;
 } callbacks[NumberOfItems];
 
 static size_t callback_count;

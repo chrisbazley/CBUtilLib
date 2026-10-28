@@ -45,9 +45,9 @@ enum
 
 static struct CBInfo
 {
-  _Optional void *key;
+  void *key;
   _Optional void *value;
-  _Optional void *arg;
+  void *arg;
 } callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;

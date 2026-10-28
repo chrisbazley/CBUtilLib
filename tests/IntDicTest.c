@@ -47,7 +47,7 @@ static struct CBInfo
 {
   IntDictKey key;
   _Optional void *value;
-  _Optional void *arg;
+  void *arg;
 } callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;
