@@ -33,69 +33,79 @@
 /* Local headers */
 #include "Tests.h"
 
+/* Counted non-null argument vectors; the parser does not use an argv sentinel.
+   Use at file scope so both the vectors and their case tables have static
+   storage duration. sizeof computes the count without evaluating a vector. */
+typedef struct
+{
+  int argc;
+  const char *const *argv;
+} Arguments;
+
+#define ARGUMENTS(...)                                                   \
+  {                                                                      \
+    .argc = (int)(sizeof((const char *const[]){__VA_ARGS__}) /              \
+                  sizeof(const char *)),                                 \
+    .argv = (const char *const[]){__VA_ARGS__},                            \
+  }
+
+/* Long integer argument parsing */
+typedef struct
+{
+  long int min, max, value;
+  Arguments args;
+  int n;
+  bool success;
+} LongArgTestCase;
+
+static const LongArgTestCase long_arg_cases[] = {
+  // Argument selection
+  {LONG_MIN, LONG_MAX, 23, ARGUMENTS("23"), 0, true},
+  {LONG_MIN, LONG_MAX, 10, ARGUMENTS("5", "10"), 1, true},
+  {LONG_MIN, LONG_MAX, 444,
+   ARGUMENTS("1", "67", "43", "2", "444", "65", "6"), 4, true},
+  // Invalid argument index (treated as missing argument)
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("23"), 1, false},
+  // Value out of range
+  {1, 2, 0, ARGUMENTS("0"), 0, false},
+  {0, 1, 0, ARGUMENTS("2"), 0, false},
+  // Switch in place of expected numeric argument
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-foo"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("- 1"), 0, false},
+  // Interesting number formats
+  {LONG_MIN, LONG_MAX, 8, ARGUMENTS("010"), 0, true},
+  {LONG_MIN, LONG_MAX, 16, ARGUMENTS("0x10"), 0, true},
+  // Invalid number formats
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("2.999"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13E2"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("1300e-1"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("x13"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13x"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("1+1"), 0, false},
+  // These should never happen unless argument parsing is broken
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS(" 13"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS(" -13"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13 "), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-13 "), 0, false},
+  // Extreme values
+  {LONG_MIN, LONG_MAX, -2147483647L - 1, ARGUMENTS("-2147483648"), 0, true},
+  {LONG_MIN, LONG_MAX, 2147483647, ARGUMENTS("2147483647"), 0, true},
+};
+
 static void test1(void)
 {
-  /* Long integer argument parsing */
-  typedef const struct
-  {
-    long int min, max;
-    int n, argc;
-    const char *argv[10];
-    bool success;
-    long int value;
-  } TestCase;
-
-  static TestCase cases[] = {
-    // Argument selection
-    {LONG_MIN, LONG_MAX, 0, 1, {"23"}, true, 23},
-    {LONG_MIN, LONG_MAX, 1, 2, {"5", "10"}, true, 10},
-    {LONG_MIN,
-     LONG_MAX,
-     4,
-     7,
-     {"1", "67", "43", "2", "444", "65", "6"},
-     true,
-     444},
-    // Invalid argument index (treated as missing argument)
-    {LONG_MIN, LONG_MAX, 1, 1, {"23"}, false, 0},
-    // Value out of range
-    {1, 2, 0, 1, {"0"}, false, 0},
-    {0, 1, 0, 1, {"2"}, false, 0},
-    // Switch in place of expected numeric argument
-    {LONG_MIN, LONG_MAX, 0, 1, {"-foo"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"- 1"}, false, 0},
-    // Interesting number formats
-    {LONG_MIN, LONG_MAX, 0, 1, {"010"}, true, 8},
-    {LONG_MIN, LONG_MAX, 0, 1, {"0x10"}, true, 16},
-    // Invalid number formats
-    {LONG_MIN, LONG_MAX, 0, 1, {"2.999"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"13E2"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"1300e-1"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"x13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"13x"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"1+1"}, false, 0},
-    // These should never happen unless argument parsing is broken
-    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {" -13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, {"-13 "}, false, 0},
-    // Extreme values
-    {LONG_MIN, LONG_MAX, 0, 1, {"-2147483648"}, true, -2147483647L - 1},
-    {LONG_MIN, LONG_MAX, 0, 1, {"2147483647"}, true, 2147483647},
-  };
-
-  FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
+  FOR_EACH_ELEM_PTR(const LongArgTestCase *, cp, long_arg_cases)
   {
     long int value = 123456;
-    assert(cp->argc <= (int)ARRAY_SIZE(cp->argv));
 
     printf(
       "Expecting %s (%ld) from argument %d of %d (%s) with range %ld,%ld\n",
-      cp->success ? "success" : "failure", cp->value, cp->n, cp->argc,
-      cp->n < cp->argc ? cp->argv[cp->n] : "?", cp->min, cp->max);
+      cp->success ? "success" : "failure", cp->value, cp->n, cp->args.argc,
+      cp->n < cp->args.argc ? cp->args.argv[cp->n] : "?", cp->min, cp->max);
 
     bool const success =
-      get_long_arg("test", &value, cp->min, cp->max, cp->argc, cp->argv, cp->n);
+      get_long_arg("test", &value, cp->min, cp->max,
+                   cp->args.argc, cp->args.argv, cp->n);
 
     assert(success == cp->success);
     if (success)
@@ -105,68 +115,61 @@ static void test1(void)
   }
 }
 
+/* Floating point argument parsing */
+typedef struct
+{
+  double min, max, value;
+  Arguments args;
+  int n;
+  bool success;
+} DoubleArgTestCase;
+
+static const DoubleArgTestCase double_arg_cases[] = {
+  // Argument selection
+  {-DBL_MAX, DBL_MAX, 23, ARGUMENTS("23"), 0, true},
+  {-DBL_MAX, DBL_MAX, 10, ARGUMENTS("5", "10"), 1, true},
+  {-DBL_MAX, DBL_MAX, 444,
+   ARGUMENTS("1", "67", "43", "2", "444", "65", "6"), 4, true},
+  // Invalid argument index (treated as missing argument)
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("23"), 1, false},
+  // Value out of range
+  {1, 2, 0, ARGUMENTS("0"), 0, false},
+  {0, 1, 0, ARGUMENTS("2"), 0, false},
+  // Switch in place of expected numeric argument
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-foo"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("- 1"), 0, false},
+  // Interesting number formats
+  {-DBL_MAX, DBL_MAX, 8, ARGUMENTS("010"), 0, true},
+  {-DBL_MAX, DBL_MAX, 16, ARGUMENTS("0x10"), 0, true},
+  {-DBL_MAX, DBL_MAX, 2.999, ARGUMENTS("2.999"), 0, true},
+  {-DBL_MAX, DBL_MAX, 1300, ARGUMENTS("13E2"), 0, true},
+  {-DBL_MAX, DBL_MAX, 130, ARGUMENTS("1300e-1"), 0, true},
+  // Invalid number formats
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("x13"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13x"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("1+1"), 0, false},
+  // These should never happen unless argument parsing is broken
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS(" 13"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS(" -13"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13 "), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-13 "), 0, false},
+  // Extreme values
+  {-DBL_MAX, DBL_MAX, -1.79769e+308, ARGUMENTS("-1.79769e+308"), 0, true},
+  {-DBL_MAX, DBL_MAX, 1.79769e+308, ARGUMENTS("1.79769e+308"), 0, true},
+};
+
 static void test2(void)
 {
-  /* Floating point argument parsing */
-  typedef const struct
-  {
-    double min, max;
-    int n, argc;
-    const char *argv[10];
-    bool success;
-    double value;
-  } TestCase;
-
-  static TestCase cases[] = {
-    // Argument selection
-    {-DBL_MAX, DBL_MAX, 0, 1, {"23"}, true, 23},
-    {-DBL_MAX, DBL_MAX, 1, 2, {"5", "10"}, true, 10},
-    {-DBL_MAX,
-     DBL_MAX,
-     4,
-     7,
-     {"1", "67", "43", "2", "444", "65", "6"},
-     true,
-     444},
-    // Invalid argument index (treated as missing argument)
-    {-DBL_MAX, DBL_MAX, 1, 1, {"23"}, false, 0},
-    // Value out of range
-    {1, 2, 0, 1, {"0"}, false, 0},
-    {0, 1, 0, 1, {"2"}, false, 0},
-    // Switch in place of expected numeric argument
-    {-DBL_MAX, DBL_MAX, 0, 1, {"-foo"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"- 1"}, false, 0},
-    // Interesting number formats
-    {-DBL_MAX, DBL_MAX, 0, 1, {"010"}, true, 8},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"0x10"}, true, 16},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"2.999"}, true, 2.999},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"13E2"}, true, 1300},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"1300e-1"}, true, 130},
-    // Invalid number formats
-    {-DBL_MAX, DBL_MAX, 0, 1, {"x13"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"13x"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"1+1"}, false, 0},
-    // These should never happen unless argument parsing is broken
-    {-DBL_MAX, DBL_MAX, 0, 1, {" 13"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {" -13"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"13 "}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"-13 "}, false, 0},
-    // Extreme values
-    {-DBL_MAX, DBL_MAX, 0, 1, {"-1.79769e+308"}, true, -1.79769e+308},
-    {-DBL_MAX, DBL_MAX, 0, 1, {"1.79769e+308"}, true, 1.79769e+308},
-  };
-
-  FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
+  FOR_EACH_ELEM_PTR(const DoubleArgTestCase *, cp, double_arg_cases)
   {
     double value = 123.456;
-    assert(cp->argc <= (int)ARRAY_SIZE(cp->argv));
 
     printf("Expecting %s (%g) from argument %d of %d (%s) with range %g,%g\n",
-           cp->success ? "success" : "failure", cp->value, cp->n, cp->argc,
-           cp->n < cp->argc ? cp->argv[cp->n] : "?", cp->min, cp->max);
+           cp->success ? "success" : "failure", cp->value, cp->n, cp->args.argc,
+           cp->n < cp->args.argc ? cp->args.argv[cp->n] : "?", cp->min, cp->max);
 
     bool const success = get_double_arg("test", &value, cp->min, cp->max,
-                                        cp->argc, cp->argv, cp->n);
+                                        cp->args.argc, cp->args.argv, cp->n);
 
     assert(success == cp->success);
     if (success)

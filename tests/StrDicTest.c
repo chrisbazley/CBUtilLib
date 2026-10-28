@@ -45,9 +45,9 @@ enum
 
 static struct CBInfo
 {
-  const char *key;
+  _Optional const char *key;
   _Optional void *value;
-  void *arg;
+  _Optional void *arg;
 } callbacks[NumberOfItems * NumberOfDuplicates];
 
 static size_t callback_count;
@@ -1160,7 +1160,8 @@ static void test35(void)
   {
     size_t const k = i / NumberOfDuplicates;
 
-    assert(stricmp(callbacks[i].key, keys[k]) == 0);
+    assert(callbacks[i].key != NULL);
+    assert(stricmp(&*callbacks[i].key, keys[k]) == 0);
 
     bool found_value = false;
     for (size_t l = 0; l < NumberOfDuplicates && !found_value; ++l)
