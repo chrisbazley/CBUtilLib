@@ -52,49 +52,44 @@ typedef struct
 /* Long integer argument parsing */
 typedef struct
 {
-  long int min, max;
-  int n;
+  long int min, max, value;
   Arguments args;
+  int n;
   bool success;
-  long int value;
 } LongArgTestCase;
 
 static const LongArgTestCase long_arg_cases[] = {
   // Argument selection
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("23"), true, 23},
-  {LONG_MIN, LONG_MAX, 1, ARGUMENTS("5", "10"), true, 10},
-  {LONG_MIN,
-   LONG_MAX,
-   4,
-   ARGUMENTS("1", "67", "43", "2", "444", "65", "6"),
-   true,
-   444},
+  {LONG_MIN, LONG_MAX, 23, ARGUMENTS("23"), 0, true},
+  {LONG_MIN, LONG_MAX, 10, ARGUMENTS("5", "10"), 1, true},
+  {LONG_MIN, LONG_MAX, 444,
+   ARGUMENTS("1", "67", "43", "2", "444", "65", "6"), 4, true},
   // Invalid argument index (treated as missing argument)
-  {LONG_MIN, LONG_MAX, 1, ARGUMENTS("23"), false, 0},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("23"), 1, false},
   // Value out of range
-  {1, 2, 0, ARGUMENTS("0"), false, 0},
-  {0, 1, 0, ARGUMENTS("2"), false, 0},
+  {1, 2, 0, ARGUMENTS("0"), 0, false},
+  {0, 1, 0, ARGUMENTS("2"), 0, false},
   // Switch in place of expected numeric argument
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-foo"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("- 1"), false, 0},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-foo"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("- 1"), 0, false},
   // Interesting number formats
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("010"), true, 8},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("0x10"), true, 16},
+  {LONG_MIN, LONG_MAX, 8, ARGUMENTS("010"), 0, true},
+  {LONG_MIN, LONG_MAX, 16, ARGUMENTS("0x10"), 0, true},
   // Invalid number formats
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("2.999"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13E2"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("1300e-1"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("x13"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13x"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("1+1"), false, 0},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("2.999"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13E2"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("1300e-1"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("x13"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13x"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("1+1"), 0, false},
   // These should never happen unless argument parsing is broken
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS(" 13"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS(" -13"), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13 "), false, 0},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-13 "), false, 0},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS(" 13"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS(" -13"), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("13 "), 0, false},
+  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-13 "), 0, false},
   // Extreme values
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("-2147483648"), true, -2147483647L - 1},
-  {LONG_MIN, LONG_MAX, 0, ARGUMENTS("2147483647"), true, 2147483647},
+  {LONG_MIN, LONG_MAX, -2147483647L - 1, ARGUMENTS("-2147483648"), 0, true},
+  {LONG_MIN, LONG_MAX, 2147483647, ARGUMENTS("2147483647"), 0, true},
 };
 
 static void test1(void)
@@ -123,49 +118,44 @@ static void test1(void)
 /* Floating point argument parsing */
 typedef struct
 {
-  double min, max;
-  int n;
+  double min, max, value;
   Arguments args;
+  int n;
   bool success;
-  double value;
 } DoubleArgTestCase;
 
 static const DoubleArgTestCase double_arg_cases[] = {
   // Argument selection
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("23"), true, 23},
-  {-DBL_MAX, DBL_MAX, 1, ARGUMENTS("5", "10"), true, 10},
-  {-DBL_MAX,
-   DBL_MAX,
-   4,
-   ARGUMENTS("1", "67", "43", "2", "444", "65", "6"),
-   true,
-   444},
+  {-DBL_MAX, DBL_MAX, 23, ARGUMENTS("23"), 0, true},
+  {-DBL_MAX, DBL_MAX, 10, ARGUMENTS("5", "10"), 1, true},
+  {-DBL_MAX, DBL_MAX, 444,
+   ARGUMENTS("1", "67", "43", "2", "444", "65", "6"), 4, true},
   // Invalid argument index (treated as missing argument)
-  {-DBL_MAX, DBL_MAX, 1, ARGUMENTS("23"), false, 0},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("23"), 1, false},
   // Value out of range
-  {1, 2, 0, ARGUMENTS("0"), false, 0},
-  {0, 1, 0, ARGUMENTS("2"), false, 0},
+  {1, 2, 0, ARGUMENTS("0"), 0, false},
+  {0, 1, 0, ARGUMENTS("2"), 0, false},
   // Switch in place of expected numeric argument
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-foo"), false, 0},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("- 1"), false, 0},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-foo"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("- 1"), 0, false},
   // Interesting number formats
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("010"), true, 8},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("0x10"), true, 16},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("2.999"), true, 2.999},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13E2"), true, 1300},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("1300e-1"), true, 130},
+  {-DBL_MAX, DBL_MAX, 8, ARGUMENTS("010"), 0, true},
+  {-DBL_MAX, DBL_MAX, 16, ARGUMENTS("0x10"), 0, true},
+  {-DBL_MAX, DBL_MAX, 2.999, ARGUMENTS("2.999"), 0, true},
+  {-DBL_MAX, DBL_MAX, 1300, ARGUMENTS("13E2"), 0, true},
+  {-DBL_MAX, DBL_MAX, 130, ARGUMENTS("1300e-1"), 0, true},
   // Invalid number formats
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("x13"), false, 0},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13x"), false, 0},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("1+1"), false, 0},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("x13"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13x"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("1+1"), 0, false},
   // These should never happen unless argument parsing is broken
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS(" 13"), false, 0},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS(" -13"), false, 0},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13 "), false, 0},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-13 "), false, 0},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS(" 13"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS(" -13"), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("13 "), 0, false},
+  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-13 "), 0, false},
   // Extreme values
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("-1.79769e+308"), true, -1.79769e+308},
-  {-DBL_MAX, DBL_MAX, 0, ARGUMENTS("1.79769e+308"), true, 1.79769e+308},
+  {-DBL_MAX, DBL_MAX, -1.79769e+308, ARGUMENTS("-1.79769e+308"), 0, true},
+  {-DBL_MAX, DBL_MAX, 1.79769e+308, ARGUMENTS("1.79769e+308"), 0, true},
 };
 
 static void test2(void)
