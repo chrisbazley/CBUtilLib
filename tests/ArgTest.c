@@ -40,53 +40,54 @@ static void test1(void)
   {
     long int min, max;
     int n, argc;
-    const char *const *argv;
+    const char *argv[10];
     bool success;
     long int value;
   } TestCase;
 
-  TestCase cases[] = {
+  static TestCase cases[] = {
     // Argument selection
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"23"}, true, 23},
-    {LONG_MIN, LONG_MAX, 1, 2, (const char *const[]){"5", "10"}, true, 10},
+    {LONG_MIN, LONG_MAX, 0, 1, {"23"}, true, 23},
+    {LONG_MIN, LONG_MAX, 1, 2, {"5", "10"}, true, 10},
     {LONG_MIN,
      LONG_MAX,
      4,
      7,
-     (const char *const[]){"1", "67", "43", "2", "444", "65", "6"},
+     {"1", "67", "43", "2", "444", "65", "6"},
      true,
      444},
     // Invalid argument index (treated as missing argument)
-    {LONG_MIN, LONG_MAX, 1, 1, (const char *const[]){"23"}, false, 0},
+    {LONG_MIN, LONG_MAX, 1, 1, {"23"}, false, 0},
     // Value out of range
-    {1, 2, 0, 1, (const char *const[]){"0"}, false, 0},
-    {0, 1, 0, 1, (const char *const[]){"2"}, false, 0},
+    {1, 2, 0, 1, {"0"}, false, 0},
+    {0, 1, 0, 1, {"2"}, false, 0},
     // Switch in place of expected numeric argument
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"-foo"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"- 1"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-foo"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"- 1"}, false, 0},
     // Interesting number formats
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"010"}, true, 8},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"0x10"}, true, 16},
+    {LONG_MIN, LONG_MAX, 0, 1, {"010"}, true, 8},
+    {LONG_MIN, LONG_MAX, 0, 1, {"0x10"}, true, 16},
     // Invalid number formats
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"2.999"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"13E2"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"1300e-1"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"x13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"13x"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"1+1"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"2.999"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13E2"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"1300e-1"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"x13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13x"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"1+1"}, false, 0},
     // These should never happen unless argument parsing is broken
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){" 13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){" -13"}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"13 "}, false, 0},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"-13 "}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {" 13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {" -13"}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"13 "}, false, 0},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-13 "}, false, 0},
     // Extreme values
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"-2147483648"}, true, -2147483647L - 1},
-    {LONG_MIN, LONG_MAX, 0, 1, (const char *const[]){"2147483647"}, true, 2147483647},
+    {LONG_MIN, LONG_MAX, 0, 1, {"-2147483648"}, true, -2147483647L - 1},
+    {LONG_MIN, LONG_MAX, 0, 1, {"2147483647"}, true, 2147483647},
   };
 
   FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
   {
     long int value = 123456;
+    assert(cp->argc <= (int)ARRAY_SIZE(cp->argv));
 
     printf(
       "Expecting %s (%ld) from argument %d of %d (%s) with range %ld,%ld\n",
@@ -111,53 +112,54 @@ static void test2(void)
   {
     double min, max;
     int n, argc;
-    const char *const *argv;
+    const char *argv[10];
     bool success;
     double value;
   } TestCase;
 
-  TestCase cases[] = {
+  static TestCase cases[] = {
     // Argument selection
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"23"}, true, 23},
-    {-DBL_MAX, DBL_MAX, 1, 2, (const char *const[]){"5", "10"}, true, 10},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"23"}, true, 23},
+    {-DBL_MAX, DBL_MAX, 1, 2, {"5", "10"}, true, 10},
     {-DBL_MAX,
      DBL_MAX,
      4,
      7,
-     (const char *const[]){"1", "67", "43", "2", "444", "65", "6"},
+     {"1", "67", "43", "2", "444", "65", "6"},
      true,
      444},
     // Invalid argument index (treated as missing argument)
-    {-DBL_MAX, DBL_MAX, 1, 1, (const char *const[]){"23"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 1, 1, {"23"}, false, 0},
     // Value out of range
-    {1, 2, 0, 1, (const char *const[]){"0"}, false, 0},
-    {0, 1, 0, 1, (const char *const[]){"2"}, false, 0},
+    {1, 2, 0, 1, {"0"}, false, 0},
+    {0, 1, 0, 1, {"2"}, false, 0},
     // Switch in place of expected numeric argument
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"-foo"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"- 1"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"-foo"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"- 1"}, false, 0},
     // Interesting number formats
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"010"}, true, 8},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"0x10"}, true, 16},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"2.999"}, true, 2.999},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"13E2"}, true, 1300},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"1300e-1"}, true, 130},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"010"}, true, 8},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"0x10"}, true, 16},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"2.999"}, true, 2.999},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13E2"}, true, 1300},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"1300e-1"}, true, 130},
     // Invalid number formats
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"x13"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"13x"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"1+1"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"x13"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13x"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"1+1"}, false, 0},
     // These should never happen unless argument parsing is broken
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){" 13"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){" -13"}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"13 "}, false, 0},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"-13 "}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {" 13"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {" -13"}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"13 "}, false, 0},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"-13 "}, false, 0},
     // Extreme values
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"-1.79769e+308"}, true, -1.79769e+308},
-    {-DBL_MAX, DBL_MAX, 0, 1, (const char *const[]){"1.79769e+308"}, true, 1.79769e+308},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"-1.79769e+308"}, true, -1.79769e+308},
+    {-DBL_MAX, DBL_MAX, 0, 1, {"1.79769e+308"}, true, 1.79769e+308},
   };
 
   FOR_EACH_ELEM_PTR(TestCase *, cp, cases)
   {
     double value = 123.456;
+    assert(cp->argc <= (int)ARRAY_SIZE(cp->argv));
 
     printf("Expecting %s (%g) from argument %d of %d (%s) with range %g,%g\n",
            cp->success ? "success" : "failure", cp->value, cp->n, cp->argc,
