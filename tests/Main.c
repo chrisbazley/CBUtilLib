@@ -27,8 +27,7 @@
 
 #ifdef FORTIFY
 static int fortify_detected;
-typedef void FortifyOutputFn(const char *);
-static _Optional FortifyOutputFn *fortify_previous_output;
+static Fortify_OutputFuncPtr fortify_previous_output;
 
 static void fortify_check(void)
 {
@@ -38,7 +37,6 @@ static void fortify_check(void)
 
 static void fortify_output(const char *text)
 {
-  assert(fortify_previous_output != NULL);
   fortify_previous_output(text);
   if (strstr(text, "detected"))
     fortify_detected = 1;
