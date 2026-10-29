@@ -52,8 +52,8 @@ History:
                  redefined by this header.
   CJB: 14-Oct-26: Omit interfaces unavailable in the SDCC library when
                   CBUTIL_SDCC is set.
-  CJB: 27-Oct-26: Preserve NULL and enable null pointer conversion warnings
-                  when Clang supports -Wnull-to-nonoptional.
+  CJB: 27-Oct-26: Preserve NULL when Clang supports -Wnull-to-nonoptional.
+  CJB: 29-Oct-26: Leave diagnostic severity to the build options.
  */
 
 #ifndef Optional_h
@@ -81,11 +81,9 @@ History:
 #include "fortify.h"
 #endif
 
-/* Prefer diagnostics for all null pointer constants when available. */
+/* Preserve NULL when the compiler can diagnose null pointer conversions. */
 #ifdef __clang__
-#if __has_warning("-Wnull-to-nonoptional")
-#pragma clang diagnostic warning "-Wnull-to-nonoptional"
-#else
+#if !__has_warning("-Wnull-to-nonoptional")
 #undef NULL
 #define NULL ((_Optional void *)0)
 #endif

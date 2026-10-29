@@ -142,6 +142,35 @@ jobs:
             -fsyntax-only \
             "$RUNNER_TEMP/optional-smoke-test.c"
 
+      - name: Verify null conversion errors
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/null-conversion.c" <<'EOF'
+          #include <sys/types.h>
+          #include "Optional.h"
+          #ifdef REQUIRED_POINTER
+          int *value = 0;
+          #else
+          _Optional int *value = 0;
+          #endif
+          EOF
+
+          clang -std=c99 -DUSE_OPTIONAL -I "$GITHUB_WORKSPACE" \
+            -Werror=null-to-nonoptional -fsyntax-only \
+            "$RUNNER_TEMP/null-conversion.c"
+
+          if clang -std=c99 -DUSE_OPTIONAL -DREQUIRED_POINTER \
+            -I "$GITHUB_WORKSPACE" -Werror=null-to-nonoptional \
+            -fsyntax-only "$RUNNER_TEMP/null-conversion.c" \
+            > "$RUNNER_TEMP/null-conversion.log" 2>&1; then
+            cat "$RUNNER_TEMP/null-conversion.log"
+            echo "A null constant assigned to a required pointer must fail"
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/null-conversion.log"
+          grep -E 'error:.*null pointer constant' \
+            "$RUNNER_TEMP/null-conversion.log"
+
       - name: Configure with _Optional
         shell: bash
         run: |
