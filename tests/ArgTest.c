@@ -17,6 +17,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/* History:
+  CJB: 28-Oct-26: Bundle argument counts and vectors using the ARGUMENTS
+                  macro and exactly sized compound literals. Keep the vectors
+                  and case tables static and const, without null padding.
+                  Reorder case members to reduce structure padding.
+*/
+
 /* ISO library headers */
 #include <assert.h>
 #include <float.h>
