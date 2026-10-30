@@ -23,7 +23,6 @@
 */
 
 /* ISO library headers */
-#include <stdbool.h>
 #include <stddef.h>
 
 /* Local headers */

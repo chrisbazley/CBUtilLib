@@ -26,7 +26,6 @@
 /* ISO library headers */
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 /* Local headers */
 #include "Internal/CBUtilMisc.h"
