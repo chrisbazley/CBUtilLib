@@ -51,9 +51,7 @@
 
 /* ISO library headers */
 #include <limits.h>
-#include <stdarg.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
