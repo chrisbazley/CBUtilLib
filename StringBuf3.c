@@ -43,12 +43,10 @@ bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format,
                  format, (void *)buffer, strb_cptr(&buffer->storage));
 
   size_t const pos = strb_tell(&buffer->storage);
+  strb_setmode(&buffer->storage, strb_overwrite);
   if (strb_vputf(&buffer->storage, format, args) == 0)
   {
-    strb_delto(&buffer->storage, SIZE_MAX);
-    int const err = strb_split(&buffer->storage);
-    assert(err == 0); /* Formatting already reserved the new end. */
-    NOT_USED(err);
+    strb_split(&buffer->storage);
     buffer->undo_pos = pos;
     success = true;
   }
