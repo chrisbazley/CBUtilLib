@@ -35,6 +35,8 @@ History:
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 14-Oct-26: Omit formatted append declarations when building the
                   SDCC subset.
+  CJB: 09-Nov-26: Embed strb_t in StringBuffer and retain the previous editing
+                  position for undo.
  */
 
 #ifndef StringBuff_h
