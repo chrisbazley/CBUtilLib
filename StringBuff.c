@@ -86,15 +86,11 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
      Keep the editing position at the logical end until finish_append. */
   size_t const pos = strb_tell(&buffer->storage);
   size_t const size = *min_size ? *min_size : 1;
+  strb_setmode(&buffer->storage, strb_overwrite);
   strb_restore(&buffer->storage);
-  /* Discard an unfinished reservation in insertion mode. Overwrite mode
-     retains the suffix that may still be needed by undo. */
-  strb_delto(&buffer->storage, SIZE_MAX);
   free_ptr = strb_write(&buffer->storage, size - 1);
   strb_seek(&buffer->storage, pos);
-  int const err = strb_split(&buffer->storage);
-  assert(err == 0); /* The old position already has storage. */
-  NOT_USED(err);
+  strb_split(&buffer->storage);
   *min_size = free_ptr ? size : 0;
 
   DEBUG_VERBOSEF("StringBuff: %zu bytes prepared at %p\n", *min_size,
@@ -109,11 +105,7 @@ void stringbuffer_finish_append(StringBuffer *const buffer, size_t const n)
   size_t const pos = strb_tell(&buffer->storage);
   assert(n <= strb_len(&buffer->storage) - pos);
   strb_seek(&buffer->storage, pos + n);
-  /* In insertion mode, remove any prepared space that was not written. */
-  strb_delto(&buffer->storage, SIZE_MAX);
-  int const err = strb_split(&buffer->storage);
-  assert(err == 0); /* prepare_append already reserved this position. */
-  NOT_USED(err);
+  strb_split(&buffer->storage);
   buffer->undo_pos = pos;
   DEBUGF("StringBuff: Finished appending %zu bytes to buffer %p ('%s')\n", n,
          (void *)buffer, strb_cptr(&buffer->storage));
@@ -203,15 +195,12 @@ void stringbuffer_truncate(StringBuffer *const buffer, size_t const len)
   DEBUGF("StringBuff: Truncating buffer %p ('%s') to %zu bytes\n",
          (void *)buffer, strb_cptr(&buffer->storage), len);
 
-  strb_setmode(&buffer->storage, strb_overwrite);
   size_t const pos = strb_tell(&buffer->storage);
   buffer->undo_pos = pos;
   if (len < pos)
   {
     strb_seek(&buffer->storage, len);
-    int const err = strb_split(&buffer->storage);
-    assert(err == 0); /* Truncation stays within existing storage. */
-    NOT_USED(err);
+    strb_split(&buffer->storage);
   }
 }
 

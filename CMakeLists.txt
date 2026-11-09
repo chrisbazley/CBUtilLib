@@ -181,8 +181,7 @@ if(NOT TARGET strb)
             ${strb_SOURCE_DIR}/strb_pos.c
             ${strb_SOURCE_DIR}/strb_error.c
             ${strb_SOURCE_DIR}/strb_write.c
-            ${strb_SOURCE_DIR}/strb_split.c
-            ${strb_SOURCE_DIR}/strb_delto.c)
+            ${strb_SOURCE_DIR}/strb_split.c)
         target_include_directories(strb PUBLIC ${strb_SOURCE_DIR})
         install(TARGETS strb ARCHIVE DESTINATION lib)
         install(FILES ${strb_SOURCE_DIR}/strb.h DESTINATION include)
