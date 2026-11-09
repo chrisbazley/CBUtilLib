@@ -21,6 +21,7 @@
   CJB: 24-Sep-23: New function to append a formatted string.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 07-Jun-26: Stop leaking a copy of the va_list if vsnprintf fails.
+  CJB: 09-Nov-26: Delegate formatted append to strb_vputf in overwrite mode.
 */
 
 /* ISO library headers */

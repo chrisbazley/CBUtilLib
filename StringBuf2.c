@@ -20,6 +20,7 @@
 /* History:
   CJB: 24-Sep-23: Moved undo function to this file.
   CJB: 07-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 09-Nov-26: Use strb_t editing positions and restoration to undo changes.
 */
 
 /* ISO library headers */

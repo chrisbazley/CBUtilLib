@@ -47,6 +47,9 @@
   CJB: 14-Jun-26: Assign a compound literal in stringbuffer_init to
                   guarantee full initialisation of new instances.
   CJB: 21-Sep-26: Declare variables when they are first assigned.
+  CJB: 09-Nov-26: Delegate character storage to strb_t and use its editing
+                  position as the logical length. Prepare output in overwrite
+                  mode and retain reserved storage for reuse.
 */
 
 /* ISO library headers */
