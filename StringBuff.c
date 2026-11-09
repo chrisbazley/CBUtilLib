@@ -59,89 +59,14 @@
 #include "Internal/CBUtilMisc.h"
 #include "StringBuff.h"
 
-#define GROWTH_FACTOR 2
-
-static bool realloc_buffer(StringBuffer *const buffer, size_t const new_size)
-{
-  _Optional void *new_buffer = NULL;
-  bool success = true;
-
-  assert(buffer != NULL);
-  if (new_size == 0)
-  {
-    DEBUGF("StringBuff: freeing %p (%zu bytes)\n", (void *)buffer->buffer,
-           buffer->buffer_size);
-    free(buffer->buffer);
-  }
-  else
-  {
-    DEBUGF("StringBuff: reallocating %p\n", (void *)buffer->buffer);
-    new_buffer = realloc(buffer->buffer, new_size);
-    if (new_buffer != NULL)
-    {
-      DEBUGF("StringBuff: reallocated at %p (%zu to %zu bytes)\n",
-             new_buffer, buffer->buffer_size, new_size);
-    }
-    else
-    {
-      DEBUGF("StringBuff: failed to reallocate %p (%zu to %zu bytes)\n",
-             (void *)buffer->buffer, buffer->buffer_size, new_size);
-      success = false;
-    }
-  }
-
-  if (success)
-  {
-    buffer->buffer = new_buffer;
-    buffer->buffer_size = new_size;
-  }
-
-  return success;
-}
-
-static bool ensure_size(StringBuffer *const buffer, size_t const min_size)
-{
-  bool success = true;
-
-  assert(buffer != NULL);
-  if (min_size > buffer->buffer_size)
-  {
-    const size_t new_size =
-      HIGHEST(min_size, buffer->buffer_size * GROWTH_FACTOR);
-    success = realloc_buffer(buffer, new_size);
-  }
-
-  return success;
-}
-
-static void set_len(StringBuffer *const buffer, size_t const new_len)
-{
-  assert(buffer != NULL);
-  assert(new_len < buffer->buffer_size);
-
-  buffer->undo_len = buffer->string_len;
-  buffer->string_len = new_len;
-
-  if (buffer->buffer)
-  {
-    /* To undo truncation we need to reinstate the character that was
-      overwritten by a nul terminator. */
-    buffer->undo_char = buffer->buffer[new_len];
-    buffer->buffer[new_len] = '\0';
-  }
-}
-
 void stringbuffer_init(StringBuffer *const buffer)
 {
   assert(buffer != NULL);
   DEBUGF("StringBuff: Initializing buffer %p\n", (void *)buffer);
 
   *buffer = (StringBuffer){
-    .buffer_size = 0,
-    .string_len = 0,
-    .buffer = NULL,
-    .undo_len = 0,
-    .undo_char = '\0',
+    .storage = STRB_INITIALIZER(0),
+    .undo_pos = 0,
   };
 }
 
@@ -154,28 +79,19 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
   assert(min_size != NULL);
   DEBUG_VERBOSEF(
     "StringBuff: Preparing to append %zu bytes to buffer %p ('%s')\n",
-    *min_size, (void *)buffer, STRING_OR_NULL(buffer->buffer));
+    *min_size, (void *)buffer, strb_cptr(&buffer->storage));
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
-  {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-  }
-
-  /* Ensure the string buffer is big enough for the existing string and
-     the number of bytes to be appended. */
-  size_t size = *min_size ? *min_size : 1; /* can't return null and succeed */
-  if (ensure_size(buffer, buffer->string_len + size) && buffer->buffer)
-  {
-    free_ptr = &*buffer->buffer + buffer->string_len;
-    *min_size = buffer->buffer_size - buffer->string_len;
-  }
-  else
-  {
-    *min_size = 0;
-  }
+  /* Restore the saved boundary before reserving space, then split there
+     again. This preserves pending truncation undo even if allocation fails.
+     Keep the editing position at the logical end until finish_append. */
+  size_t const pos = strb_tell(&buffer->storage);
+  size_t const size = *min_size ? *min_size : 1;
+  strb_setmode(&buffer->storage, strb_overwrite);
+  strb_restore(&buffer->storage);
+  free_ptr = strb_write(&buffer->storage, size - 1);
+  strb_seek(&buffer->storage, pos);
+  strb_split(&buffer->storage);
+  *min_size = free_ptr ? size : 0;
 
   DEBUG_VERBOSEF("StringBuff: %zu bytes prepared at %p\n", *min_size,
                  (void *)free_ptr);
@@ -186,9 +102,13 @@ _Optional char *stringbuffer_prepare_append(StringBuffer *const buffer,
 void stringbuffer_finish_append(StringBuffer *const buffer, size_t const n)
 {
   assert(buffer != NULL);
-  set_len(buffer, buffer->string_len + n);
+  size_t const pos = strb_tell(&buffer->storage);
+  assert(n <= strb_len(&buffer->storage) - pos);
+  strb_seek(&buffer->storage, pos + n);
+  strb_split(&buffer->storage);
+  buffer->undo_pos = pos;
   DEBUGF("StringBuff: Finished appending %zu bytes to buffer %p ('%s')\n", n,
-         (void *)buffer, STRING_OR_NULL(buffer->buffer));
+         (void *)buffer, strb_cptr(&buffer->storage));
 }
 
 bool stringbuffer_append_separated(StringBuffer *const buffer, const char sep,
@@ -221,15 +141,9 @@ bool stringbuffer_append(StringBuffer *const buffer,
   assert(buffer != NULL);
   DEBUG_VERBOSEF("StringBuff: Appending '%.*s' to buffer %p ('%s')\n",
                  (int)HIGHEST(n, INT_MAX), STRING_OR_NULL(tail), (void *)buffer,
-                 STRING_OR_NULL(buffer->buffer));
+                 strb_cptr(&buffer->storage));
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
-  {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-  }
+  assert(strb_tell(&buffer->storage) <= strb_len(&buffer->storage));
 
   /* Find the length of the tail string (if any was provided). */
   if (n > 0)
@@ -254,8 +168,6 @@ bool stringbuffer_append(StringBuffer *const buffer,
       stringbuffer_prepare_append(buffer, &min_size);
     if (free_ptr != NULL)
     {
-      assert(buffer->buffer != NULL);
-
       /* Copy characters from the tail string to the end of the existing
          string. */
       memcpy(&*free_ptr, STRING_OR_NULL(tail), extra_chars);
@@ -271,7 +183,7 @@ bool stringbuffer_append(StringBuffer *const buffer,
   else
   {
     /* Remove any previously-pending undo. */
-    buffer->undo_len = buffer->string_len;
+    buffer->undo_pos = strb_tell(&buffer->storage);
   }
 
   return success;
@@ -281,62 +193,50 @@ void stringbuffer_truncate(StringBuffer *const buffer, size_t const len)
 {
   assert(buffer != NULL);
   DEBUGF("StringBuff: Truncating buffer %p ('%s') to %zu bytes\n",
-         (void *)buffer, STRING_OR_NULL(buffer->buffer), len);
+         (void *)buffer, strb_cptr(&buffer->storage), len);
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
+  size_t const pos = strb_tell(&buffer->storage);
+  buffer->undo_pos = pos;
+  if (len < pos)
   {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-    assert(buffer->buffer[buffer->string_len] == '\0');
-  }
-
-  /* Attempting to truncate a string that is already shorter than or equal
-     to the specified number of characters has no effect. */
-  if (len < buffer->string_len)
-  {
-    /* Record the new string length and store a null terminator at
-       the appropriate place (remembering the character overwritten). */
-    set_len(buffer, len);
-  }
-  else
-  {
-    /* Remove any previously-pending undo. */
-    buffer->undo_len = buffer->string_len;
+    strb_seek(&buffer->storage, len);
+    strb_split(&buffer->storage);
   }
 }
 
 void stringbuffer_minimize(StringBuffer *const buffer)
 {
-  size_t min_size;
-
   assert(buffer != NULL);
   DEBUGF("StringBuff: Minimizing buffer %p ('%s')\n", (void *)buffer,
-         STRING_OR_NULL(buffer->buffer));
+         strb_cptr(&buffer->storage));
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
+  /* Minimizing always discards undo, including when allocation fails. */
+  size_t const len = strb_tell(&buffer->storage);
+  buffer->undo_pos = len;
+
+  if (len == 0)
   {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-    assert(buffer->buffer[buffer->string_len] == '\0');
-    min_size = buffer->string_len + 1; /* +1 for nul terminator */
+    strb_destroy(&buffer->storage);
+    strb_init(&buffer->storage, 0);
   }
   else
   {
-    min_size = 0;
-  }
-
-  /* Guard against trying to undo truncation after minimizing the buffer
-     size. This is deliberately simplistic to make the behaviour more
-     predictable. */
-  buffer->undo_len = buffer->string_len;
-
-  if (min_size < buffer->buffer_size)
-  {
-    (void)realloc_buffer(buffer, min_size);
+    /* strb_t has no in-place shrink operation. Rebuild with the smallest
+       initial allocation its policy permits, preserving the old value if
+       allocation fails. Copy the counted bytes, including embedded nuls. */
+    strb_t smaller;
+    strb_init(&smaller, len);
+    _Optional char *const chars = strb_write(&smaller, len);
+    if (chars)
+    {
+      memcpy(&*chars, strb_cptr(&buffer->storage), len);
+      strb_destroy(&buffer->storage);
+      buffer->storage = smaller;
+    }
+    else
+    {
+      strb_destroy(&smaller);
+    }
   }
 }
 
@@ -344,7 +244,7 @@ void stringbuffer_destroy(StringBuffer *const buffer)
 {
   assert(buffer != NULL);
   DEBUGF("StringBuff: Destroying buffer %p ('%s')\n", (void *)buffer,
-         STRING_OR_NULL(buffer->buffer));
+         strb_cptr(&buffer->storage));
 
-  (void)realloc_buffer(buffer, 0);
+  strb_destroy(&buffer->storage);
 }

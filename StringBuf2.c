@@ -33,49 +33,33 @@ void stringbuffer_undo(StringBuffer *const buffer)
 {
   assert(buffer != NULL);
   DEBUGF("StringBuff: Undoing last operation on buffer %p ('%s')\n",
-         (void *)buffer, STRING_OR_NULL(buffer->buffer));
+         (void *)buffer, strb_cptr(&buffer->storage));
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
+  size_t const pos = strb_tell(&buffer->storage);
+  if (buffer->undo_pos < pos)
   {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-    assert(buffer->buffer[buffer->string_len] == '\0');
-  }
-
-  if (buffer->undo_len < buffer->string_len)
-  {
-    /* Undo append by storing a null terminator at the old place. */
+    /* Undo append by splitting at its starting position. */
     DEBUGF("StringBuff: Undoing append (truncating to %zu)\n",
-           buffer->undo_len);
+           buffer->undo_pos);
 
-    if (buffer->buffer)
-    {
-      buffer->buffer[buffer->undo_len] = '\0';
-    }
+    stringbuffer_truncate(buffer, buffer->undo_pos);
   }
-  else if (buffer->undo_len > buffer->string_len)
+  else if (buffer->undo_pos > pos)
   {
-    /* Undo truncation by reinstating the character previously overwritten
-       by a null terminator. Pre-truncation terminator must be intact. */
+    /* Restore the character overwritten by the truncation's terminator. */
     DEBUGF("StringBuff: Undoing truncation (extending to %zu)\n",
-           buffer->undo_len);
+           buffer->undo_pos);
 
-    assert(buffer->undo_len < buffer->buffer_size);
-    if (buffer->buffer)
-    {
-      assert(buffer->buffer[buffer->undo_len] == '\0');
-      buffer->buffer[buffer->string_len] = buffer->undo_char;
-    }
+    strb_restore(&buffer->storage);
+    strb_seek(&buffer->storage, buffer->undo_pos);
   }
   else
   {
-    DEBUGF("StringBuff: Nothing to undo (length %zu)\n", buffer->undo_len);
+    DEBUGF("StringBuff: Nothing to undo (length %zu)\n", buffer->undo_pos);
   }
 
-  buffer->string_len = buffer->undo_len;
+  buffer->undo_pos = strb_tell(&buffer->storage);
 
   DEBUGF("StringBuff: buffer now contains '%s'\n",
-         STRING_OR_NULL(buffer->buffer));
+         strb_cptr(&buffer->storage));
 }
