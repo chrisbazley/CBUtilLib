@@ -47,26 +47,23 @@ History:
 #include <stddef.h> /* (for size_t) */
 #include <stdint.h>
 
+#include "strb.h"
+
 #if !defined(USE_OPTIONAL) && !defined(_Optional)
 #define _Optional
 #endif
 
 typedef struct
 {
-  size_t buffer_size;     /* No. of bytes of memory allocated for the 'buffer'
-                             array. Must be greater than string_len unless
-                             string_len is 0. */
-  size_t string_len;      /* Length of the string in the 'buffer' array, not
-                             including its nul terminator. */
-  _Optional char *buffer; /* Pointer to a dynamically-allocated character array
-                             containing the current string. May be NULL if
-                             buffer_size and string_len are both 0. */
-  size_t undo_len;        /* Length of the previous string in the 'buffer' array
-                             or equal to string_len if not possible to undo. */
-  char undo_char;         /* Character replaced by the nul terminator
-                             (to allow truncation to be undone). */
+  strb_t storage;         /* The editing position is the logical string length.
+                             The recorded length includes any undoable suffix
+                             or space prepared but not yet committed. */
+  size_t undo_pos;        /* Position before the last append or truncation,
+                             or the current position if undo is unavailable. */
 } StringBuffer;
 /*
+ * Maximum string length is STRB_MAX_SIZE - 1 characters.
+ *
  * Control structure for a string buffer (storage lifetime is under
  * client's control).
  */
@@ -75,7 +72,8 @@ void stringbuffer_init(StringBuffer * /*buffer*/);
 /*
  * Initializes a given string buffer. The caller must already have
  * allocated space for the 'buffer' control structure. The initial
- * content will be the empty string.
+ * content will be the empty string. No character storage is allocated
+ * until needed.
  */
 
 _Optional char *stringbuffer_prepare_append(StringBuffer * /*buffer*/,
@@ -181,16 +179,11 @@ static inline size_t stringbuffer_get_length(const StringBuffer *const buffer)
 {
   assert(buffer != NULL);
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
-  {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-    assert(buffer->buffer[buffer->string_len] == '\0');
-  }
+  size_t const pos = strb_tell(&buffer->storage);
+  assert(pos <= strb_len(&buffer->storage));
+  assert(strb_cptr(&buffer->storage)[pos] == '\0');
 
-  return buffer->string_len;
+  return pos;
 }
 /*
  * Gets the length in characters of the current string in a given buffer,
@@ -201,16 +194,12 @@ static inline char *stringbuffer_get_pointer(const StringBuffer *const buffer)
 {
   assert(buffer != NULL);
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
-  {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
-    assert(buffer->buffer[buffer->string_len] == '\0');
-  }
+  assert(strb_tell(&buffer->storage) <= strb_len(&buffer->storage));
+  assert(strb_cptr(&buffer->storage)[strb_tell(&buffer->storage)] == '\0');
 
-  return buffer->buffer ? &*buffer->buffer : "";
+  /* The const parameter protects metadata; the existing API returns a
+     mutable pointer for temporary modifications to the character array. */
+  return (char *)strb_cptr(&buffer->storage);
 }
 /*
  * Returns a direct pointer to the current string in a given buffer. May

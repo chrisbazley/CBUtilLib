@@ -280,8 +280,13 @@ static void test8(void)
   bool success = stringbuffer_append_all(&buffer, "foo");
   assert(success);
 
+  /* Exceed strb_t's initial allocation so this still tests growth failure. */
+  char tail[STRB_DFL_SIZE + 1];
+  memset(tail, 'x', sizeof(tail) - 1);
+  tail[sizeof(tail) - 1] = '\0';
+
   Fortify_SetAllocationLimit(0);
-  success = stringbuffer_append_all(&buffer, "bar");
+  success = stringbuffer_append_all(&buffer, tail);
   Fortify_SetAllocationLimit(ULONG_MAX);
   assert(!success);
 
@@ -290,13 +295,14 @@ static void test8(void)
   const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
-  success = stringbuffer_append_all(&buffer, "bar");
+  success = stringbuffer_append_all(&buffer, tail);
   assert(success);
 
   len = stringbuffer_get_length(&buffer);
-  assert(len == 6);
+  assert(len == 3 + strlen(tail));
   s = stringbuffer_get_pointer(&buffer);
-  assert(strcmp(s, "foobar") == 0);
+  assert(strncmp(s, "foo", 3) == 0);
+  assert(strcmp(s + 3, tail) == 0);
 
   stringbuffer_destroy(&buffer);
 #endif
@@ -682,8 +688,13 @@ static void test21(void)
   bool success = stringbuffer_append_separated(&buffer, sep, "foo");
   assert(success);
 
+  /* Exceed strb_t's initial allocation so this still tests growth failure. */
+  char tail[STRB_DFL_SIZE + 1];
+  memset(tail, 'x', sizeof(tail) - 1);
+  tail[sizeof(tail) - 1] = '\0';
+
   Fortify_SetAllocationLimit(0);
-  success = stringbuffer_append_separated(&buffer, sep, "bar");
+  success = stringbuffer_append_separated(&buffer, sep, tail);
   Fortify_SetAllocationLimit(ULONG_MAX);
   assert(!success);
 
@@ -692,13 +703,14 @@ static void test21(void)
   const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, ".foo") == 0);
 
-  success = stringbuffer_append_separated(&buffer, sep, "bar");
+  success = stringbuffer_append_separated(&buffer, sep, tail);
   assert(success);
 
   len = stringbuffer_get_length(&buffer);
-  assert(len == 8);
+  assert(len == 5 + strlen(tail));
   s = stringbuffer_get_pointer(&buffer);
-  assert(strcmp(s, ".foo.bar") == 0);
+  assert(strncmp(s, ".foo.", 5) == 0);
+  assert(strcmp(s + 5, tail) == 0);
 
   stringbuffer_destroy(&buffer);
 #endif
@@ -747,8 +759,13 @@ static void test23(void)
   bool success = stringbuffer_printf(&buffer, "%s", "foo");
   assert(success);
 
+  /* Exceed strb_t's initial allocation so this still tests growth failure. */
+  char tail[STRB_DFL_SIZE + 1];
+  memset(tail, 'x', sizeof(tail) - 1);
+  tail[sizeof(tail) - 1] = '\0';
+
   Fortify_SetAllocationLimit(0);
-  success = stringbuffer_printf(&buffer, "%s", "bar");
+  success = stringbuffer_printf(&buffer, "%s", tail);
   Fortify_SetAllocationLimit(ULONG_MAX);
   assert(!success);
 
@@ -757,19 +774,54 @@ static void test23(void)
   const char *s = stringbuffer_get_pointer(&buffer);
   assert(strcmp(s, "foo") == 0);
 
-  success = stringbuffer_printf(&buffer, "%s", "bar");
+  success = stringbuffer_printf(&buffer, "%s", tail);
   assert(success);
 
   len = stringbuffer_get_length(&buffer);
-  assert(len == 6);
+  assert(len == 3 + strlen(tail));
   s = stringbuffer_get_pointer(&buffer);
-  assert(strcmp(s, "foobar") == 0);
+  assert(strncmp(s, "foo", 3) == 0);
+  assert(strcmp(s + 3, tail) == 0);
 
   stringbuffer_destroy(&buffer);
 #endif
 }
 
 #endif /* !CBUTIL_SDCC */
+
+static void test24(void)
+{
+  /* Finish a short direct append before or after truncation */
+  for (unsigned int pass = 0; pass < 2; ++pass)
+  {
+    StringBuffer buffer;
+    stringbuffer_init(&buffer);
+
+    bool const success = stringbuffer_append_all(&buffer, "abcdef");
+    assert(success);
+    if (pass)
+    {
+      stringbuffer_truncate(&buffer, 2);
+    }
+    size_t const old_len = pass ? 2 : 6;
+
+    size_t size = 16;
+    _Optional char *const chars = stringbuffer_prepare_append(&buffer, &size);
+    assert(chars != NULL);
+    assert(size >= 16);
+    assert(stringbuffer_get_length(&buffer) == old_len);
+    memcpy(&*chars, "xy", 2);
+    stringbuffer_finish_append(&buffer, 2);
+
+    assert(stringbuffer_get_length(&buffer) == old_len + 2);
+    assert(strcmp(stringbuffer_get_pointer(&buffer), pass ? "abxy" : "abcdefxy") == 0);
+    stringbuffer_undo(&buffer);
+    assert(stringbuffer_get_length(&buffer) == old_len);
+    assert(strcmp(stringbuffer_get_pointer(&buffer), pass ? "ab" : "abcdef") == 0);
+
+    stringbuffer_destroy(&buffer);
+  }
+}
 
 void StringBuffer_tests(void)
 {
@@ -803,6 +855,7 @@ void StringBuffer_tests(void)
     {"Append formatted", test22},
     {"Append formatted fail recovery", test23},
 #endif
+    {"Finish short direct append", test24},
   };
 
   for (size_t count = 0; count < ARRAY_SIZE(unit_tests); count++)

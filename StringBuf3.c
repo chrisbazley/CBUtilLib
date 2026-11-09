@@ -40,50 +40,18 @@ bool stringbuffer_vprintf(StringBuffer *const buffer, const char *const format,
   assert(format != NULL);
   DEBUG_VERBOSEF("StringBuff: Appending string formatted according to '%s' to "
                  "buffer %p ('%s')\n",
-                 format, (void *)buffer, STRING_OR_NULL(buffer->buffer));
+                 format, (void *)buffer, strb_cptr(&buffer->storage));
 
-  /* If the string buffer contains the empty string "" then the length
-     may be zero (no allocated memory) as a special case. */
-  if (buffer->string_len > 0)
+  size_t const pos = strb_tell(&buffer->storage);
+  if (strb_vputf(&buffer->storage, format, args) == 0)
   {
-    assert(buffer->buffer != NULL);
-    assert(buffer->string_len < buffer->buffer_size);
+    strb_delto(&buffer->storage, SIZE_MAX);
+    int const err = strb_split(&buffer->storage);
+    assert(err == 0); /* Formatting already reserved the new end. */
+    NOT_USED(err);
+    buffer->undo_pos = pos;
+    success = true;
   }
 
-  /* Find the length of the tail string (if any was provided). */
-  va_list args_copy;
-  va_copy(args_copy, args);
-
-  do {
-    int const extra_chars = vsnprintf(&(char){'\0'}, 0, format, args);
-    if (extra_chars < 0)
-    {
-      break;
-    }
-
-    /* Allocate space for the number of characters to be appended and a
-       null terminator. */
-    size_t min_size = (unsigned)extra_chars + 1;
-    _Optional char *const free_ptr =
-      stringbuffer_prepare_append(buffer, &min_size);
-    if (free_ptr == NULL)
-    {
-      break;
-    }
-
-    assert(buffer->buffer != NULL);
-
-    /* Copy characters from the tail string to the end of the existing
-       string. */
-    int const n = vsnprintf(&*free_ptr, min_size, format, args_copy);
-    assert(n == extra_chars);
-    NOT_USED(n);
-
-    /* Record the new string length and append a null terminator. */
-    stringbuffer_finish_append(buffer, (unsigned)extra_chars);
-    success = true;
-  } while (0);
-
-  va_end(args_copy);
   return success;
 }

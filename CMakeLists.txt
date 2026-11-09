@@ -159,7 +159,40 @@ set_target_properties(CBUtil PROPERTIES
     MAP_IMPORTED_CONFIG_CLANGANALYSISOPTIONAL  DEBUG
 )
 
+# StringBuffer embeds strb_t, so clients need its header and library too.
+if(NOT TARGET strb)
+    include(FetchContent)
+    FetchContent_Declare(strb
+        GIT_REPOSITORY https://github.com/chrisbazley/strb_t.git
+        GIT_TAG 7f304497a75cbf2913d7841b0b211f9cd7266f7a)
+
+    if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
+        # CBUtil's SDCC subset does not use hosted formatting. Build only the
+        # strb operations needed by the wrapper; upstream's hosted target
+        # also compiles vsnprintf and FILE-based debugging, absent on Z80.
+        FetchContent_GetProperties(strb)
+        if(NOT strb_POPULATED)
+            FetchContent_Populate(strb)
+        endif()
+        add_library(strb STATIC
+            ${strb_SOURCE_DIR}/strb_core.c
+            ${strb_SOURCE_DIR}/strb_dynamic.c
+            ${strb_SOURCE_DIR}/strb_mode.c
+            ${strb_SOURCE_DIR}/strb_pos.c
+            ${strb_SOURCE_DIR}/strb_error.c
+            ${strb_SOURCE_DIR}/strb_write.c
+            ${strb_SOURCE_DIR}/strb_split.c
+            ${strb_SOURCE_DIR}/strb_delto.c)
+        target_include_directories(strb PUBLIC ${strb_SOURCE_DIR})
+        install(TARGETS strb ARCHIVE DESTINATION lib)
+        install(FILES ${strb_SOURCE_DIR}/strb.h DESTINATION include)
+    else()
+        FetchContent_MakeAvailable(strb)
+    endif()
+endif()
+
 target_include_directories(CBUtil PUBLIC .)
+target_link_libraries(CBUtil PUBLIC strb)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
     # SDCC's library lacks FILE streams and formatted buffer append.
