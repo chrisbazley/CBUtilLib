@@ -6,7 +6,7 @@ Link = gcc
 
 # Toolflags:
 CCFlags = -c -I.. -Wall -Wextra -Wsign-conversion -pedantic -std=c99 -g -DDEBUG_OUTPUT -DDEBUG_DUMP -MMD -MP -o $@
-LinkFlags = -L.. -lCBUtildbg -o $@
+LinkFlags = -L.. -lCBUtildbg -lstrbdbg -o $@
 
 include MakeCommon
 

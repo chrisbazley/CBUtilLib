@@ -10,6 +10,27 @@ in the standard C library such as linked lists, string buffers and case-
 insensitive string comparisons. It should have minimal dependencies on other
 libraries and must not include any platform-specific code.
 
+String buffers
+--------------
+  StringBuffer uses [strb_t](https://github.com/chrisbazley/strb_t) for
+character storage. CMake fetches the dependency automatically and propagates
+its include directory and link requirement. Other build systems must make
+strb.h available and link the matching strb library (including a fortified
+build when using Fortify). For example, add `-lstrb` after `-lCBUtil`.
+
+  Initialisation with stringbuffer_init remains allocation-free.
+Append, direct preparation/completion, embedded nul
+characters and single-operation undo are supported. The default hosted
+strb_t permits at most 65,534 characters plus the terminating nul; an
+operation exceeding that limit fails without changing the logical string.
+
+  stringbuffer_minimize remains available. Empty buffers release their
+storage. Nonempty buffers are rebuilt using strb_t's initial allocation
+policy, which currently allocates at least 256 bytes, rather than shrinking
+to exactly the string length plus one. This temporarily needs both arrays;
+if allocation fails, the existing string is retained. As before, minimizing
+always discards undo.
+
 Fortified memory allocation
 ---------------------------
   I use Simon's P. Bullen's fortified memory allocation shell 'Fortify' to
