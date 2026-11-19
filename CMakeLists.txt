@@ -7,9 +7,11 @@ option(ENABLE_CLANG_TIDY "Run clang-tidy during compilation" OFF)
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
 if(USE_OPTIONAL)
-    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang|AppleClang|SDCC")
-        message(FATAL_ERROR
-            "USE_OPTIONAL requires SDCC or Christopher Bazley's Clang fork")
+    include(CheckCSourceCompiles)
+    check_c_source_compiles("_Optional int *p; int main(void) { return p != 0; }"
+        HAVE_C_OPTIONAL_QUALIFIER)
+    if(NOT HAVE_C_OPTIONAL_QUALIFIER)
+        message(FATAL_ERROR "USE_OPTIONAL requires compiler support for _Optional")
     endif()
 
     add_compile_definitions(USE_OPTIONAL)
@@ -164,7 +166,7 @@ if(NOT TARGET strb)
     include(FetchContent)
     FetchContent_Declare(strb
         GIT_REPOSITORY https://github.com/chrisbazley/strb_t.git
-        GIT_TAG 7f304497a75cbf2913d7841b0b211f9cd7266f7a)
+        GIT_TAG fbc331ddc4a53b666e771787711a8e7afb24a3cf)
 
     if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
         # CBUtil's SDCC subset does not use hosted formatting. Build only the
