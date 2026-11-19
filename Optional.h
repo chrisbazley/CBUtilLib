@@ -54,6 +54,7 @@ History:
                   CBUTIL_SDCC is set.
   CJB: 27-Oct-26: Preserve NULL when Clang supports -Wnull-to-nonoptional.
   CJB: 29-Oct-26: Leave diagnostic severity to the build options.
+  CJB: 19-Nov-26: Make inclusion of "StrExtra.h" conditional to allow use from Godbolt.
  */
 
 #ifndef Optional_h
@@ -71,7 +72,10 @@ History:
 #include <unistd.h>
 #endif
 #endif
+
+#ifndef StrExtra_h
 #include "StrExtra.h" // for strdup
+#endif
 
 #ifdef FORTIFY
 #include "fortify.h"
