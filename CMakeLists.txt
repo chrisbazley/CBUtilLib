@@ -166,7 +166,7 @@ if(NOT TARGET strb)
     include(FetchContent)
     FetchContent_Declare(strb
         GIT_REPOSITORY https://github.com/chrisbazley/strb_t.git
-        GIT_TAG fbc331ddc4a53b666e771787711a8e7afb24a3cf)
+        GIT_TAG c2cd07ce3ea681d5339511a690beb3fd7ed90d28)
 
     if(CMAKE_C_COMPILER_ID STREQUAL "SDCC")
         # CBUtil's SDCC subset does not use hosted formatting. Build only the
