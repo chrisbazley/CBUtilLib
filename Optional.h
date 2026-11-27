@@ -91,7 +91,7 @@ History:
 #undef NULL
 #define NULL ((_Optional void *)0)
 #endif
-#elif !defined(__TINYC__)
+#elif !defined(__TINYC__) && !defined(__SDCC)
 #undef NULL
 #define NULL ((_Optional void *)0)
 #endif
