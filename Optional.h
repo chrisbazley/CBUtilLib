@@ -85,17 +85,6 @@ History:
 #include "fortify.h"
 #endif
 
-/* Preserve NULL when the compiler can diagnose null pointer conversions. */
-#ifdef __clang__
-#if !__has_warning("-Wnull-to-nonoptional")
-#undef NULL
-#define NULL ((_Optional void *)0)
-#endif
-#elif !defined(__TINYC__) && !defined(__SDCC)
-#undef NULL
-#define NULL ((_Optional void *)0)
-#endif
-
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #define OPTIONAL_QCHAR_RESULT(result, str) \
 _Generic(1 ? (str) : (char *)0, \
